@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Shildon Poems</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link href='http://fonts.googleapis.com/css?family=Goudy+Bookletter+1911' rel='stylesheet' type='text/css' />
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+		<!-- <script type="text/javascript" src="./d3/d3.min.js"></script> -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+		<style type="text/css">
+			h1 { font-family: 'Goudy Bookletter 1911', serif; color: #FFF; text-align: center; }
+			body { background-color: #666; padding:0; margin:0; overflow: hidden;}
+			svg { position:absolute; top:0; left:0; height:auto; min-width:100%; }
+			svg text::selection { background: none; }
+			.link-verso, .link-recto {
+				/*stroke: #000;
+				stroke-width:2px;*/
+				pointer-events: none;
+			}
+			.imprint, .inter-title, #quote {
+				font: 10px 'Goudy Bookletter 1911';
+				pointer-events: none;
+			}
+			#quote-author {
+				font: 10px 'Goudy Bookletter 1911';
+				font-style: italic;
+				pointer-events: none;
+			}
+			.node-verso text, .node-recto text {
+				font: 12px 'Goudy Bookletter 1911';
+				cursor: move;
+			}
+			.text, .folio, #sub-alternate-title, #publisher, #year, .contents-poem-title, .contents-poem-page-number {
+				font: 12px 'Goudy Bookletter 1911';
+				pointer-events: none;
+			}
+			.header, #author, #place, #contents-title {
+				font: 14px 'Goudy Bookletter 1911';
+				pointer-events: none;
+			}
+			#main-alternate-title {
+				font: 16px 'Goudy Bookletter 1911';
+				pointer-events: none;
+			}
+			#main-pre-title {
+				font: 20px 'Goudy Bookletter 1911';
+				pointer-events: none;
+			}
+			#main-title {
+				font: 28px 'Goudy Bookletter 1911';
+				pointer-events: none;
+			}
+			@keyframes loading {
+				0%   {opacity: 1;}
+				50% {opacity: 0;}
+				100% {opacity: 1;}
+			}
+			#loading { 
+				position:absolute; 
+				z-index: 1000;
+				font: 45px 'Goudy Bookletter 1911';
+				text-transform: uppercase;
+				text-align: center;
+				width:1266px;
+				top:300px;
+				text-shadow:
+					-1px -1px 0 #FFF,  
+					 1px -1px 0 #FFF,
+					-1px  1px 0 #FFF,
+					 1px  1px 0 #FFF;
+				animation: loading 2s infinite;
+			}
+
+			#poems {
+				width: 1266px;
+				height: 752px;
+				margin: 0;
+			}
+			#recto-poem, #verso-poem {
+				background-color:#EEE; height:750px;width:600px; position:relative; overflow: hidden;
+				border: 1px solid #000;
+				float:left;
+			}
+			#recto-poem {
+				border-left:none;
+
+			}
+			#verso-poem {
+				border-right: none;
+
+			}
+			.pages {
+				width:45px;
+				height: 750px;
+				background-color: #EEE;
+				float:left;
+			}
+			.recto {
+				background-image: linear-gradient(to right, #000 0%, #EEE 100%);
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+			.verso {
+				background-image: linear-gradient(to left, #000 0%, #EEE 100%);
+				position: absolute;
+				top: 0;
+				right: 0;
+			}
+			#featured-image {
+				width: 70%;
+				height: auto;
+				position:absolute;
+				top:25%;
+				left:15%;
+			}
+			#featured-image::selection { background: none; }
+
+			#previous-page, #next-page {
+				float:left;
+				width:30px;
+				height:750px;
+				border:1px solid #000;
+				display: inline-block;
+				text-decoration: none;
+				color:#000;
+				font-size: 2.2em;
+				background-color: #EEE;
+				cursor: pointer;
+			}
+			#previous-page {
+				text-align: right;
+			}
+			#next-page {
+				text-align: left;
+			}
+			#previous-page:link, #next-page:visited {
+				background-color: #EEE;
+				color: #000;
+			}
+			#previous-page:focus, #next-page:focus,
+			#previous-page:hover, #next-page:hover,
+			#previous-page:active, #next-page:active {
+				background-color: #000;
+				color: #FFF;
+			}
+			#previous-page span, #next-page span {
+				display:block; 
+				float:none;
+				margin-top:320px;
+				/* support of user-select problematic? */
+				-moz-user-select: none;
+				-khtml-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+			#previous-page span {
+				padding-right:3px;
+			}
+			#next-page span {
+				padding-left:3px;
+			}
+			#verso-poem.no-page { background-color: #000; }
+			#verso-poem.no-page .pages, #verso-poem.no-page .verso { background-color: #000; background-image: none; }
+
+		</style>
+	</head>
+	<body>
+		<div id="poems">
+			<a id="previous-page"><span>&lt;</span></a>
+			<div id="loading">Printing</div>
+			<div id="verso-poem">
+				<div class="verso pages"></div>
+			</div>
+			<div id="recto-poem">
+				<div class="recto pages"></div>
+			</div>
+			<a id="next-page"><span>&gt;</span></a>
+		</div>
+		<script type="text/javascript">
+		
+		var city = "Melbourne";
+		var country = "Australia";
+		var currentPageSpread = 0;
+
+		function ChapbookPrinter(chapbook, publisher, city, country) {
+			this.chapbook = chapbook;
+			this.publisher = publisher;
+			this.city = city; 
+			this.country = country; 
+			this.year = new Date().getUTCFullYear(); //change to current year
+			this.pageSettings = [
+				{
+					"side" : "recto",
+					"header" : { "x" : 60, "y" : 40, "edge" : "start"},
+					"footer" : { "x" : 360, "y" : 460, "edge" : "end"},
+					"width" : 400,
+					"height" : 500,
+					"edge" : "end"
+				},
+				{
+					"side" : "verso",
+					"header" : { "x" : 40, "y" : 40, "edge" : "start"},
+					"footer" : { "x" : 40, "y" : 460, "edge" : "start"},
+					"width" : 400,
+					"height" : 500,
+					"edge" : "start"
+				}
+			];
+			this.startingPage = 3;
+		}
+		ChapbookPrinter.prototype.updatePlace = function(cityName, countryName) {
+			this.city = cityName; 
+			this.country = countryName; 
+		}
+		ChapbookPrinter.prototype.printImprintPage = function() {
+			page = this.pageSettings[1];
+			var svgRoot = d3.select("#" + page.side + "-poem");
+			//remove current poem if it exists
+			svgRoot.select("#" + page.side + "-page-svg").remove();
+			var svg = svgRoot.append("svg").attr("id", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+			
+			var initY = 40,
+				incrementY = 15;
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY)
+				.attr("text-anchor", "start")
+				.text("First Published " + this.year);
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+incrementY)
+				.attr("text-anchor", "start")
+				.text("By " + this.publisher.name);
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+2*incrementY)
+				.attr("text-anchor", "start")
+				.text(this.publisher.url);
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+4*incrementY)
+				.attr("text-anchor", "start")
+				.text("© " + this.chapbook.author.join(" ") + " " + this.year);
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+6*incrementY)
+				.attr("text-anchor", "start")
+				.text("Designed by Benjamin Laird");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+7*incrementY)
+				.attr("text-anchor", "start")
+				.text("Typeset by D3");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+8*incrementY)
+				.attr("text-anchor", "start")
+				.text("In Goudy Bookletter 1911");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+10*incrementY)
+				.attr("text-anchor", "start")
+				.text("Printed and bound in HTML, SVG, CSS and JavaScript");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+11*incrementY)
+				.attr("text-anchor", "start")
+				.text("Distributed by the Internet");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+13*incrementY)
+				.attr("text-anchor", "start")
+				.text(this.chapbook.author.reverse().join(", "));
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+14*incrementY)
+				.attr("text-anchor", "start")
+				.text(this.chapbook.title + " / " + this.chapbook.author.reverse().join(" "));
+			
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+15*incrementY)
+				.attr("text-anchor", "start")
+				.text("URL " + window.location.href);
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+17*incrementY)
+				.attr("text-anchor", "start")
+				.text("All rights reserved.");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+18*incrementY)
+				.attr("text-anchor", "start")
+				.text("No part of this publication may be");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+19*incrementY)
+				.attr("text-anchor", "start")
+				.text("reproduced, stored in a retrieval system or");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+20*incrementY)
+				.attr("text-anchor", "start")
+				.text("transmitted in any form or by any means");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+21*incrementY)
+				.attr("text-anchor", "start")
+				.text("electronic, mechanical, photocopying or");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+22*incrementY)
+				.attr("text-anchor", "start")
+				.text("otherwise without the prior permission of");
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", initY+23*incrementY)
+				.attr("text-anchor", "start")
+				.text("the publisher.");
+
+		}
+		ChapbookPrinter.prototype.printTitlePage = function() {
+			page = this.pageSettings[0];
+			var svgRoot = d3.select("#" + page.side + "-poem");
+			//remove current poem if it exists
+			svgRoot.select("#" + page.side + "-page-svg").remove();
+			var svg = svgRoot.append("svg").attr("id", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+			svg.append("text")
+				.attr("class", "inter-title")
+				.attr("dx", 200)
+				.attr("dy", 40)
+				.attr("text-anchor", "middle")
+				.text("THE");
+			svg.append("text")
+				.attr("id", "main-title")
+				.attr("dx", 200)
+				.attr("dy", 90)
+				.attr("text-anchor", "middle")
+				.text(this.chapbook.title.toUpperCase() + ";");
+			
+			svg.append("text")
+				.attr("class", "inter-title")
+				.attr("dx", 200)
+				.attr("dy", 130)
+				.attr("text-anchor", "middle")
+				.text("OR,");
+
+			svg.append("text")
+				.attr("id", "main-alternate-title")
+				.attr("dx", 200)
+				.attr("dy", 170)
+				.attr("text-anchor", "middle")
+				.text(this.chapbook.alternateTitle.split(" ")[0].toUpperCase());
+
+			svg.append("text")
+				.attr("id", "sub-alternate-title")
+				.attr("dx", 200)
+				.attr("dy", 210)
+				.attr("text-anchor", "middle")
+				.text(this.chapbook.alternateTitle.split(" ").slice(1).join(" ").toUpperCase() + '.');
+
+			svg.append("text")
+				.attr("class", "inter-title")
+				.attr("dx", 200)
+				.attr("dy", 280)
+				.attr("text-anchor", "middle")
+				.text("BY");
+
+			svg.append("text")
+				.attr("id", "author")
+				.attr("dx", 200)
+				.attr("dy", 300)
+				.attr("text-anchor", "middle")
+				.text(this.chapbook.author.join(" ").toUpperCase());
+
+			svg.append("text")
+				.attr("id", "quote")
+				.attr("dx", 200)
+				.attr("dy", 360)
+				.attr("text-anchor", "middle")
+				.text("“" + this.chapbook.quote.quote + "”");
+
+			svg.append("text")
+				.attr("id", "quote-author")
+				.attr("dx", 310)
+				.attr("dy", 375)
+				.attr("text-anchor", "end")
+				.text(this.chapbook.quote.author + ".");
+
+			svg.append("text")
+				.attr("id", "place")
+				.attr("dx", 200)
+				.attr("dy", 420)
+				.attr("text-anchor", "middle")
+				.text(this.city.toUpperCase() + ", " + this.country.toUpperCase() + ":");
+
+			svg.append("text")
+				.attr("id", "publisher")
+				.attr("dx", 200)
+				.attr("dy", 440)
+				.attr("text-anchor", "middle")
+				.text(this.publisher.name.toUpperCase() + ",");
+
+			svg.append("text")
+				.attr("id", "year")
+				.attr("dx", 200)
+				.attr("dy", 455)
+				.attr("text-anchor", "middle")
+				.text(this.year + ".");
+		}
+		ChapbookPrinter.prototype.printPreTitlePage = function() {
+			page = this.pageSettings[0];
+			var svgRoot = d3.select("#" + page.side + "-poem");
+			//remove current poem if it exists
+			svgRoot.select("#" + page.side + "-page-svg").remove();
+			var svg = svgRoot.append("svg").attr("id", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+
+			svg.append("text")
+				.attr("id", "main-pre-title")
+				.attr("dx", 200)
+				.attr("dy", 180)
+				.attr("text-anchor", "middle")
+				.text(this.chapbook.title.toUpperCase());
+			
+		}
+		ChapbookPrinter.prototype.printImagePage = function(specificImage) {
+			page = this.pageSettings[1];
+			var primary = d3.select("#" + page.side + "-poem");
+			//remove current poem if it exists
+			primary.select("#" + page.side + "-page-svg").remove();
+			console.log(specificImage);
+
+			if (!specificImage) {
+				primary.append("img")
+					.attr("src", this.chapbook.image)
+					.attr("id", "featured-image");
+			} else {
+				primary.append("img")
+					.attr("src", specificImage)
+					.attr("id", "featured-image");
+			}
+		}
+		ChapbookPrinter.prototype.printContentsPage = function() {
+			page = this.pageSettings[0];
+			var svgRoot = d3.select("#" + page.side + "-poem");
+			//remove current poem if it exists
+			svgRoot.select("#" + page.side + "-page-svg").remove();
+			var svg = svgRoot.append("svg").attr("id", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+			var yLoc = 90;
+			var xLocTitle = 70;
+			var xLocPage = 320;
+			var increment = 20;
+
+			svg.append("text")
+				.attr("id", "contents-title")
+				.attr("dx", (((xLocPage-xLocTitle)/2) + xLocTitle))
+				.attr("dy", 50)
+				.attr("text-anchor", "middle")
+				.text("CONTENTS");
+
+			for (i=0;i<this.chapbook.poems.length;i++) {
+				svg.append("text")
+					.attr("class", "contents-poem-title")
+					.attr("dx", xLocTitle)
+					.attr("dy", yLoc+(increment*i))
+					.attr("text-anchor", "start")
+					.text(this.chapbook.poems[i].title);
+
+				svg.append("text")
+					.attr("class", "contents-poem-page-number")
+					.attr("dx", xLocPage)
+					.attr("dy", yLoc+(increment*i))
+					.attr("text-anchor", "end")
+					.text(i+this.startingPage);
+			}
+		}
+		ChapbookPrinter.prototype.printPoemPageSpread = function(poemStartIndex) {
+			if (poemStartIndex == 0) {
+				this.tabulaRasa(1);
+				this.printPoemPage(poemStartIndex);
+			} else {
+				this.printPoemPage(poemStartIndex);
+				this.printPoemPage(poemStartIndex+1);
+			}
+		}
+		ChapbookPrinter.prototype.printPoemPage = function(poemIndex) {
+			//index determines page number and whether recto or verso
+			
+			var pageNumber = poemIndex + this.startingPage;
+			var page = this.pageSettings[(poemIndex % 2)];
+			var poem = this.chapbook.poems[poemIndex];
+
+			d3.select("#featured-image").remove();
+
+			var svgRoot = d3.select("#" + page.side + "-poem");
+			//remove current poem if it exists
+			svgRoot.select("#" + page.side + "-page-svg").remove();
+
+			var svg = svgRoot.append("svg").attr("id", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+	
+			var force = d3.layout.force()
+				.gravity(.05)
+				.distance(100)
+				.charge(-50)
+				.size([page.width, page.height])
+				.nodes(poem.nodes)
+				.links(poem.links);
+
+			svg.append("text")
+				.attr("class", "folio")
+				.attr("dx", page.footer.x)
+				.attr("dy", page.footer.y)
+				.attr("text-anchor", page.footer.edge)
+				.text(pageNumber);
+
+			svg.append("text")
+				.attr("class", "header")
+				.attr("dx", page.header.x)
+				.attr("dy", page.header.y)
+				.attr("text-anchor", page.header.edge)
+				.text(poem.title);
+
+			var link = svg.selectAll(".link-" + page.side)
+			  .data(poem.links, function(d){return d.id;});
+			
+			link.enter().insert("text")
+				.attr("class", "text")
+				.attr("text-anchor", "middle")
+				.append("textPath")
+				.attr("startOffset", "50%")
+				.attr("xlink:href", function(d) {return "#l-" + page.side + "-" + d.id;})
+				.text(function(d) { return d.text });
+
+			link.enter().insert("path", ":first-child")
+				.attr("class", "link-" + page.side)
+				.attr("id", function(d) {return "l-" + page.side + "-" +d.id;});
+
+			link.exit().remove();
+
+			//add nodes
+			var node = svg.selectAll(".node-" + page.side)
+			  .data(poem.nodes, function(d){return d.id;});
+			
+			var nodeG = node.enter().insert("g")
+			  .attr("class", "node-" + page.side)
+			  .attr("id", function(d){return "n-" + page.side + "-" + d.id;})
+			  .call(force.drag);
+			
+			nodeG.append("text")
+			  .attr("dx", 0)
+			  .attr("dy", 0)
+			  .attr("text-anchor", "middle")
+			  .text(function(d) { return d.text });
+
+			node.exit().remove();
+			force.on("tick", function() {
+				link.attr("d", function(d) { return "M " + d.source.x + " " + d.source.y + "L "  + d.target.x + " " + d.target.y; } );
+				node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+			});
+			force.start();
+		}
+		ChapbookPrinter.prototype.tabulaRasa = function(pageIndex) {
+			//clear page
+			var page = this.pageSettings[(pageIndex % 2)];
+			d3.select("#" + page.side + "-poem").classed("no-page",false);
+			d3.select("#" + page.side + "-page-svg").remove();
+			d3.select("#featured-image").remove();
+		}
+		ChapbookPrinter.prototype.removePage = function(pageIndex) {
+			var page = this.pageSettings[(pageIndex % 2)];
+			d3.select("#" + page.side + "-poem").classed("no-page",true);
+		}
+		//double spread pages
+
+		/* A collection of poems */
+		function Chapbook(title, alternateTitle, author, image, quote, poemsCollected) {
+			this.poems = [];
+			this.title = title;
+			this.alternateTitle = alternateTitle;
+			this.author = author;
+			this.image = image;
+			this.quote = quote;
+			this.poemsCollected = poemsCollected;
+		}
+		Chapbook.prototype.addPoem = function(poem) {
+			this.poems.push(poem);
+		}
+		Chapbook.prototype.removePoem = function(poemIndex) {
+
+		}
+		Chapbook.prototype.prepareForPublication = function() {
+			var manuscript = this.poems.slice();
+			var index = manuscript.length;
+			var value, randomIndex;
+
+			while(0 != index) {
+				randomIndex = Math.floor(Math.random() * index);
+				index -= 1;
+
+				value = manuscript[index];
+				manuscript[index] = manuscript[randomIndex];
+				manuscript[randomIndex] = value;
+			}
+
+			this.poems = manuscript.slice(0,this.poemsCollected);
+		}
+
+		/* make sure join doesn't already exist and add error checking + add to poem */
+		function lineJoin(length, joins) {
+			var source = 0;
+			var target = 0;
+			while ((source == target) || (joins.indexOf(source + "," + target) != -1)) {
+				source = Math.floor(Math.random()*length);
+				target = Math.floor(Math.random()*length);
+			}
+			return [source, target];
+		}
+
+		/* A poem */
+		function Poem(title, words, lines) {
+			this.title = title;
+			this.words = words;
+			this.lines = lines;
+			this.nodes = [];
+			for (var i=0; i<words.length; i++) {
+				this.nodes.push({"id" : i, "text" : words[i]})
+			}
+			this.links = [];
+			this.joins = [];
+			for (var i=0; i<lines.length; i++) {
+				join = lineJoin(words.length, this.joins);
+				this.joins.push(join[0] + "," + join[1], join[1] + "," + join[0]);
+				this.links.push({"id" : i, "source": join[0], "target": join[1], "text" : lines[i]});
+			}
+		}
+		function updateWindow(){
+			 var x = window.innerWidth || e.clientWidth || g.clientWidth;
+			 var y = window.innerHeight|| e.clientHeight|| g.clientHeight;
+
+			 var yRatio = y/752;
+			 var xRatio = x/1266;
+
+			 var ratio = 1;
+			 if (xRatio <= yRatio) {
+				ratio = xRatio;
+			 } else {
+				ratio = yRatio;
+			 }
+			 var xLoc = (x - (ratio*1266))/2 + "px";
+
+			 d3.select("#poems").attr("style", "transform: translateX("+ xLoc +") scale("+ ratio +");transform-origin: 0 0;");
+			 d3.select("body").attr("style", "height:" + y + "px;");
+		}
+		window.onresize = updateWindow;
+
+		function initPublishing() {
+			//change to place
+			updateWindow();
+			//scale to window height
+			//var height = window.innerHeight;
+			//var ratio = height/752;
+			//ratio = 1;
+			//var translate = "-" + (376 * ratio) + "px"; 
+			//translate = "0"
+			//var ratioT = ratio * 752;
+			//d3.select("#poems").attr("style", "transform: translateY("+ translate +") scale("+ ratio +");transform-origin:50% 0;");
+			//console.log(window.innerHeight);
+			//console.log(ratio);
+			//console.log(ratioT);
+
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(geopositionDetermined, geopositionError, {"enableHighAccuracy" : false, "timeout": 5000, "maximumAge": 10000});
+			} else {
+				beginPublishing(city, country);
+			}
+			function geopositionDetermined(geoposition) {
+				determineLocality(geoposition.coords.latitude, geoposition.coords.longitude, beginPublishing);
+				//determineLocality(42.329084, -71.102961, beginPublishing);
+				//determineLocality(-37.919349, 145.766262, beginPublishing);
+				//determineLocality(48.889230, 2.503272, beginPublishing);
+				//determineLocality(-37.807397, 144.964219, beginPublishing);
+				//determineLocality(50.660651, 75.736325, beginPublishing); //fail
+				//determineLocality(59.562751, -73.853516, beginPublishing);
+				//determineLocality(-3.808276, -61.900391, beginPublishing);
+				//determineLocality(-82.281609, 42.582489, beginPublishing);
+
+				
+				
+			}
+
+			function geopositionError(error) {
+				beginPublishing(city, country);
+			}
+			function determineLocality(lat, lng, processCity) {
+				var geocoder = new google.maps.Geocoder();
+				var latlng = new google.maps.LatLng(lat, lng);
+				var cityName = city;
+				var countryName = country;
+				geocoder.geocode({'latLng': latlng}, function(results, status) {
+					if (status == google.maps.GeocoderStatus.OK) {
+						if (results[0]) {
+							var cityFound = false;
+							for (i=0;i<results[0].address_components.length;i++) {
+								if ((results[0].address_components[i].types[0]=="locality") && !cityFound ) {
+									cityName = results[0].address_components[i].long_name;
+									cityFound = true;
+								} else if ((results[0].address_components[i].types[0]=="administrative_area_level_2") && !cityFound ){
+									cityName = results[0].address_components[i].long_name;
+									cityFound = true;
+								}
+								if (results[0].address_components[i].types[0]=="country") {
+									countryName = results[0].address_components[i].long_name;
+								}
+							}
+							if (!cityFound) {
+								//reset
+								cityName = city;
+								countryName = country;
+							}
+						} 
+					} 
+					processCity(cityName, countryName);
+				});
+			}
+			function beginPublishing(cityName, countryName) {
+				city = cityName;
+				country = countryName;
+				printChapbook(city, country);
+			}
+		}
+		// image sourced from http://www.gracesguide.co.uk/File:Im1923TimHack-Erectingshop.jpg and modified and used under the terms of the GNU Free Documentation Licence, Version 1.2
+		var poetryChapbook = new Chapbook("Shildon Poems", "Poems on William Denton’s Apprenticeships", ["Benjamin", "Laird"], "./images/erectingshop.png", {"quote" : "A poem is a small (or large) machine made of words.", "author" : "Williams"}, 5);
+
+		//randomise the secondary headings
+		//Poems on the Machinery of the Nineteenth Century
+
+		//new poems
+		poetryChapbook.addPoem(new Poem("A Coat without Buttons", 
+								["Young Denton", "ascetic fever", "Quaker-like", "what need", "for them", "a sensation", "practice of wearing", "master", "the situation", "despite", "the ridicule", "of worldlings"], 
+								[]
+								));
+		poetryChapbook.addPoem(new Poem("The Methodist Library", 
+								["“Saint’s Rest”", "“Pilgrim’s Progress”", "“The Methodist Magazine”", "him", "he", "books", "his taste", "Sunday School", "the Bible", "ritualism", "eight years", "avidity"], 
+								["and volumes of", "were speaking", "figuratively", "swallowed", "with", "soon began", "a relish for", "attended", "recited", "reached", "assembled", "through", "was"]
+								));
+
+		poetryChapbook.addPoem(new Poem("Machinist", 
+								["problem", "rule", "sphere", "cone", "frustum", "solidity", "product", "diameter", "read", "metallurgy", "find", "difference", "sum", "square"], 
+								["÷", "¼", "30 pages", "+", "−", "×", "½", "10 pages", "of the", "of their", "will give the", "will be", "2 chapters", "being"]
+								));
+
+		poetryChapbook.addPoem(new Poem("Hammer in Hand", 
+								["geologist’s hammer", "hand", "silver spoon", "poverty", "genius", "love", "honor", "germ-principle", "world", "denizen"], 
+								["into", "with", "neither", "in", "indigenous to", "became", "of", "what of", "loosen", "to"]
+								));
+
+		poetryChapbook.addPoem(new Poem("Strata", 
+								["granite", "metamorphic", "Cambrian", "Silurian", "Devonian", "Carboniferous", "Permian", "Secondary", "Tertiary", "Quaternary"], 
+								["layered", "through", "on", "under", "over", "splitting", "excavating", "compressing", "ejecting", "leeching"]
+								));
+		poetryChapbook.addPoem(new Poem("Principles of Geology",
+									["geology", "history", "doctrine", "connexions", "light", "lakes", "valleys", "mountains", "volcanoes", "physical sciences", "moral"],
+									["compared to", "brought to", "as", "and", "is", "are", "can", "belonged to", "changed to", "related to", "acquainted with"]
+									));
+		poetryChapbook.addPoem(new Poem("Character is the Growth of Time", 
+						["solid", "rock", "love", "beauty", "world", "ours", "battlefields", "fights", "Alpine peaks", "lives", "words", "compute"], 
+						["as", "and", "devoid of", "utterly", "of", "forced into", "rise to", "is", "are", "can"]
+						));
+
+		poetryChapbook.prepareForPublication();
+		var poetryChapbookPrinter = new ChapbookPrinter(poetryChapbook, {"name" : "The Code of Things", "url" : "thecodeofthings.com"}, city, country);
+		//image sourced from http://collectionscanada.gc.ca/pam_archives/index.php?fuseaction=genitem.displayItem&rec_nbr=3391580 and no longer in copyright
+		var postImageSrc = "./images/samson.jpg";
+		// use image objects?
+		// preloader
+		var preImage = new Image();
+		var postImage = new Image();
+		preImage.src = poetryChapbook.image;
+		postImage.src = postImageSrc;
+		
+		initPublishing();
+
+		function printChapbook(cityName, countryName) {
+			d3.select("#loading").remove();
+			poetryChapbookPrinter.updatePlace(cityName, countryName);
+			
+			//add page turners
+			d3.select("#next-page").on("click", nextPage);
+			d3.select("#previous-page").on("click", previousPage);
+
+			/* render initial pages */
+			//poetryChapbookPrinter.printImagePage();
+			poetryChapbookPrinter.printPreTitlePage();
+			//poetryChapbookPrinter.printPoemPageSpread(1);
+			//poetryChapbookPrinter.printImagePage();
+			//poetryChapbookPrinter.printContentsPage();
+			//poetryChapbookPrinter.printPoemPage(1);
+			//poetryChapbookPrinter.printPage(2);
+		}
+
+		function nextPage() {
+			//increment the page spread and render
+			currentPageSpread += 2;
+			if (currentPageSpread > (poetryChapbook.poems.length + 7)) {
+				currentPageSpread = 0;
+			}
+			renderPageSpread();
+			d3.event.preventDefault();
+		}
+
+		function previousPage() {
+			currentPageSpread -= 2;
+			if (currentPageSpread < 0) {
+				currentPageSpread = poetryChapbook.poems.length + 7;
+			}
+			renderPageSpread();
+			d3.event.preventDefault();
+		}
+		function renderPageSpread() {
+			// render pre title page
+			if (currentPageSpread == 0) {
+				poetryChapbookPrinter.tabulaRasa(1);
+				poetryChapbookPrinter.printPreTitlePage();
+			} 
+			// render image page and title page
+			else if (currentPageSpread == 2) {
+				poetryChapbookPrinter.printImagePage();
+				poetryChapbookPrinter.printTitlePage();
+			}
+			// render imprint and contents page
+			else if (currentPageSpread == 4) {
+				poetryChapbookPrinter.tabulaRasa(1);
+				poetryChapbookPrinter.printImprintPage();
+				poetryChapbookPrinter.printContentsPage();
+			}
+			//inital poem
+			else if (currentPageSpread == 6) {
+				poetryChapbookPrinter.printPoemPageSpread(0);
+			}
+			else if (currentPageSpread < (poetryChapbook.poems.length + 6)) {
+				poetryChapbookPrinter.printPoemPageSpread(currentPageSpread-7);
+			}
+			else {
+				poetryChapbookPrinter.tabulaRasa(0);
+				poetryChapbookPrinter.printImagePage(postImageSrc);
+			}
+		}
+
+		</script>
+
+	</body>
+</html>
