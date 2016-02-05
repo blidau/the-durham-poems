@@ -2,21 +2,60 @@
 <html>
 	<head>
 		<meta charset="UTF-8" />
-		<title>Shildon Poems</title>
+		<title>The Durham Poems</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link href='http://fonts.googleapis.com/css?family=Goudy+Bookletter+1911' rel='stylesheet' type='text/css' />
-		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-		<!-- <script type="text/javascript" src="./d3/d3.min.js"></script> -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0" />
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js"></script>
+		<script type="text/javascript" src="./d3/d3.min.js"></script>
+		<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>  -->
+		<!-- to do: generalise and clean up clear function (eg Tabula rasa), flag poem requesting fix location timeout (esp Firefox), check positioning, check page number/TOC for acknowledgements etc., move functions into chapbook reader? alt text on images used in the chapbook, move to a secure server, ARIA? fb and twitter metadata, move poems into a json file -->
 		<style type="text/css">
-			h1 { font-family: 'Goudy Bookletter 1911', serif; color: #FFF; text-align: center; }
-			body { background-color: #666; padding:0; margin:0; overflow: hidden;}
+
+			/* * { -webkit-font-smoothing: subpixel-antialiased; } /* put somewhere sensible not needed? */
+			html { height: 100%; position: fixed; width: 100%; background-color: #666; }
+			body { background-color: #666; /* background-color: #000; */ padding:0; margin:0; height:100%; width:100%; overflow: hidden; } /* make body 100% / 100% > */
+			h1 { font-family: 'Goudy Bookletter 1911', serif; color: #FFF; text-align: center; padding:10px 0 0; margin:0; vertical-align: middle; line-height: 20px; font-weight: normal; 
+				-moz-user-select: none;
+				-khtml-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				user-select: none; cursor:default;}
 			svg { position:absolute; top:0; left:0; height:auto; min-width:100%; }
-			svg text::selection { background: none; }
+			
+			svg text::-webkit-selection { background: transparent; }
+			svg text::-moz-selection { background: transparent; }
+			svg text::selection { background: transparent; }
+			
+			svg tspan::-webkit-selection { background: transparent; }
+			svg tspan::-moz-selection { background: transparent; }
+			svg tspan::selection { background: transparent; }
+
+			svg path::-webkit-selection { background: transparent; }
+			svg path::-moz-selection { background: transparent; }
+			svg path::selection { background: transparent; }
+
+			svg textPath::-webkit-selection { background: transparent; }
+			svg textPath::-moz-selection { background: transparent; }
+			svg textpath::selection { background: transparent; }
+
+			::-webkit-selection { background: transparent; }
+			::-moz-selection { background: transparent; }
+			::selection { background: transparent; }
+
+			/* *::-webkit-selection { background: none; }
+			*::-moz-selection { background: none; }
+			*::selection { background: none; } */
+
 			.link-verso, .link-recto {
 				/*stroke: #000;
 				stroke-width:2px;*/
 				pointer-events: none;
+				-moz-user-select: none;
+				-khtml-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
 			}
 			.imprint, .inter-title, #quote {
 				font: 10px 'Goudy Bookletter 1911';
@@ -31,11 +70,15 @@
 				font: 12px 'Goudy Bookletter 1911';
 				cursor: move;
 			}
+			.acknowledgements {
+				font: 12px 'Goudy Bookletter 1911';
+				pointer-events: none;
+			}
 			.text, .folio, #sub-alternate-title, #publisher, #year, .contents-poem-title, .contents-poem-page-number {
 				font: 12px 'Goudy Bookletter 1911';
 				pointer-events: none;
 			}
-			.header, #author, #place, #contents-title {
+			.header, #author, #place, #contents-title, .acknowledments-title {
 				font: 14px 'Goudy Bookletter 1911';
 				pointer-events: none;
 			}
@@ -51,6 +94,11 @@
 				font: 28px 'Goudy Bookletter 1911';
 				pointer-events: none;
 			}
+			@-webkit-keyframes loading {
+				0%   {opacity: 1;}
+				50% {opacity: 0;}
+				100% {opacity: 1;}
+			}			
 			@keyframes loading {
 				0%   {opacity: 1;}
 				50% {opacity: 0;}
@@ -58,7 +106,8 @@
 			}
 			#loading { 
 				position:absolute; 
-				z-index: 1000;
+				background: url('./images/cover.png') no-repeat -9999px -9999px;
+				z-index: 5000; /* seems to be covered by turned page */
 				font: 45px 'Goudy Bookletter 1911';
 				text-transform: uppercase;
 				text-align: center;
@@ -69,44 +118,132 @@
 					 1px -1px 0 #FFF,
 					-1px  1px 0 #FFF,
 					 1px  1px 0 #FFF;
+				-webkit-animation: loading 2s infinite;
 				animation: loading 2s infinite;
+
+				-webkit-transform: translate3d(0,0,2px); /* Safari positioning fix */
+
+
+				-moz-user-select: none;
+				-khtml-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
 			}
 
 			#poems {
 				width: 1266px;
 				height: 752px;
 				margin: 0;
-			}
-			#recto-poem, #verso-poem {
-				background-color:#EEE; height:750px;width:600px; position:relative; overflow: hidden;
-				border: 1px solid #000;
-				float:left;
-			}
-			#recto-poem {
-				border-left:none;
+		      -webkit-perspective: 50000px;
+		         -moz-perspective: 50000px;
+		           -o-perspective: 50000px;
+		              perspective: 50000px;
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box; }
+
+			.page { height:750px;width:600px;
+				/* border:1px solid red; */
+				z-index:0;
+				border:1px solid #000;
+				/* border-left:none; */
+				position: absolute;
+				top:0;
+				right:31px;
+				/* overflow: hidden; */
+				background-color: #EEE;
+				/* box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box; */
+      -webkit-transition: -webkit-transform 0.5s linear;
+         -moz-transition: -moz-transform 0.5s linear;
+           -o-transition: -o-transform 0.5s linear;
+              transition: transform 0.5s linear;
+		-webkit-transform: rotateY( 0deg ) translateZ(-0.000001px); /* translateZ set to -1px to stop a Safari flicker issue / Opx doesn't work -- maybe actual number forces acceleration */
+		 -moz-transform: rotateY( 0deg ) translateZ(-0.000001px);
+		   -o-transform: rotateY( 0deg ) translateZ(-0.000001px);
+		      transform: rotateY( 0deg ) translateZ(-0.000001px);
+	     -webkit-transform-style: preserve-3d;
+         -moz-transform-style: preserve-3d;
+           -o-transform-style: preserve-3d;
+              transform-style: preserve-3d;
 
 			}
-			#verso-poem {
-				border-right: none;
+			#poems .page { 
+
+	     -webkit-transform-origin: left center; 
+         -moz-transform-origin: left center; 
+           -o-transform-origin: left center; 
+              transform-origin: left center; 
 
 			}
-			.pages {
+			#poems .page.turned {
+				z-index: 1;
+				-webkit-transform: rotateY( -180deg ) translateZ(0.000001px); /* translateZ set to -1px to stop a Safari flicker issue / Opx doesn't work -- maybe actual number forces acceleration  */
+				 -moz-transform: rotateY( -180deg ) translateZ(0.000001px);
+				   -o-transform: rotateY( -180deg ) translateZ(0.000001px);
+				      transform: rotateY( -180deg ) translateZ(0.000001px);
+			}
+			#poems .page.turning {
+				z-index: 2;
+			}
+
+			#poems .recto-poem,
+			#poems .verso-poem {
+				background-color:#EEE;
+				height:750px;
+				width:600px; 
+				position: absolute;
+
+		      -webkit-transform-style: preserve-3d;
+		         -moz-transform-style: preserve-3d;
+		           -o-transform-style: preserve-3d;
+		              transform-style: preserve-3d;
+				
+				-webkit-backface-visibility: hidden;
+				-moz-backface-visibility: hidden;
+				-o-backface-visibility: hidden;
+				backface-visibility: hidden;
+
+			}
+			#poems * { /* fix a strange artifact bug -- bottom lefthand square on verso pages during transitions */
+				background-color: transparent;
+			}
+
+			.page .recto-poem {
+
+			}
+
+			#poems .page .verso-poem {
+
+      -webkit-transform: rotateY( 180deg );
+         -moz-transform: rotateY( 180deg );
+           -o-transform: rotateY( 180deg );
+              transform: rotateY( 180deg );
+			}
+
+			#poems .pages {
 				width:45px;
 				height: 750px;
 				background-color: #EEE;
 				float:left;
+				
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box; 
 			}
-			.recto {
+			#poems .recto {
 				background-image: linear-gradient(to right, #000 0%, #EEE 100%);
 				position: absolute;
 				top: 0;
-				left: 0;
+				left: -1px;
 			}
-			.verso {
+			#poems .verso {
 				background-image: linear-gradient(to left, #000 0%, #EEE 100%);
 				position: absolute;
 				top: 0;
-				right: 0;
+				right: -1px;
 			}
 			#featured-image {
 				width: 70%;
@@ -115,40 +252,68 @@
 				top:25%;
 				left:15%;
 			}
+			/*#cover-image {
+				width: 100%;
+				height: auto;
+				position:absolute;
+				top:0;
+				left:0;
+			}
+			#cover {
+				position:absolute;
+				top:20%;
+				left:0;
+				width:100%;
+				text-align:center;
+				font-size: 5em;
+				line-height: 1.3em;
+			}*/
 			#featured-image::selection { background: none; }
 
 			#previous-page, #next-page {
-				float:left;
-				width:30px;
+				width:28px;
 				height:750px;
 				border:1px solid #000;
-				display: inline-block;
+				display: block;
 				text-decoration: none;
 				color:#000;
-				font-size: 2.2em;
-				background-color: #EEE;
 				cursor: pointer;
 			}
-			#previous-page {
-				text-align: right;
+			#poems #previous-page {
+				background: #FFF url("./images/previous-pages.png") repeat top right;
+				background-size: 72px auto;
+				border-right:none;
+				
+				position:absolute;
+				top: 0;
+				left: 3px;
 			}
-			#next-page {
-				text-align: left;
+			#poems #next-page {
+				background: #FFF url("./images/next-pages.png") repeat top left;
+				background-size: 72px auto;
+				border-left:none;
+				
+				position:absolute;
+				top: 0;
+				right: 3px;
 			}
-			#previous-page:link, #next-page:visited {
-				background-color: #EEE;
+
+			#poems #previous-page:link, #poems #next-page:link {
+				background-color: #333;
 				color: #000;
 			}
-			#previous-page:focus, #next-page:focus,
-			#previous-page:hover, #next-page:hover,
-			#previous-page:active, #next-page:active {
-				background-color: #000;
+			#poems #previous-page:focus, #poems #next-page:focus,
+			#poems #previous-page:hover, #poems #next-page:hover,
+			#poems #previous-page:active, #poems #next-page:active {
+				background-color: #CCC;
 				color: #FFF;
 			}
-			#previous-page span, #next-page span {
+			#poems #previous-page span, #poems #next-page span {
 				display:block; 
 				float:none;
-				margin-top:320px;
+				background-color: transparent;
+				height:750px;
+				width:100%;				
 				/* support of user-select problematic? */
 				-moz-user-select: none;
 				-khtml-user-select: none;
@@ -156,37 +321,376 @@
 				-ms-user-select: none;
 				user-select: none;
 			}
-			#previous-page span {
-				padding-right:3px;
-			}
-			#next-page span {
-				padding-left:3px;
-			}
-			#verso-poem.no-page { background-color: #000; }
-			#verso-poem.no-page .pages, #verso-poem.no-page .verso { background-color: #000; background-image: none; }
+			#poems .verso-poem.no-page { background-color: #000; }
+			#poems .verso-poem.no-page .pages, #poems .verso-poem.no-page .verso { background-color: #000; background-image: none; }
 
+			header { height: 37px; background-color: #000; z-index: 10;
+				position:absolute; top:0; left:0; width:100%; 
+				transition: top 1s;
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box; }
+			menu { height: 37px; background-color: #000; 
+				position:absolute; bottom:0; left:0; width:100%; 
+				transition: bottom 1s;
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box;
+				-moz-user-select: none;
+				-khtml-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+
+			#fullscreen, #previous-control, #next-control, #single-page, #double-page, #about, #share, #close-modal, #play-pause { cursor: pointer; }
+
+			#play-pause { position:absolute; right: 270px; top:5px;}
+			button img { height: 25px; width:auto; border:none; }
+
+			button::-moz-focus-inner { /* remove extra padding from Firefox */
+				padding: 0;
+				border: 0
+			}
+
+			#about {
+				position:absolute; right: 315px; top:5px;
+				height: 25px; width: 25px;
+				border: 2px solid #FFF;
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box;				
+				font-family: 'Goudy Bookletter 1911', serif;
+				text-align: center;
+				border-radius: 50%;
+				font-size: 1.4em;
+				line-height: 0.8em;
+				vertical-align: top;
+			}
+			#about abbr {
+				text-decoration: none;
+			}
+
+			#share { position:absolute; right: 235px; top:5px;}
+			/* #share img { height: 25px; width:auto; } */
+
+			#close-modal { position:absolute; right: 0; top:0; }
+			#close-modal img { height: 20px; width:auto; }
+
+			#single-page { position:absolute; right: 200px; top:5px; }
+			/* #single-page img {height: 25px; width: auto; } */
+			#double-page  { position:absolute; right: 150px; top:5px; }
+			/* #double-page img { height: 25px; width:auto; } */
+			#fullscreen { position:absolute; right: 110px; top:5px;}
+			/* #fullscreen img { height: 25px; width:auto; }  */
+			
+			#previous-control { position:absolute; right: 70px; top:5px; }
+			/* #previous-control img { height: 25px; width:auto; } */
+
+			#next-control { position:absolute; right: 30px; top:5px; }
+			/* #next-control img { height: 25px; width:auto; } */
+			
+			button { padding:1px; margin: 0; border: none; background-color: transparent; color:#FFF; display:block; height:25px; box-sizing: content-box;
+				-moz-box-sizing: content-box;
+				-webkit-box-sizing: content-box; min-width: 25px; text-align: center; }
+			button:focus { outline: none; }
+			button:hover, button:active { outline: none; opacity:0.5; } 
+
+			a:link, a:visited {
+				color:#000;
+			}
+			a:focus, a:hover, a:active { 
+
+			}
+			#double-page[disabled="disabled"], #single-page[disabled="disabled"] {
+				opacity: 0.5;
+				cursor: default;
+			}
+
+			#controls-tab { position:absolute; width:40px; height: 10px; background-color: #444; bottom:37px; right:70px; overflow:hidden; border-radius: 5px 5px 0 0; transition: bottom 1s, height 1s, opacity 1s; opacity:0.6;
+				-moz-user-select: none;
+				-khtml-user-select: none;
+				-webkit-user-select: none;
+				-ms-user-select: none;
+				user-select: none; }
+			#controls-tab:hover { height:25px; opacity:1;}
+			#controls-switch { padding:0; display:block; height:25px; width:40px; cursor: pointer; }
+			#controls-switch img { width: 30px; height: auto; padding:5px; }
+
+			.without-controls header { top:-37px; }
+			.without-controls menu { bottom:-37px; }
+			.without-controls #controls-tab { bottom: 0; }
+
+			menu { list-style-type: none; padding: 0; margin: 0; }
+			menu li { padding: 0; margin: 0; }
+
+			#modal-screen {
+				position:absolute; 
+				z-index: 50;
+				background-color: #000;
+				width:100%;
+				height: 100%;
+				opacity: 0.5;
+			}
+
+			#modal-panel {
+				position:absolute; 
+				z-index: 100;
+
+				width:420px;
+				height:230px;
+				
+				background-color: #DDD;
+				background-color: #EEE;
+				color:#000;
+				top: 50%;
+				-webkit-transform: translateY(-50%);
+				-moz-transform: translateY(-50%);
+				-o-transform: translateY(-50%);
+  				transform: translateY(-50%); /* add specific */
+				margin-left: auto;
+				margin-right: auto;
+				left: 0;
+				right: 0;
+				border: 10px solid #000;
+				border-radius: 5px;
+				overflow: hidden;
+			}
+			#modal-panel h2 {
+				background-color: #000;
+				color:#FFF;
+				font-family: 'Goudy Bookletter 1911', serif;
+				margin: 0;
+				padding: 0 0 5px 0;
+				line-height: 1em;
+				font-weight: normal;
+			}
+			#modal-panel h3 {
+				font-family: 'Goudy Bookletter 1911', serif;
+				margin: 10px 0 5px 10px;
+				padding: 0;
+				font-weight: normal;
+			}
+			#modal-panel p {
+				font-family: 'Goudy Bookletter 1911', serif;
+				margin: 10px;
+				text-align: justify;
+			}
+			#modal-panel img.cover {
+				width:80px;
+				height:auto;
+				float:left;
+				margin: 4px 8px 0 0;
+			}
+			#modal-panel input {
+				border: 1px solid #666;
+				width: 400px;
+				font-family: sans-serif;
+				font-size: 0.8em;
+				margin: 0 0 0 10px;
+				padding:3px;
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box;
+			}
+			#modal-panel textarea {
+				resize:none;
+				overflow: hidden;
+				border: 1px solid #666;
+				width: 400px;
+				height: 53px;
+				font-family: sans-serif;
+				font-size: 0.8em;
+				margin: 0 0 0 10px;
+				padding:3px;
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+				-webkit-box-sizing: border-box;
+			}
+
+			#modal {
+				display:none;
+			}
+			.show-modal #modal {
+				display:block;
+			}
+			/* the book, not actually a book but made to appear like one (like the act of biography) */
+
+			/* single page mode */
+			.single-page-mode #poems #previous-page,
+			.single-page-mode #poems #next-page {
+				display:none;
+			}
+			.single-page-mode #poems .pages {
+				display:none;
+			}
+			.single-page-mode #poems .page {
+				top:0px;
+				right:332px;
+      -webkit-transition: top 0.5s ease;
+         -moz-transition: top 0.5s ease;
+           -o-transition: top 0.5s ease;
+              transition: top 0.5s ease;
+              transform: none;
+			}
+			.single-page-mode #poems .page.turned {
+				-webkit-transform: none; /* add specific */
+				-moz-transform: none; /* add specific */
+				-o-transform: none; /* add specific */
+				transform: none; /* add specific */
+			}
+			.single-page-mode #poems .page .verso-poem {
+				-webkit-transform: none; /* add specific */
+				-moz-transform: none; /* add specific */
+				-o-transform: none; /* add specific */
+				transform: none; /* add specific */
+			}
+			.single-page-mode #poems .page.following {
+				top: 753px;
+			}
+			.single-page-mode #poems .page.preceding {
+				top: -753px;
+			}
+			.single-page-mode #poems .page.offscreen.following {
+				top: 1506px;
+			}
+			.single-page-mode #poems .page.offscreen.preceding {
+				top: -1506px;
+			}
+
+ 
+			.single-page-mode.reading #poems .page {
+      -webkit-transition: top 1s linear;
+         -moz-transition: top 1s linear;
+           -o-transition: top 1s linear;
+              transition: top 1s linear;
+			}
+			.reading #poems .page {
+      -webkit-transition: -webkit-transform 2s linear;
+         -moz-transition: -moz-transform 2s linear;
+           -o-transition: -o-transform 2s linear;
+              transition: transform 2s linear;
+			}
+
+			@media screen and (max-width: 420px) {
+
+				#modal-panel {
+					position:absolute; 
+					z-index: 100;
+
+					width:100%;
+					height:270px;
+					box-sizing: border-box;
+					-moz-box-sizing: border-box;
+					-webkit-box-sizing: border-box;
+				}
+				#modal-panel input, #modal-panel textarea {
+					width:95%;
+					box-sizing: border-box;
+					-moz-box-sizing: border-box;
+					-webkit-box-sizing: border-box;					
+				}
+			}
 		</style>
 	</head>
 	<body>
+		<header><h1 id="title"></h1></header>
 		<div id="poems">
-			<a id="previous-page"><span>&lt;</span></a>
+			<!-- script in loading -->
 			<div id="loading">Printing</div>
-			<div id="verso-poem">
-				<div class="verso pages"></div>
-			</div>
-			<div id="recto-poem">
-				<div class="recto pages"></div>
-			</div>
-			<a id="next-page"><span>&gt;</span></a>
+			<a id="previous-page"></a>
+			<a id="next-page"></a>
 		</div>
+		<div id="controls-tab"><button type="button" id="controls-switch"><img alt="Hide controls" title="Hide controls" src="./images/down-arrow.svg" /></button></div>
+		<menu>
+			<li><button type="button" id="about"><abbr title="About">i</abbr></button></li>
+			<li><button type="button" id="play-pause"><img alt="Play" title="Play" src="./images/play.svg" /></button></li>
+			<li><button type="button" id="share"><img alt="Share" title="Share" src="./images/share.svg" /></button></li>
+			<li><button type="button" id="single-page"><img alt="Single page" title="Show single page view" src="./images/single-page.svg" /></button></li>
+			<li><button type="button" id="double-page"><img alt="Double page" title="Show double page view" src="./images/double-page.svg" /></button></li>
+			<li><button type="button" id="fullscreen"><img id="fullscreen-icon" alt="Fullscreen" title="Go fullscreen" src="./images/fullscreen.svg" /></button></li>
+			<li><button type="button" id="previous-control"><img alt="Previous page" title="Previous page" src="./images/previous-arrow.svg" /></button></li>
+			<li><button type="button" id="next-control"><img alt="Next page" title="Next page" src="./images/next-arrow.svg" /></button></li>
+		</menu>
 		<script type="text/javascript">
-		
+		"use strict";
+		//support italics?
+
+		//clean up variable declarations
+
 		var city = "Melbourne";
 		var country = "Australia";
 		var currentPageSpread = 0;
+		var withControls = true;
+		var inTransition = false;
+		var removePage = "#page-1";
+		var turningPage = "#page-2";
+		var modeDoublePage = true;
+		var isPlaying = false;
+		var pageTurnInterval = null;
 
-		function ChapbookPrinter(chapbook, publisher, city, country) {
+// http://stackoverflow.com/questions/326069/how-to-identify-if-a-webpage-is-being-loaded-inside-an-iframe-or-directly-into-t
+function inIframe () {
+    try {
+        return window.self !== window.top;
+    } catch (e) {
+        return true;
+    }
+}
+//https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
+function inFullscreen() {
+	return document.fullscreenElement ||    // alternative standard method
+      document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+}
+
+function isFullscreenEnabled() {
+			var _isFullscreenEnabled;
+
+			if(document.fullscreenEnabled){
+			   _isFullscreenEnabled = document.fullscreenEnabled;
+			}
+			else if(document.msFullscreenEnabled){ 
+			   _isFullscreenEnabled = document.msFullscreenEnabled;
+			} 
+			else if (document.mozFullScreenEnabled){
+			   _isFullscreenEnabled = document.mozFullScreenEnabled;
+			}
+			else if (document.webkitFullscreenEnabled){
+			   _isFullscreenEnabled = document.webkitFullscreenEnabled;
+			}
+			return _isFullscreenEnabled;
+}
+
+
+		function resetInTransition() {
+			
+			if (inTransition) {
+				// destroy previousPage
+				d3.select(removePage).remove();
+				//kick the tyres for Safari / rendering issue with Safari timeout and/or getting the computed style doesn't seem to work
+				//window.getComputedStyle(document.getElementById("poems")).height;
+				d3.select(turningPage).classed("turning", false); // crappy delay with two transitions to stop Safari flicker
+				inTransition = false;
+			}
+			//}, 200);
+		}
+
+		function resetInTransitionSingle() {
+			if (inTransition) {
+				// destroy previousCard
+				console.log("inTransition");
+				console.log(inTransition);
+				d3.select(removePage).remove();
+				d3.select(turningPage).classed("turning", false); // may need a delay for Safari
+				inTransition = false;
+			}
+		}		
+
+		function ChapbookPrinter(chapbook, publisher, city, country, acknowledgements, sources) {
+			//keep publishing city contained within the chapbook printer
 			this.chapbook = chapbook;
+			this.acknowledgements = acknowledgements;
+			this.sources = sources;
 			this.publisher = publisher;
 			this.city = city; 
 			this.country = country; 
@@ -210,167 +714,225 @@
 				}
 			];
 			this.startingPage = 3;
+
+			//initialise printing?
 		}
-		ChapbookPrinter.prototype.updatePlace = function(cityName, countryName) {
+		ChapbookPrinter.prototype.determinePublishingCity = function(geoposition) {
+			var geocoder = new google.maps.Geocoder();
+			var latlng = new google.maps.LatLng(geoposition.coords.latitude, geoposition.coords.longitude);
+			var _this = this;
+			var cityName = this.city;
+			var countryName = this.country;
+			geocoder.geocode({'latLng': latlng}, function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+					if (results[0]) {
+						var cityFound = false;
+						for (var i=0;i<results[0].address_components.length;i++) {
+							if ((results[0].address_components[i].types[0]=="locality") && !cityFound ) {
+								cityName = results[0].address_components[i].long_name;
+								cityFound = true;
+							} else if ((results[0].address_components[i].types[0]=="administrative_area_level_2") && !cityFound ){
+								cityName = results[0].address_components[i].long_name;
+								cityFound = true;
+							}
+							if (results[0].address_components[i].types[0]=="country") {
+								countryName = results[0].address_components[i].long_name;
+							}
+						}
+						if (!cityFound) {
+							//reset
+							cityName = _this.city;
+							countryName = _this.country;
+						}
+					} 
+				} 
+				_this.city = cityName;
+				_this.country = countryName;
+			});
+		}
+		ChapbookPrinter.prototype.updatePublishingCity = function() { //update publishing city
+			if (navigator.geolocation) {
+				var _this = this;
+				navigator.geolocation.getCurrentPosition(function(geoposition) { 
+					_this.determinePublishingCity(geoposition); 
+				});
+			} 
+		}	
+		ChapbookPrinter.prototype.updatePlace = function(cityName, countryName) { //update publishing city
 			this.city = cityName; 
 			this.country = countryName; 
 		}
-		ChapbookPrinter.prototype.printImprintPage = function() {
-			page = this.pageSettings[1];
-			var svgRoot = d3.select("#" + page.side + "-poem");
+		//check function type (to be removed)
+		ChapbookPrinter.prototype.printLine = function(svgObj, text, attributes) {
+			var textNode = svgObj.append("text");
+			for (var i=0; i<attributes.length; i++) {
+				textNode.attr(attributes[i][0], attributes[i][1]);
+			}
+			textNode.text(text);
+		}
+		ChapbookPrinter.prototype.printImprintPage = function(pageID) {
+			var page = this.pageSettings[1];
+			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
-			svgRoot.select("#" + page.side + "-page-svg").remove();
-			var svg = svgRoot.append("svg").attr("id", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+			svgRoot.select("." + page.side + "-page-svg").remove();
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
 			
+			var yLayoutPosition = 40,
+				yIncrement = 15;
+
 			var initY = 40,
 				incrementY = 15;
 
-			svg.append("text")
-				.attr("class", "imprint")
-				.attr("dx", 40)
-				.attr("dy", initY)
-				.attr("text-anchor", "start")
-				.text("First Published " + this.year);
+			//?
+			//this.printLine(svg, "First Published " + this.year, [["class", "imprint"],["dx",40],["dy",initY],["text-anchor","start"]]);
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+incrementY)
+				.attr("dy", yLayoutPosition)
+				.attr("text-anchor", "start")
+				.text("First Published " + this.year); //or fix the date ...
+
+			svg.append("text")
+				.attr("class", "imprint")
+				.attr("dx", 40)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("By " + this.publisher.name);
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+2*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text(this.publisher.url);
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+4*incrementY)
+				.attr("dy", yLayoutPosition+=(2*yIncrement))
 				.attr("text-anchor", "start")
 				.text("© " + this.chapbook.author.join(" ") + " " + this.year);
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+6*incrementY)
+				.attr("dy", yLayoutPosition+=(2*yIncrement))
 				.attr("text-anchor", "start")
 				.text("Designed by Benjamin Laird");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+7*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
-				.text("Typeset by D3");
+				.text("Typeset with D3");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+8*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("In Goudy Bookletter 1911");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+10*incrementY)
+				.attr("dy", yLayoutPosition+=(2*yIncrement))
 				.attr("text-anchor", "start")
 				.text("Printed and bound in HTML, SVG, CSS and JavaScript");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+11*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("Distributed by the Internet");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+13*incrementY)
+				.attr("dy", yLayoutPosition+=(2*yIncrement))
 				.attr("text-anchor", "start")
 				.text(this.chapbook.author.reverse().join(", "));
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+14*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text(this.chapbook.title + " / " + this.chapbook.author.reverse().join(" "));
 			
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+15*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
-				.text("URL " + window.location.href);
+				.text("URI " + window.location.origin + window.location.pathname);
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+17*incrementY)
+				.attr("dy", yLayoutPosition+=(2*yIncrement))
 				.attr("text-anchor", "start")
 				.text("All rights reserved.");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+18*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("No part of this publication may be");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+19*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("reproduced, stored in a retrieval system or");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+20*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("transmitted in any form or by any means");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+21*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("electronic, mechanical, photocopying or");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+22*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("otherwise without the prior permission of");
 
 			svg.append("text")
 				.attr("class", "imprint")
 				.attr("dx", 40)
-				.attr("dy", initY+23*incrementY)
+				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("the publisher.");
 
 		}
-		ChapbookPrinter.prototype.printTitlePage = function() {
-			page = this.pageSettings[0];
-			var svgRoot = d3.select("#" + page.side + "-poem");
+		ChapbookPrinter.prototype.printTitlePage = function(pageID) {
+			var page = this.pageSettings[0];
+			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
-			svgRoot.select("#" + page.side + "-page-svg").remove();
-			var svg = svgRoot.append("svg").attr("id", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+			svgRoot.select("." + page.side + "-page-svg").remove();
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
 			svg.append("text")
 				.attr("class", "inter-title")
 				.attr("dx", 200)
 				.attr("dy", 40)
 				.attr("text-anchor", "middle")
-				.text("THE");
+				.text("THE"); //split out the first word? //title article (if title article insert here otherwise ignore and use title article to create a full title property)
+
 			svg.append("text")
 				.attr("id", "main-title")
 				.attr("dx", 200)
@@ -448,27 +1010,28 @@
 				.attr("text-anchor", "middle")
 				.text(this.year + ".");
 		}
-		ChapbookPrinter.prototype.printPreTitlePage = function() {
-			page = this.pageSettings[0];
-			var svgRoot = d3.select("#" + page.side + "-poem");
+		ChapbookPrinter.prototype.printPreTitlePage = function(pageID) {
+			var page = this.pageSettings[0];
+			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
-			svgRoot.select("#" + page.side + "-page-svg").remove();
-			var svg = svgRoot.append("svg").attr("id", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+			svgRoot.select("." + page.side + "-page-svg").remove();
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
 
 			svg.append("text")
 				.attr("id", "main-pre-title")
 				.attr("dx", 200)
 				.attr("dy", 180)
 				.attr("text-anchor", "middle")
-				.text(this.chapbook.title.toUpperCase());
+				.text(("The " + this.chapbook.title).toUpperCase());
 			
 		}
-		ChapbookPrinter.prototype.printImagePage = function(specificImage) {
-			page = this.pageSettings[1];
-			var primary = d3.select("#" + page.side + "-poem");
+		ChapbookPrinter.prototype.printImagePage = function(pageID, specificImage, pageOrientation) {
+			var page = this.pageSettings[1];
+			var primary = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
-			primary.select("#" + page.side + "-page-svg").remove();
+			primary.select("." + page.side + "-page-svg").remove();
 			console.log(specificImage);
+			primary.select("img").remove() //replace once clear function works correctly
 
 			if (!specificImage) {
 				primary.append("img")
@@ -480,12 +1043,26 @@
 					.attr("id", "featured-image");
 			}
 		}
-		ChapbookPrinter.prototype.printContentsPage = function() {
-			page = this.pageSettings[0];
-			var svgRoot = d3.select("#" + page.side + "-poem");
+		ChapbookPrinter.prototype.printCoverPage = function(pageID) {
+			var page = this.pageSettings[0];
+			var primary = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
-			svgRoot.select("#" + page.side + "-page-svg").remove();
-			var svg = svgRoot.append("svg").attr("id", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+			primary.select("." + page.side + "-page-svg").remove();
+			primary.select("img").remove() //replace once clear function works correctly
+
+			primary.append("img")
+				.attr("src", "./images/cover-black.png")
+				.attr("id", "cover-image");
+
+			primary.append("h1").attr("id","cover").text("The Durham Poems");
+
+		}		
+		ChapbookPrinter.prototype.printContentsPage = function(pageID) {
+			var page = this.pageSettings[0];
+			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+			//remove current poem if it exists
+			svgRoot.select("." + page.side + "-page-svg").remove();
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
 			var yLoc = 90;
 			var xLocTitle = 70;
 			var xLocPage = 320;
@@ -498,7 +1075,7 @@
 				.attr("text-anchor", "middle")
 				.text("CONTENTS");
 
-			for (i=0;i<this.chapbook.poems.length;i++) {
+			for (var i=0;i<this.chapbook.poems.length;i++) {
 				svg.append("text")
 					.attr("class", "contents-poem-title")
 					.attr("dx", xLocTitle)
@@ -514,29 +1091,96 @@
 					.text(i+this.startingPage);
 			}
 		}
-		ChapbookPrinter.prototype.printPoemPageSpread = function(poemStartIndex) {
+		ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
+			var page = this.pageSettings[0];
+			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+			//remove current poem if it exists
+			svgRoot.select("." + page.side + "-page-svg").remove();
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+			var yLoc = 70;
+			var xLocTitle = 70;
+			var xLocText = 50;
+			var xLocPage = 320;
+			var increment = 20;
+
+			svg.append("text")
+				.attr("class", "acknowledments-title")
+				.attr("dx", (((xLocPage-xLocTitle)/2) + xLocTitle))
+				.attr("dy", 50)
+				.attr("text-anchor", "middle")
+				.text("Acknowledgements".toUpperCase());
+
+			var text = svg.append("text")
+				.attr("class", "acknowledgements")
+				.attr("dx", 0)
+				.attr("dy", yLoc)
+				.attr("text-anchor", "start");
+			
+			var words = this.acknowledgements.text.split(/\s+/).reverse();
+			var word;
+			var width = 280;
+			var line = [];
+			var lineNumber = 0;
+			var lineHeight = 14; // pixels
+			var y = 12;
+			var dy = parseFloat(text.attr("dy"));
+			var tspan = text.text(null).append("tspan").attr("x", (((xLocPage-xLocTitle)/2) + xLocTitle)-140).attr("y", y).attr("dy", dy);
+			while (word = words.pop()) {
+				line.push(word);
+				tspan.text(line.join(" ")); //last line when we've run out of words which is not justified
+				if (tspan.node().getComputedTextLength() > width) {
+					line.pop();
+					tspan.text(line.join(" "));
+					var wordSpacing = (width - tspan.node().getComputedTextLength()) / (line.length-1);
+					tspan.attr("word-spacing", wordSpacing);
+					//add attr
+					console.log(tspan.node().getComputedTextLength());
+					console.log(wordSpacing);
+					line = [word];
+					tspan = text.append("tspan").attr("x", (((xLocPage-xLocTitle)/2) + xLocTitle)-140).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy).text(word);
+				}
+			}
+			if (this.sources) {
+				var startLineNum = lineNumber * lineHeight + dy + 60;
+				svg.append("text")
+					.attr("class", "acknowledments-title")
+					.attr("dx", (((xLocPage-xLocTitle)/2) + xLocTitle))
+					.attr("dy", startLineNum)
+					.attr("text-anchor", "middle")
+					.text("Sources".toUpperCase());
+				for (var i=0; i<sources.length; i++) {
+					//print a source
+					//add title and then start adding and computing words? title wrapping?
+				}
+			}
+
+
+
+		}
+		ChapbookPrinter.prototype.printPoemPageSpread = function(pageID, poemStartIndex) {
 			if (poemStartIndex == 0) {
-				this.tabulaRasa(1);
-				this.printPoemPage(poemStartIndex);
+				this.tabulaRasa(pageID, 1);
+				this.printPoemPage(pageID, poemStartIndex);
 			} else {
-				this.printPoemPage(poemStartIndex);
-				this.printPoemPage(poemStartIndex+1);
+				this.printPoemPage(pageID, poemStartIndex);
+				this.printPoemPage(pageID, poemStartIndex+1);
 			}
 		}
-		ChapbookPrinter.prototype.printPoemPage = function(poemIndex) {
+		ChapbookPrinter.prototype.printPoemPage = function(pageID, poemIndex) {
 			//index determines page number and whether recto or verso
 			
 			var pageNumber = poemIndex + this.startingPage;
 			var page = this.pageSettings[(poemIndex % 2)];
 			var poem = this.chapbook.poems[poemIndex];
 
-			d3.select("#featured-image").remove();
+			//d3.select("#featured-image").remove();
 
-			var svgRoot = d3.select("#" + page.side + "-poem");
+			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
-			svgRoot.select("#" + page.side + "-page-svg").remove();
+			console.log(pageID);
+			svgRoot.select("." + page.side + "-page-svg").remove();
 
-			var svg = svgRoot.append("svg").attr("id", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
 	
 			var force = d3.layout.force()
 				.gravity(.05)
@@ -546,21 +1190,7 @@
 				.nodes(poem.nodes)
 				.links(poem.links);
 
-			svg.append("text")
-				.attr("class", "folio")
-				.attr("dx", page.footer.x)
-				.attr("dy", page.footer.y)
-				.attr("text-anchor", page.footer.edge)
-				.text(pageNumber);
-
-			svg.append("text")
-				.attr("class", "header")
-				.attr("dx", page.header.x)
-				.attr("dy", page.header.y)
-				.attr("text-anchor", page.header.edge)
-				.text(poem.title);
-
-			var link = svg.selectAll(".link-" + page.side)
+			var link = svg.selectAll(".link-" + poemIndex + "-" + page.side)
 			  .data(poem.links, function(d){return d.id;});
 			
 			link.enter().insert("text")
@@ -568,22 +1198,24 @@
 				.attr("text-anchor", "middle")
 				.append("textPath")
 				.attr("startOffset", "50%")
-				.attr("xlink:href", function(d) {return "#l-" + page.side + "-" + d.id;})
+				.attr("xlink:href", function(d) {return "#l-" + poemIndex + "-" + page.side + "-" + d.id;})
 				.text(function(d) { return d.text });
 
 			link.enter().insert("path", ":first-child")
-				.attr("class", "link-" + page.side)
-				.attr("id", function(d) {return "l-" + page.side + "-" +d.id;});
+				.classed("link-" + page.side, true)
+				.classed("link-" + poemIndex + "-" + page.side, true)
+				.attr("id", function(d) {return "l-" + poemIndex + "-" + page.side + "-" +d.id;});
 
 			link.exit().remove();
 
 			//add nodes
-			var node = svg.selectAll(".node-" + page.side)
+			var node = svg.selectAll(".node-" + poemIndex + "-" + page.side)
 			  .data(poem.nodes, function(d){return d.id;});
 			
 			var nodeG = node.enter().insert("g")
-			  .attr("class", "node-" + page.side)
-			  .attr("id", function(d){return "n-" + page.side + "-" + d.id;})
+			  .classed("node-" + page.side, true)
+			  .classed("node-" + poemIndex + "-" + page.side, true)
+			  .attr("id", function(d){return "n-" + poemIndex + "-" + page.side + "-" + d.id;})
 			  .call(force.drag);
 			
 			nodeG.append("text")
@@ -598,17 +1230,31 @@
 				node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 			});
 			force.start();
+
+			svg.append("text")
+				.attr("class", "folio")
+				.attr("dx", page.footer.x)
+				.attr("dy", page.footer.y)
+				.attr("text-anchor", page.footer.edge)
+				.text(pageNumber);
+
+			svg.append("text")
+				.attr("class", "header")
+				.attr("dx", page.header.x)
+				.attr("dy", page.header.y)
+				.attr("text-anchor", page.header.edge)
+				.text(poem.title);
 		}
-		ChapbookPrinter.prototype.tabulaRasa = function(pageIndex) {
+		ChapbookPrinter.prototype.tabulaRasa = function(pageID, pageIndex) {
 			//clear page
 			var page = this.pageSettings[(pageIndex % 2)];
-			d3.select("#" + page.side + "-poem").classed("no-page",false);
-			d3.select("#" + page.side + "-page-svg").remove();
-			d3.select("#featured-image").remove();
+			d3.select(pageID).select("." + page.side + "-poem").classed("no-page",false);
+			d3.select(pageID).select("." + page.side + "-page-svg").remove();
+			d3.select(pageID).select("#featured-image").remove();
 		}
-		ChapbookPrinter.prototype.removePage = function(pageIndex) {
+		ChapbookPrinter.prototype.removePage = function(pageID, pageIndex) {
 			var page = this.pageSettings[(pageIndex % 2)];
-			d3.select("#" + page.side + "-poem").classed("no-page",true);
+			d3.select(pageID).select("." + page.side + "-poem").classed("no-page",true);
 		}
 		//double spread pages
 
@@ -668,17 +1314,33 @@
 			this.links = [];
 			this.joins = [];
 			for (var i=0; i<lines.length; i++) {
-				join = lineJoin(words.length, this.joins);
+				var join = lineJoin(words.length, this.joins);
 				this.joins.push(join[0] + "," + join[1], join[1] + "," + join[0]);
 				this.links.push({"id" : i, "source": join[0], "target": join[1], "text" : lines[i]});
 			}
 		}
 		function updateWindow(){
-			 var x = window.innerWidth || e.clientWidth || g.clientWidth;
-			 var y = window.innerHeight|| e.clientHeight|| g.clientHeight;
+			 var x = window.innerWidth;
+			 var y = window.innerHeight;
+			 var yOffset = 0;
+			 var yActual = y;
+			 //if barActive
+			 if (withControls) {
+			 	y-=80;
+			 	yOffset = 40;
+			 } else {
+			 	y-=6;
+			 	yOffset = 3;
+			 }
+			var xOffset = modeDoublePage ? 0 : 3;
+			if (!modeDoublePage) {
+				x-=6;
+			}
+			console.log(x);
 
+			 var xRatio = modeDoublePage ? x/1266 : x/602;
 			 var yRatio = y/752;
-			 var xRatio = x/1266;
+		
 
 			 var ratio = 1;
 			 if (xRatio <= yRatio) {
@@ -686,12 +1348,28 @@
 			 } else {
 				ratio = yRatio;
 			 }
-			 var xLoc = (x - (ratio*1266))/2 + "px";
+			 
+			 console.log(ratio);
 
-			 d3.select("#poems").attr("style", "transform: translateX("+ xLoc +") scale("+ ratio +");transform-origin: 0 0;");
-			 d3.select("body").attr("style", "height:" + y + "px;");
+			 var xLoc = ((x - (ratio*1266))/2 + xOffset).toFixed(10) + "px"; //toFixed add because of an issue with Safari and very small numbers using e notation/format			 
+			 var yLoc = ((y - (ratio*752))/2 + yOffset).toFixed(10) + "px";
+
+			 d3.select("#poems").attr("style", "transform: translate("+ xLoc +","+ yLoc +") scale("+ ratio +");transform-origin: 0 0 0;-webkit-transform: translate("+ xLoc +","+ yLoc +") scale("+ ratio +");-webkit-transform-origin: 0 0 0;");
+
+			 //move to a function and change to 
+
+			 //if (!document.fullscreenElement &&    // alternative standard method
+		     // !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
+
+			if (!inFullscreen()) {
+		      	d3.select("#fullscreen-icon").attr("src", "./images/fullscreen.svg").attr("alt","Go fullscreen").attr("title", "Go fullscreen");
+			 } else {
+			 	
+			 	d3.select("#fullscreen-icon").attr("src", "./images/exit-fullscreen.svg").attr("alt","Exit fullscreen").attr("title", "Exit fullscreen");
+			 }
+			 //d3.select("body").attr("style", "height:" + yActual + "px;");
 		}
-		window.onresize = updateWindow;
+		window.onresize = updateWindow; 
 
 		function initPublishing() {
 			//change to place
@@ -708,13 +1386,47 @@
 			//console.log(ratio);
 			//console.log(ratioT);
 
-			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition(geopositionDetermined, geopositionError, {"enableHighAccuracy" : false, "timeout": 5000, "maximumAge": 10000});
+			/*var isFullScreenEnabled;
+
+			if(document.fullscreenEnabled){
+			   isFullScreenEnabled = document.fullscreenEnabled;
+			}
+			else if(document.msFullscreenEnabled){ 
+			   isFullScreenEnabled = document.msFullscreenEnabled;
+			} 
+			else if (document.mozFullScreenEnabled){
+			   isFullScreenEnabled = document.mozFullScreenEnabled;
+			}
+			else if (document.webkitFullscreenEnabled){
+			   isFullScreenEnabled = document.webkitFullscreenEnabled;
+			}*/
+		
+			if (!isFullscreenEnabled()) {
+				d3.select("#fullscreen").remove();
+			}
+
+			//move to chapbook printer
+/*			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(publishingCityDetermined, publishingCityError, {"enableHighAccuracy" : false, "timeout": 5000, "maximumAge": 10000});
 			} else {
 				beginPublishing(city, country);
-			}
-			function geopositionDetermined(geoposition) {
-				determineLocality(geoposition.coords.latitude, geoposition.coords.longitude, beginPublishing);
+			}*/
+
+			//try and determine location or fail silently
+
+			//if (navigator.geolocation) {
+			//	navigator.geolocation.getCurrentPosition(publishingCityDetermined);
+			//} 
+			// wait 5 seconds before printing
+
+			window.setTimeout(function() { printChapbook(city, country); }, 5000 );
+
+			
+
+
+			//d3.select("#fullscreen").attr("disabled","disabled");
+			function publishingCityDetermined(geoposition) {
+				//determineLocality(geoposition.coords.latitude, geoposition.coords.longitude, beginPublishing);
 				//determineLocality(42.329084, -71.102961, beginPublishing);
 				//determineLocality(-37.919349, 145.766262, beginPublishing);
 				//determineLocality(48.889230, 2.503272, beginPublishing);
@@ -723,24 +1435,15 @@
 				//determineLocality(59.562751, -73.853516, beginPublishing);
 				//determineLocality(-3.808276, -61.900391, beginPublishing);
 				//determineLocality(-82.281609, 42.582489, beginPublishing);
-
-				
-				
-			}
-
-			function geopositionError(error) {
-				beginPublishing(city, country);
-			}
-			function determineLocality(lat, lng, processCity) {
 				var geocoder = new google.maps.Geocoder();
-				var latlng = new google.maps.LatLng(lat, lng);
+				var latlng = new google.maps.LatLng(geoposition.coords.latitude, geoposition.coords.longitude);
 				var cityName = city;
 				var countryName = country;
 				geocoder.geocode({'latLng': latlng}, function(results, status) {
 					if (status == google.maps.GeocoderStatus.OK) {
 						if (results[0]) {
 							var cityFound = false;
-							for (i=0;i<results[0].address_components.length;i++) {
+							for (var i=0;i<results[0].address_components.length;i++) {
 								if ((results[0].address_components[i].types[0]=="locality") && !cityFound ) {
 									cityName = results[0].address_components[i].long_name;
 									cityFound = true;
@@ -759,19 +1462,57 @@
 							}
 						} 
 					} 
-					processCity(cityName, countryName);
+					city = cityName;
+					country = countryName;
 				});
+
 			}
+
+			/*function publishingCityError(error) {
+				beginPublishing(city, country);
+			}
+			function determineLocality(lat, lng, processCity) {
+				var geocoder = new google.maps.Geocoder();
+				var latlng = new google.maps.LatLng(lat, lng);
+				var cityName = city;
+				var countryName = country;
+				geocoder.geocode({'latLng': latlng}, function(results, status) {
+					if (status == google.maps.GeocoderStatus.OK) {
+						if (results[0]) {
+							var cityFound = false;
+							for (var i=0;i<results[0].address_components.length;i++) {
+								if ((results[0].address_components[i].types[0]=="locality") && !cityFound ) {
+									cityName = results[0].address_components[i].long_name;
+									cityFound = true;
+								} else if ((results[0].address_components[i].types[0]=="administrative_area_level_2") && !cityFound ){
+									cityName = results[0].address_components[i].long_name;
+									cityFound = true;
+								}
+								if (results[0].address_components[i].types[0]=="country") {
+									countryName = results[0].address_components[i].long_name;
+								}
+							}
+							if (!cityFound) {
+								//reset
+								cityName = city;
+								countryName = country;
+							}
+						} 
+					} 
+					beginPublishing(cityName, countryName);
+				});
+			} 
+
 			function beginPublishing(cityName, countryName) {
 				city = cityName;
 				country = countryName;
 				printChapbook(city, country);
-			}
+			} */
 		}
 		// image sourced from http://www.gracesguide.co.uk/File:Im1923TimHack-Erectingshop.jpg and modified and used under the terms of the GNU Free Documentation Licence, Version 1.2
-		var poetryChapbook = new Chapbook("Shildon Poems", "Poems on William Denton’s Apprenticeships", ["Benjamin", "Laird"], "./images/erectingshop.png", {"quote" : "A poem is a small (or large) machine made of words.", "author" : "Williams"}, 5);
+		var poetryChapbook = new Chapbook("Durham Poems", "Poems on early William Denton", ["Benjamin", "Laird"], "./images/erectingshop.png", {"quote" : "A poem is a small (or large) machine made of words.", "author" : "Williams"}, 9);
 
-		//randomise the secondary headings
+		//randomise the secondary headings?
 		//Poems on the Machinery of the Nineteenth Century
 
 		//new poems
@@ -806,83 +1547,725 @@
 						["solid", "rock", "love", "beauty", "world", "ours", "battlefields", "fights", "Alpine peaks", "lives", "words", "compute"], 
 						["as", "and", "devoid of", "utterly", "of", "forced into", "rise to", "is", "are", "can"]
 						));
+		poetryChapbook.addPoem(new Poem("Samson, Hercules and John Buddle", 
+						["cylinders", "cast iron", "box-like frames", "valve gear", "pumps", "throttle", "reversing lever", "vertically", "parallel motion", "wheels", "slides", "axles", "brackets", "chilled tread"], 
+						["fitted over", "resting on", "giving", "assembled", "guided by", "fixed upon", "bolted to", "renewed", "with a", "capacity of", "working", "rivetted to", "attached", "reduced to"]
+						));
+		poetryChapbook.addPoem(new Poem("A New Teacher, William Shotton", 
+						["rara avis", "phrenology", "electricity", "Baptist", "practical lessons", "religious subjects", "his lips", "galvanic battery", "revolution", "soul", "students"], 
+						["and", "conclusions on", "working within", "experiments with", "his own", "making", "anti-methodistic", "delighted to", "listening", "impressing", "marvelled at"]
+						));
 
 		poetryChapbook.prepareForPublication();
-		var poetryChapbookPrinter = new ChapbookPrinter(poetryChapbook, {"name" : "The Code of Things", "url" : "thecodeofthings.com"}, city, country);
+		var acknowledgements = {"text" : "I am grateful to the Wellesley Historical Society for access to the Denton family collection and especially to Kathleen Fahey for her time and invaluable assistance with the archive."}
+		//convert to source object?? object types
+		var sources = [
+						{"document" : "Diary. 1839–1842", "collection" : "Denton family collection. Wellesley Historical Society", "authors" : [["Denton", "William"]]},
+						];
+		//sources chapbook or chapbook printer?
+		var poetryChapbookPrinter = new ChapbookPrinter(poetryChapbook, {"name" : "The Code of Things", "url" : "thecodeofthings.com"}, city, country, acknowledgements);
+
+		// call dertermine locality now ... and add wait time to the publishing?
+
 		//image sourced from http://collectionscanada.gc.ca/pam_archives/index.php?fuseaction=genitem.displayItem&rec_nbr=3391580 and no longer in copyright
 		var postImageSrc = "./images/samson.jpg";
 		// use image objects?
-		// preloader
+		// preloader //add cover image here
 		var preImage = new Image();
 		var postImage = new Image();
 		preImage.src = poetryChapbook.image;
 		postImage.src = postImageSrc;
-		
+
+		d3.select("#title").text("The " + poetryChapbook.title); //add this in properly
+		addPage("page-1", true); // move this to printer
+		addPage("page-2"); // move this to printer
+
+
+		poetryChapbookPrinter.updatePublishingCity();
 		initPublishing();
+
 
 		function printChapbook(cityName, countryName) {
 			d3.select("#loading").remove();
-			poetryChapbookPrinter.updatePlace(cityName, countryName);
+			//poetryChapbookPrinter.updatePlace(cityName, countryName); //move determine locality into chapbook printer
 			
-			//add page turners
+			//add move to set up controllers / page turners
+			d3.select("body").on("wheel", pageScroll);
 			d3.select("#next-page").on("click", nextPage);
 			d3.select("#previous-page").on("click", previousPage);
 
+			d3.select("#controls-switch").on("click", toggleControls);
+
+			//make sure the buttons contain the correct disabled/enabled state (possible bug?)
+			d3.select("#play-pause").on("click", playPauseReading).attr("disabled", null);
+
+			d3.select("#about").on("click", aboutChapbook).attr("disabled", null);
+			d3.select("#share").on("click", shareChapbook).attr("disabled", null);
+
+
+			//disable mode change during transition ... if so renable during play?
+			d3.select("#single-page").on("click", singlePageMode).attr("disabled", null);
+			d3.select("#double-page").on("click", doublePageMode).attr("disabled", "disabled");
+
+			d3.select("#fullscreen").on("click", toggleFullScreen).attr("disabled", null);
+			d3.select("#next-control").on("click", nextPage).attr("disabled", null);
+			d3.select("#previous-control").on("click", previousPage).attr("disabled", null);
+
+
 			/* render initial pages */
-			//poetryChapbookPrinter.printImagePage();
-			poetryChapbookPrinter.printPreTitlePage();
-			//poetryChapbookPrinter.printPoemPageSpread(1);
-			//poetryChapbookPrinter.printImagePage();
-			//poetryChapbookPrinter.printContentsPage();
-			//poetryChapbookPrinter.printPoemPage(1);
-			//poetryChapbookPrinter.printPage(2);
+
+			poetryChapbookPrinter.tabulaRasa("#page-1", 0);
+			poetryChapbookPrinter.tabulaRasa("#page-1", 1);
+
+			poetryChapbookPrinter.printPreTitlePage("#page-2");
+			//poetryChapbookPrinter.printCoverPage("#page-2");
+			poetryChapbookPrinter.printImagePage("#page-2");
 		}
+
+		function toggleFullScreen() {
+		  if (!inFullscreen()) {  // current working methods
+		    if (document.documentElement.requestFullscreen) {
+		      document.documentElement.requestFullscreen();
+		    } else if (document.documentElement.msRequestFullscreen) {
+		      document.documentElement.msRequestFullscreen();
+		    } else if (document.documentElement.mozRequestFullScreen) {
+		      document.documentElement.mozRequestFullScreen();
+		    } else if (document.documentElement.webkitRequestFullscreen) {
+		      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+		    }
+		  } else {
+		    if (document.exitFullscreen) {
+		      document.exitFullscreen();
+		    } else if (document.msExitFullscreen) {
+		      document.msExitFullscreen();
+		    } else if (document.mozCancelFullScreen) {
+		      document.mozCancelFullScreen();
+		    } else if (document.webkitExitFullscreen) {
+		      document.webkitExitFullscreen();
+		    }
+		  }
+		}
+		function toggleControls() {
+			if (withControls) {
+				d3.select("body").classed("with-controls", false).classed("without-controls", true);
+				withControls = false;
+				d3.select("#controls-switch").select("img").attr("src","./images/up-arrow.svg").attr("alt", "Show controls").attr("title", "Show controls");
+				updateWindow();
+			} else {
+				d3.select("body").classed("with-controls", true).classed("without-controls", false);
+				withControls = true;
+				d3.select("#controls-switch").select("img").attr("src","./images/down-arrow.svg").attr("alt", "Hide controls").attr("title", "Hide controls");
+				updateWindow();
+			}
+		}
+		function addSinglePage(pageID, isVerso, hasClass) {
+			//append to #poems
+			var pageAdded = d3.select("#poems").insert("div").attr("id", pageID).attr("class", "page").on("transitionend", resetInTransitionSingle);
+			var pageClass = isVerso ? "verso-poem" : "recto-poem";
+			pageAdded.append("div").attr("class", pageClass);
+		}
+
+		//update to make reading mode a toggle
+		function singlePageMode() {
+			if (modeDoublePage && !inTransition){
+				modeDoublePage = false;
+				d3.select("#single-page").attr("disabled", "disabled");
+				d3.select("#double-page").attr("disabled", null);
+				console.log("current page spread: " + currentPageSpread);
+				d3.select("body").classed("single-page-mode", true);
+				//remove pages currentPageSpread +1 and currentPageSpread +2
+				var versoPage = currentPageSpread + 1;
+				var rectoPage = (currentPageSpread < (Math.floor(poetryChapbook.poems.length/2) + 5)) ? currentPageSpread + 2 : 1;
+				var afterPoems = poetryChapbook.poems.length + 6;
+				//remove pages
+				d3.select("#page-" + versoPage).remove();
+				d3.select("#page-" + rectoPage).remove();
+				d3.select("#previous-page").remove();
+				d3.select("#next-page").remove();
+				//convert page format *2 (even recto, odd verso)
+				currentPageSpread = currentPageSpread*2;
+				//add page
+				var currentPageID = currentPageSpread + 1;
+
+				addSinglePage("page-" + currentPageID, currentPageSpread % 2, true); //add current page
+				//add preceding page
+				var precedingPageID = (currentPageSpread == 0) ? afterPoems + 5: currentPageSpread;
+				var followingPageID = (currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
+
+				addSinglePage("page-" + precedingPageID, true, true); //add current page
+				addSinglePage("page-" + followingPageID, true, true); //add current page
+
+				d3.select("#page-" + precedingPageID).classed("preceding", true);
+				d3.select("#page-" + followingPageID).classed("following", true);
+
+				switch (true) {
+					case currentPageSpread == 0: // pre title page
+						poetryChapbookPrinter.printPreTitlePage("#page-1");//right
+						break;
+					case currentPageSpread == 1: // image
+						poetryChapbookPrinter.printImagePage("#page-2");
+						break;
+					case currentPageSpread == 2: // title page
+						poetryChapbookPrinter.printTitlePage("#page-3");
+						break;
+					case currentPageSpread == 3: // imprint
+						poetryChapbookPrinter.tabulaRasa("#page-4", 1);
+						poetryChapbookPrinter.printImprintPage("#page-4");
+						break;
+					case currentPageSpread == 4:
+						poetryChapbookPrinter.printContentsPage("#page-5"); //right
+						break;
+					case currentPageSpread == 5:
+						poetryChapbookPrinter.tabulaRasa("#page-6", 1);
+						break;
+					default:
+						poetryChapbookPrinter.printPoemPage("#page-" + currentPageID, currentPageSpread-6);
+						break;
+					case currentPageSpread == afterPoems:
+						poetryChapbookPrinter.tabulaRasa("#page-" + currentPageID, 0); //move function into page draw
+						poetryChapbookPrinter.printImagePage("#page-" + currentPageID, postImageSrc);
+						break;
+					case currentPageSpread == afterPoems + 1:
+						poetryChapbookPrinter.tabulaRasa("#page-" + currentPageID, 1);
+						if (poetryChapbookPrinter.acknowledgements) {
+							poetryChapbookPrinter.printAcknowledgementsPage("#page-" + currentPageID);
+						}
+						break;
+					case currentPageSpread == afterPoems + 2:
+						poetryChapbookPrinter.tabulaRasa("#page-" + currentPageID, 0);
+						break;
+					case currentPageSpread == afterPoems + 3:
+						poetryChapbookPrinter.tabulaRasa("#page-" + currentPageID, 1);
+						break;
+					case currentPageSpread == afterPoems + 4:
+						poetryChapbookPrinter.tabulaRasa("#page-" + currentPageID, 0);
+						break;
+				}
+				updateWindow();
+			}
+
+		}
+		function doublePageMode() {
+			console.log("current page spread: " + currentPageSpread);
+			if (!modeDoublePage && !inTransition) {
+				d3.select("#double-page").attr("disabled", "disabled");
+				d3.select("#single-page").attr("disabled", null);
+				modeDoublePage = true;
+				d3.select("body").classed("single-page-mode", false);
+				//next and previous
+				d3.select("#poems").insert("a").attr("id", "next-page").on("click", nextPage);
+				d3.select("#poems").insert("a").attr("id", "previous-page").on("click", previousPage);
+
+				//remove the three pages
+
+				var currentPageID = currentPageSpread + 1;
+				var afterPoems = poetryChapbook.poems.length + 6;
+
+				d3.select("#page-" + currentPageID).remove(); //add current page
+				//add preceding page
+				var precedingPageID = (currentPageSpread == 0) ? afterPoems + 5: currentPageSpread;
+				var followingPageID = (currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
+				console.log("preceding page: " + precedingPageID);
+				console.log("following page: " + followingPageID);
+				console.log("current page spread: " + currentPageSpread);
+
+				d3.select("#page-" + precedingPageID).remove();
+				d3.select("#page-" + followingPageID).remove();
+
+				currentPageSpread = Math.ceil(currentPageSpread/2);
+				console.log("current page spread: " + currentPageSpread);
+				
+				if (currentPageSpread > (Math.floor(poetryChapbook.poems.length/2) + 5)) {
+							currentPageSpread = 0;
+						}
+
+				var firstPageNum = currentPageSpread + 1;
+				var secondPageNum = (currentPageSpread < (Math.floor(poetryChapbook.poems.length/2) + 5)) ? currentPageSpread + 2 : 1;
+				var firstPage = (currentPageSpread*2) - 6;
+
+				afterPoems = Math.floor(poetryChapbook.poems.length/2) + 4;
+
+				addPage("page-" + firstPageNum, true);
+				addPage("page-" + secondPageNum);
+
+				//convert currentPageSpread
+				switch (true) {
+					case currentPageSpread == 0:
+						poetryChapbookPrinter.tabulaRasa("#page-1", 1);
+						poetryChapbookPrinter.tabulaRasa("#page-1", 0);				
+						poetryChapbookPrinter.printPreTitlePage("#page-2");
+						poetryChapbookPrinter.printImagePage("#page-2");
+						break;
+					case currentPageSpread == 1:
+						poetryChapbookPrinter.printPreTitlePage("#page-2");
+						poetryChapbookPrinter.printImagePage("#page-2");				
+						poetryChapbookPrinter.printTitlePage("#page-3");
+						poetryChapbookPrinter.tabulaRasa("#page-3", 1);
+						poetryChapbookPrinter.printImprintPage("#page-3");
+						break;
+					case currentPageSpread == 2:
+						poetryChapbookPrinter.printTitlePage("#page-3");
+						poetryChapbookPrinter.tabulaRasa("#page-3", 1);
+						poetryChapbookPrinter.printImprintPage("#page-3");				
+						poetryChapbookPrinter.printContentsPage("#page-4");
+						poetryChapbookPrinter.tabulaRasa("#page-4", 1);
+						break;
+					case currentPageSpread == 3:
+						poetryChapbookPrinter.printContentsPage("#page-4");
+						poetryChapbookPrinter.tabulaRasa("#page-4", 1);
+						poetryChapbookPrinter.printPoemPage("#page-5", 0);
+						break;
+					case currentPageSpread == afterPoems:
+						poetryChapbookPrinter.tabulaRasa("#page-" + firstPageNum, 1);
+						poetryChapbookPrinter.printImagePage("#page-" + firstPageNum, postImageSrc);
+						if (poetryChapbookPrinter.acknowledgements) {
+							poetryChapbookPrinter.tabulaRasa("#page-" + secondPageNum, 0);
+							poetryChapbookPrinter.printAcknowledgementsPage("#page-" + secondPageNum);
+						}
+						break;
+					case currentPageSpread == afterPoems + 1:
+						//add blank to last page and to page 1
+						poetryChapbookPrinter.tabulaRasa("#page-" + firstPageNum, 1);
+						poetryChapbookPrinter.tabulaRasa("#page-" + secondPageNum, 0);
+						poetryChapbookPrinter.tabulaRasa("#page-" + secondPageNum, 1);
+						break;
+					default:
+						poetryChapbookPrinter.printPoemPage("#page-" + firstPageNum, firstPage - 1);
+						poetryChapbookPrinter.printPoemPage("#page-" + secondPageNum, firstPage);
+						break;
+				}
+				updateWindow();
+			}
+			
+
+		}
+		function pageScroll() {
+			console.log("foo" + d3.event.deltaY);
+			if (!inIframe() || inFullscreen()) {
+				if (d3.event.deltaY > 0) {
+					nextPage();
+				}
+				else if (d3.event.deltaY < 0) {
+					previousPage();
+				}
+			}
+		}
+		function playPauseReading() {
+			if (!isPlaying) {
+				console.log("Playing");
+				isPlaying = true;
+				d3.select("body").classed("reading", true);
+				d3.select("#play-pause").select("img").attr("src","./images/pause.svg").attr("alt","Pause").attr("title","Pause");
+				//start playing -- make sure the book isn't playing?
+				//change play button into a pause button
+				//disabled layout change modes
+				d3.select("#single-page").attr("disabled", "disabled");
+				d3.select("#double-page").attr("disabled", "disabled");
+				nextPage();
+				pageTurnInterval = window.setInterval(nextPage, 3000);
+			} else {
+				console.log("Paused");
+				d3.select("body").classed("reading", false);
+				d3.select("#play-pause").select("img").attr("src","./images/play.svg").attr("alt","Play").attr("title","Play");
+				isPlaying = false;
+				window.clearInterval(pageTurnInterval);
+				if (modeDoublePage) {
+					d3.select("#single-page").attr("disabled", null);
+				} else {
+					d3.select("#double-page").attr("disabled", null);
+				}
+			}
+		}
+		function shareChapbook() {
+			var sharePanel = addModal("Share");
+			var readerURL = window.location.origin + window.location.pathname;
+			sharePanel.append("h3").text("Link to this chapbook");
+			sharePanel.append("input").attr("id", "chapbook-link").on("click", (function () {
+   this.select(); })).attr("type","text").attr("readonly","readonly").attr("value", readerURL);
+
+			sharePanel.append("h3").text("Embed this chapbook");
+			sharePanel.append("textarea").attr("id", "chapbook-embed").on("click", (function () {
+   this.select(); })).attr("readonly","readonly").attr("cols","60").attr("rows","5").html('&lt;iframe src="' + readerURL + '" style="width:100%;height:400px;" allowfullscreen="allowfullscreen"&gt;&lt;/iframe&gt;');
+		}
+
+		function aboutChapbook() {
+			var aboutPanel = addModal("About");
+			//make h3 text dynamic
+			//preload the image? what to do about the cover?
+			aboutPanel.append("h3").html("About <cite>The Durham Poems</cite>");
+			aboutPanel.append("p").html("<img class='cover' src='./images/cover.png' alt='' />These poems are part of a larger collection of biographical poems in print and programmable media concerning the life of scientific lecturer, Spiritualist and radical, William Denton (1823–1883). More information about the series can be found at <a target='_top' href='http://thecodeofthings.com'><cite>The Code of Things</cite></a>.")
+		}
+
+		function addModal(title) {
+			var modal = d3.select("body").insert("div", "#poems").attr("id", "modal");
+			modal.append("div").attr("id", "modal-screen");
+			var modalPanel = modal.append("div").attr("id", "modal-panel");
+			var modalTitle = title;
+			var modalName = title.toLowerCase();
+			modalPanel.append("button").attr("type", "button").attr("id","close-modal").on("click", removeModal).append("img").attr("src", "./images/close.svg").attr("alt", "Close " + modalName).attr("title", "Close " + modalName);
+			modalPanel.append("h2").text(modalTitle);
+			d3.select("body").classed("show-modal", true);
+
+			return modalPanel;
+		}
+
+		function removeModal() {
+			d3.select("body").classed("show-modal", false); // hide modal
+			d3.select("#modal").remove(); // remove modal
+		}
+
 
 		function nextPage() {
 			//increment the page spread and render
-			currentPageSpread += 2;
-			if (currentPageSpread > (poetryChapbook.poems.length + 7)) {
-				currentPageSpread = 0;
+			if (!inTransition) {
+				if (modeDoublePage) {
+					currentPageSpread += 1;
+					if (currentPageSpread > (Math.floor(poetryChapbook.poems.length/2) + 5)) {
+						currentPageSpread = 0;
+					}
+
+					var removePageNum = currentPageSpread > 0 ? currentPageSpread : Math.floor(poetryChapbook.poems.length/2) + 6;
+					var turnPageNum = currentPageSpread + 1;
+					var addPageNum = (currentPageSpread < (Math.floor(poetryChapbook.poems.length/2) + 5)) ? currentPageSpread + 2 : 1;
+
+					var firstPage = (currentPageSpread*2) - 6;
+
+					var afterPoems = Math.floor(poetryChapbook.poems.length/2) + 4;
+
+					removePage = "#page-" + removePageNum;
+					turningPage = "#page-" + turnPageNum;
+					addPage("page-" + addPageNum);
+
+					d3.select("#page-" + turnPageNum).classed("turned", true).classed("turning", true);
+
+					switch (true) {
+						case currentPageSpread == 0:
+							poetryChapbookPrinter.printPreTitlePage("#page-2");
+							poetryChapbookPrinter.printImagePage("#page-2");
+							break;
+						case currentPageSpread == 1:
+							poetryChapbookPrinter.printTitlePage("#page-3");
+							poetryChapbookPrinter.tabulaRasa("#page-3", 1);
+							poetryChapbookPrinter.printImprintPage("#page-3");
+							break;
+						case currentPageSpread == 2:
+							poetryChapbookPrinter.printContentsPage("#page-4");
+							poetryChapbookPrinter.tabulaRasa("#page-4", 1);
+							break;
+						case currentPageSpread == 3:
+							poetryChapbookPrinter.printPoemPage("#page-5", 0);
+							break;
+						case currentPageSpread == afterPoems:
+							poetryChapbookPrinter.tabulaRasa("#page-" + turnPageNum, 1);
+							poetryChapbookPrinter.printImagePage("#page-" + turnPageNum, postImageSrc);
+							if (poetryChapbookPrinter.acknowledgements) {
+								poetryChapbookPrinter.printAcknowledgementsPage("#page-" + addPageNum);
+							}
+							break;
+						case currentPageSpread == afterPoems + 1:
+							//add blank to last page and to page 1
+							poetryChapbookPrinter.tabulaRasa("#page-" + turnPageNum, 1);
+							poetryChapbookPrinter.tabulaRasa("#page-" + addPageNum, 0);
+							break;
+						default:
+							poetryChapbookPrinter.printPoemPage("#page-" + addPageNum, firstPage);
+							poetryChapbookPrinter.printPoemPage("#page-" + turnPageNum, firstPage - 1);
+							break;
+					}
+				} else {
+					var removePageNum = currentPageSpread + 1;
+					currentPageSpread += 1;
+					currentPageSpread = (currentPageSpread > poetryChapbook.poems.length + 10) ? 0 : currentPageSpread;
+					//remove page number (current page)
+					var newPageID = currentPageSpread + 1;
+					var afterPoems = poetryChapbook.poems.length + 6;
+
+					var precedingPageID = (currentPageSpread < 2) ? afterPoems + (4 + currentPageSpread): currentPageSpread - 1;
+					var followingPageID = (currentPageSpread + 1) > afterPoems + 4 ? 1 : newPageID + 1;
+
+					addSinglePage("page-" + followingPageID, !(currentPageSpread % 2), false); //add a page ahead
+					removePage = "#page-" + precedingPageID; //actually remove the current previous page
+
+					var pageShift = d3.select("#page-" + followingPageID);
+					pageShift.classed("offscreen", true).classed("following", true);
+					console.log(pageShift);
+					//kick the tyres and force a recalc
+					window.getComputedStyle(document.getElementById("poems")).height;
+					//window.setTimeout(function(){
+					pageShift.classed("offscreen", false);
+					d3.select("#page-" + precedingPageID).classed("offscreen", true);
+					//}, 0); //not reliable
+					d3.select("#page-" + removePageNum).classed("preceding", true);
+					d3.select("#page-" + newPageID).classed("following", false);
+					console.log("current page spread: " + currentPageSpread);
+
+					switch (true) {
+						case currentPageSpread == 0: // pre title page
+							poetryChapbookPrinter.printPreTitlePage("#page-1");//right
+							break;
+						case currentPageSpread == 1: // image
+							poetryChapbookPrinter.printImagePage("#page-2");
+							break;
+						case currentPageSpread == 2: // title page
+							poetryChapbookPrinter.printTitlePage("#page-3");
+							break;
+						case currentPageSpread == 3: // imprint
+							poetryChapbookPrinter.tabulaRasa("#page-4", 1);
+							poetryChapbookPrinter.printImprintPage("#page-4");
+							break;
+						case currentPageSpread == 4:
+							poetryChapbookPrinter.printContentsPage("#page-5"); //right
+							break;
+						case currentPageSpread == 5:
+							poetryChapbookPrinter.tabulaRasa("#page-6", 1);
+							break;
+						default:
+							poetryChapbookPrinter.printPoemPage("#page-" + newPageID, currentPageSpread-6);
+							break;
+						case currentPageSpread == afterPoems:
+							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0); //move function into page draw
+							poetryChapbookPrinter.printImagePage("#page-" + newPageID, postImageSrc);
+							break;
+						case currentPageSpread == afterPoems + 1:
+							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 1);
+							if (poetryChapbookPrinter.acknowledgements) {
+								poetryChapbookPrinter.printAcknowledgementsPage("#page-" + newPageID);
+							}
+							break;
+						case currentPageSpread == afterPoems + 2:
+							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0);
+							break;
+						case currentPageSpread == afterPoems + 3:
+							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 1);
+							break;
+						case currentPageSpread == afterPoems + 4:
+							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0);
+							break;
+					}
+				}
+				//set transition state commenced
+				inTransition = true;
 			}
-			renderPageSpread();
-			d3.event.preventDefault();
+			//d3.event.preventDefault();
+
 		}
 
 		function previousPage() {
-			currentPageSpread -= 2;
-			if (currentPageSpread < 0) {
-				currentPageSpread = poetryChapbook.poems.length + 7;
+			if (!inTransition) {
+				if (modeDoublePage) {
+					currentPageSpread -= 1;
+					if (currentPageSpread < 0) {
+						currentPageSpread = Math.floor(poetryChapbook.poems.length/2) + 5;
+					}
+					
+					var afterPoems = Math.floor(poetryChapbook.poems.length/2) + 4;
+
+					var addPageNum = currentPageSpread + 1;
+					var unturnPageNum = currentPageSpread < afterPoems + 1 ? currentPageSpread + 2 : (currentPageSpread-afterPoems);
+					var removePageNum = currentPageSpread < afterPoems ? currentPageSpread + 3 : (currentPageSpread-afterPoems) + 1;
+					
+					var firstPage = (currentPageSpread*2) - 6;
+
+					removePage = "#page-" + removePageNum;
+					turningPage = "#page-" + unturnPageNum;
+
+					addPage("page-" + addPageNum, true, "#page-" + unturnPageNum);
+					unturnPage("#page-" + unturnPageNum);
+
+					switch (true) {
+						case currentPageSpread == 0:
+						//unturn last page
+							poetryChapbookPrinter.tabulaRasa("#page-1", 0);
+							poetryChapbookPrinter.tabulaRasa("#page-1", 1);
+							break;
+						case currentPageSpread == 1:
+							poetryChapbookPrinter.printPreTitlePage("#page-2");
+							poetryChapbookPrinter.printImagePage("#page-2");
+							break;
+						case currentPageSpread == 2:
+							poetryChapbookPrinter.printTitlePage("#page-3");
+							poetryChapbookPrinter.tabulaRasa("#page-3", 1);
+							poetryChapbookPrinter.printImprintPage("#page-3");
+							break;
+						case currentPageSpread == 3:
+							poetryChapbookPrinter.printContentsPage("#page-4");
+							poetryChapbookPrinter.tabulaRasa("#page-4", 1);
+							poetryChapbookPrinter.printPoemPage("#page-5", 0);
+							break;
+						case currentPageSpread == afterPoems:
+							poetryChapbookPrinter.tabulaRasa("#page-" + addPageNum, 1);
+							poetryChapbookPrinter.printImagePage("#page-" + addPageNum, postImageSrc);
+							if (poetryChapbookPrinter.acknowledgements) {
+								poetryChapbookPrinter.printAcknowledgementsPage("#page-" + unturnPageNum);
+							}
+							break;
+						case currentPageSpread == afterPoems + 1:
+							poetryChapbookPrinter.tabulaRasa("#page-" + addPageNum, 1);
+							poetryChapbookPrinter.tabulaRasa("#page-" + unturnPageNum, 0);
+							break;
+						default:
+							poetryChapbookPrinter.printPoemPage("#page-" + addPageNum, firstPage - 1);
+							poetryChapbookPrinter.printPoemPage("#page-" + unturnPageNum, firstPage);
+							break;
+					}
+				} else {
+					var removePageNum = currentPageSpread + 1;
+					currentPageSpread -= 1;
+					currentPageSpread = (currentPageSpread < 0) ? poetryChapbook.poems.length + 10 : currentPageSpread;
+					//remove page number (current page)
+					var newPageID = currentPageSpread + 1;
+					var afterPoems = poetryChapbook.poems.length + 6;
+
+					var precedingPageID = (currentPageSpread < 1) ? afterPoems + 5: currentPageSpread;
+					var followingPageID = (currentPageSpread + 2) > afterPoems + 4 ? 2 + (currentPageSpread - (poetryChapbook.poems.length + 10)) : newPageID + 2;
+
+					addSinglePage("page-" + precedingPageID, !(currentPageSpread % 2), false); //add a page ahead
+					removePage = "#page-" + followingPageID; //actually remove the current following page
+					console.log("remove page:" + removePage);
+					
+					var pageShift = d3.select("#page-" + precedingPageID);
+					pageShift.classed("offscreen", true).classed("preceding", true);
+					window.getComputedStyle(document.getElementById("poems")).height;
+					pageShift.classed("offscreen", false);
+					
+					d3.select("#page-" + followingPageID).classed("offscreen", true);
+
+					d3.select("#page-" + removePageNum).classed("following", true);
+					d3.select("#page-" + newPageID).classed("preceding", false);
+					console.log("current page spread: " + currentPageSpread);
+
+					switch (true) {
+						case currentPageSpread == 0: // pre title page
+							poetryChapbookPrinter.printPreTitlePage("#page-1");//right
+							break;
+						case currentPageSpread == 1: // image
+							poetryChapbookPrinter.printImagePage("#page-2");
+							break;
+						case currentPageSpread == 2: // title page
+							poetryChapbookPrinter.printTitlePage("#page-3");
+							break;
+						case currentPageSpread == 3: // imprint
+							poetryChapbookPrinter.tabulaRasa("#page-4", 1);
+							poetryChapbookPrinter.printImprintPage("#page-4");
+							break;
+						case currentPageSpread == 4:
+							poetryChapbookPrinter.printContentsPage("#page-5"); //right
+							break;
+						case currentPageSpread == 5:
+							poetryChapbookPrinter.tabulaRasa("#page-6", 1);
+							break;
+						default:
+							console.log("adding poem:" + (currentPageSpread - 6));
+							poetryChapbookPrinter.printPoemPage("#page-" + newPageID, currentPageSpread-6);
+							break;
+						case currentPageSpread == afterPoems:
+							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0); //move function into page draw
+							poetryChapbookPrinter.printImagePage("#page-" + newPageID, postImageSrc);
+							break;
+						case currentPageSpread == afterPoems + 1:
+							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 1);
+							if (poetryChapbookPrinter.acknowledgements) {
+								poetryChapbookPrinter.printAcknowledgementsPage("#page-" + newPageID);
+							}
+							break;
+						case currentPageSpread == afterPoems + 2:
+							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0);
+							break;
+						case currentPageSpread == afterPoems + 3:
+							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 1);
+							break;
+						case currentPageSpread == afterPoems + 4:
+							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0);
+							break;
+					}
+				}
+				inTransition = true;
 			}
-			renderPageSpread();
-			d3.event.preventDefault();
+			//d3.event.preventDefault();
 		}
+		function addPage(pageID, turned, before) {
+			var insertLocation = before ? before : "#next-page";
+			var pageAdded = d3.select("#poems").insert("div", insertLocation).attr("id", pageID).attr("class", "page").classed("turned", turned).on("transitionend", resetInTransition);
+			pageAdded.append("div").attr("class", "recto-poem").append("div").attr("class","recto pages");
+			pageAdded.append("div").attr("class", "verso-poem").append("div").attr("class","verso pages");
+
+		}
+		function unturnPage(pageID) {
+			d3.select(pageID).classed("turned", false).classed("turning", true);
+		}
+		//remove as no longer used
 		function renderPageSpread() {
 			// render pre title page
 			if (currentPageSpread == 0) {
-				poetryChapbookPrinter.tabulaRasa(1);
-				poetryChapbookPrinter.printPreTitlePage();
+				poetryChapbookPrinter.tabulaRasa("#page-1", 1);
+				poetryChapbookPrinter.printPreTitlePage("#page-2");
 			} 
 			// render image page and title page
-			else if (currentPageSpread == 2) {
-				poetryChapbookPrinter.printImagePage();
-				poetryChapbookPrinter.printTitlePage();
+			else if (currentPageSpread == 1) {
+				console.log("foo");
+				d3.select("#page-2").classed("turned", true);
+				
+				removePage = "#page-1";
+				addPage("page-3");
+
+				poetryChapbookPrinter.printTitlePage("#page-3");
+				poetryChapbookPrinter.tabulaRasa("#page-3", 1);
+				poetryChapbookPrinter.printImprintPage("#page-3");
 			}
 			// render imprint and contents page
-			else if (currentPageSpread == 4) {
-				poetryChapbookPrinter.tabulaRasa(1);
-				poetryChapbookPrinter.printImprintPage();
-				poetryChapbookPrinter.printContentsPage();
+			else if (currentPageSpread == 2) {
+				d3.select("#page-3").classed("turned", true);
+
+				removePage = "#page-2";
+				addPage("page-4");
+
+				poetryChapbookPrinter.printContentsPage("#page-4");
+				poetryChapbookPrinter.tabulaRasa("#page-4", 1);
 			}
 			//inital poem
-			else if (currentPageSpread == 6) {
-				poetryChapbookPrinter.printPoemPageSpread(0);
+			else if (currentPageSpread == 3) {
+				d3.select("#page-4").classed("turned", true);
+				
+				removePage = "#page-3";
+				addPage("page-5");
+
+				poetryChapbookPrinter.printPoemPage("#page-5", 0);
+				//poetryChapbookPrinter.printPoemPage("#page-5", 1);
+				
 			}
-			else if (currentPageSpread < (poetryChapbook.poems.length + 6)) {
-				poetryChapbookPrinter.printPoemPageSpread(currentPageSpread-7);
+			else if (currentPageSpread < poetryChapbook.poems.length) {
+				console.log("page spread: " + currentPageSpread);
+				console.log("poems length: " + poetryChapbook.poems.length);
+
+				var turnPageNum = currentPageSpread + 1;
+				var removePageNum = currentPageSpread;
+				var addPageNum = currentPageSpread + 2;
+				//7-2 = 5
+				d3.select("#page-" + turnPageNum).classed("turned", true);
+				//d3.select("#page-" + removePageNum).remove();
+				removePage = "#page-" + removePageNum;
+
+				// move to add page function
+				addPage("page-" + addPageNum);
+				
+				//4 (x2 - 6),    5 (x2 - 6),    6 (x2 - 6),     7
+				//2/3,  4/5,  6/7,   8/9
+				var firstPage = (currentPageSpread*2) - 6;
+
+				poetryChapbookPrinter.printPoemPage("#page-" + turnPageNum, firstPage - 1);
+				poetryChapbookPrinter.printPoemPage("#page-" + addPageNum, firstPage);
+				//
+			}
+			else if (currentPageSpread < (poetryChapbook.poems.length + 1)) {
+				poetryChapbookPrinter.tabulaRasa("#page-1", 0);
+				poetryChapbookPrinter.printImagePage("#page-1", postImageSrc);
+				if (poetryChapbookPrinter.acknowledgements) {
+					poetryChapbookPrinter.printAcknowledgementsPage("#page-1");
+				}
 			}
 			else {
-				poetryChapbookPrinter.tabulaRasa(0);
-				poetryChapbookPrinter.printImagePage(postImageSrc);
+				poetryChapbookPrinter.tabulaRasa("#page-1", 0);
+				poetryChapbookPrinter.tabulaRasa("#page-1", 1);
 			}
 		}
 
