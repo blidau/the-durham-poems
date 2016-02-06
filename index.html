@@ -618,32 +618,33 @@
 
 		//clean up variable declarations
 
-		var city = "Melbourne";
-		var country = "Australia";
-		var currentPageSpread = 0;
+
+		
 		var withControls = true;
-		var inTransition = false;
-		var removePage = "#page-1";
-		var turningPage = "#page-2";
-		var modeDoublePage = true;
+
+		
 		var isPlaying = false;
 		var pageTurnInterval = null;
 
 // http://stackoverflow.com/questions/326069/how-to-identify-if-a-webpage-is-being-loaded-inside-an-iframe-or-directly-into-t
-function inIframe () {
-    try {
-        return window.self !== window.top;
-    } catch (e) {
-        return true;
-    }
-}
-//https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
-function inFullscreen() {
-	return document.fullscreenElement ||    // alternative standard method
-      document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
-}
-
-function isFullscreenEnabled() {
+		//chapbookreader
+		function inIframe () {
+			var _inIframe;
+			try {
+				_inIframe = window.self !== window.top;
+			} catch (error) {
+				_inIframe = true;
+			}
+			return _inIframe;
+		}
+		//chapbookreader
+		//https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
+		function inFullscreen() {
+			return document.fullscreenElement ||    // alternative standard method
+			document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+		}
+		//chapbookreader
+		function isFullscreenEnabled() {
 			var _isFullscreenEnabled;
 
 			if(document.fullscreenEnabled){
@@ -659,32 +660,9 @@ function isFullscreenEnabled() {
 			   _isFullscreenEnabled = document.webkitFullscreenEnabled;
 			}
 			return _isFullscreenEnabled;
-}
-
-
-		function resetInTransition() {
-			
-			if (inTransition) {
-				// destroy previousPage
-				d3.select(removePage).remove();
-				//kick the tyres for Safari / rendering issue with Safari timeout and/or getting the computed style doesn't seem to work
-				//window.getComputedStyle(document.getElementById("poems")).height;
-				d3.select(turningPage).classed("turning", false); // crappy delay with two transitions to stop Safari flicker
-				inTransition = false;
-			}
-			//}, 200);
 		}
 
-		function resetInTransitionSingle() {
-			if (inTransition) {
-				// destroy previousCard
-				console.log("inTransition");
-				console.log(inTransition);
-				d3.select(removePage).remove();
-				d3.select(turningPage).classed("turning", false); // may need a delay for Safari
-				inTransition = false;
-			}
-		}		
+		//chapbookprinter
 
 		function ChapbookPrinter(chapbook, publisher, city, country, acknowledgements, sources) {
 			//keep publishing city contained within the chapbook printer
@@ -695,6 +673,15 @@ function isFullscreenEnabled() {
 			this.city = city; 
 			this.country = country; 
 			this.year = new Date().getUTCFullYear(); //change to current year
+
+
+			this.currentPageSpread = 0;
+			this.modeDoublePage = true;
+			this.inTransition = false;
+
+			this.removePage = "#page-1";
+			this.turningPage = "#page-2";
+
 			this.pageSettings = [
 				{
 					"side" : "recto",
@@ -717,39 +704,41 @@ function isFullscreenEnabled() {
 
 			//initialise printing?
 		}
+
 		ChapbookPrinter.prototype.determinePublishingCity = function(geoposition) {
 			var geocoder = new google.maps.Geocoder();
 			var latlng = new google.maps.LatLng(geoposition.coords.latitude, geoposition.coords.longitude);
 			var _this = this;
-			var cityName = this.city;
-			var countryName = this.country;
+			var _city = this.city;
+			var _country = this.country;
 			geocoder.geocode({'latLng': latlng}, function(results, status) {
 				if (status == google.maps.GeocoderStatus.OK) {
 					if (results[0]) {
 						var cityFound = false;
 						for (var i=0;i<results[0].address_components.length;i++) {
 							if ((results[0].address_components[i].types[0]=="locality") && !cityFound ) {
-								cityName = results[0].address_components[i].long_name;
+								_city = results[0].address_components[i].long_name;
 								cityFound = true;
 							} else if ((results[0].address_components[i].types[0]=="administrative_area_level_2") && !cityFound ){
-								cityName = results[0].address_components[i].long_name;
+								_city = results[0].address_components[i].long_name;
 								cityFound = true;
 							}
 							if (results[0].address_components[i].types[0]=="country") {
-								countryName = results[0].address_components[i].long_name;
+								_country = results[0].address_components[i].long_name;
 							}
 						}
 						if (!cityFound) {
 							//reset
-							cityName = _this.city;
-							countryName = _this.country;
+							_city = _this.city;
+							_country = _this.country;
 						}
 					} 
 				} 
-				_this.city = cityName;
-				_this.country = countryName;
+				_this.city = _city;
+				_this.country = _country;
 			});
 		}
+
 		ChapbookPrinter.prototype.updatePublishingCity = function() { //update publishing city
 			if (navigator.geolocation) {
 				var _this = this;
@@ -757,18 +746,475 @@ function isFullscreenEnabled() {
 					_this.determinePublishingCity(geoposition); 
 				});
 			} 
-		}	
-		ChapbookPrinter.prototype.updatePlace = function(cityName, countryName) { //update publishing city
-			this.city = cityName; 
-			this.country = countryName; 
 		}
-		//check function type (to be removed)
-		ChapbookPrinter.prototype.printLine = function(svgObj, text, attributes) {
-			var textNode = svgObj.append("text");
-			for (var i=0; i<attributes.length; i++) {
-				textNode.attr(attributes[i][0], attributes[i][1]);
+		ChapbookPrinter.prototype.resetInTransition = function() {
+			if (this.inTransition) {
+				// destroy previous page
+				d3.select(this.removePage).remove();
+				d3.select(this.turningPage).classed("turning", false); 
+				this.inTransition = false;
 			}
-			textNode.text(text);
+		}
+		ChapbookPrinter.prototype.nextPage = function() {
+			//increment the page spread and render
+			if (!this.inTransition) {
+				if (this.modeDoublePage) {
+					this.currentPageSpread += 1;
+					if (this.currentPageSpread > (Math.floor(this.chapbook.poems.length/2) + 5)) {
+						this.currentPageSpread = 0;
+					}
+
+					var removePageNum = this.currentPageSpread > 0 ? this.currentPageSpread : Math.floor(this.chapbook.poems.length/2) + 6;
+					var turnPageNum = this.currentPageSpread + 1;
+					var addPageNum = (this.currentPageSpread < (Math.floor(this.chapbook.poems.length/2) + 5)) ? this.currentPageSpread + 2 : 1;
+
+					var firstPage = (this.currentPageSpread*2) - 6;
+
+					var afterPoems = Math.floor(this.chapbook.poems.length/2) + 4;
+
+					this.removePage = "#page-" + removePageNum;
+					this.turningPage = "#page-" + turnPageNum;
+					this.addPage("page-" + addPageNum);
+
+					d3.select("#page-" + turnPageNum).classed("turned", true).classed("turning", true);
+
+					switch (true) {
+						case this.currentPageSpread == 0:
+							this.printPreTitlePage("#page-2");
+							this.printImagePage("#page-2");
+							break;
+						case this.currentPageSpread == 1:
+							this.printTitlePage("#page-3");
+							this.tabulaRasa("#page-3", 1);
+							this.printImprintPage("#page-3");
+							break;
+						case this.currentPageSpread == 2:
+							this.printContentsPage("#page-4");
+							this.tabulaRasa("#page-4", 1);
+							break;
+						case this.currentPageSpread == 3:
+							this.printPoemPage("#page-5", 0);
+							break;
+						case this.currentPageSpread == afterPoems:
+							this.tabulaRasa("#page-" + turnPageNum, 1);
+							this.printImagePage("#page-" + turnPageNum, postImageSrc);
+							if (this.acknowledgements) {
+								this.printAcknowledgementsPage("#page-" + addPageNum);
+							}
+							break;
+						case this.currentPageSpread == afterPoems + 1:
+							//add blank to last page and to page 1
+							this.tabulaRasa("#page-" + turnPageNum, 1);
+							this.tabulaRasa("#page-" + addPageNum, 0);
+							break;
+						default:
+							this.printPoemPage("#page-" + addPageNum, firstPage);
+							this.printPoemPage("#page-" + turnPageNum, firstPage - 1);
+							break;
+					}
+				} else {
+					var removePageNum = this.currentPageSpread + 1;
+					this.currentPageSpread += 1;
+					this.currentPageSpread = (this.currentPageSpread > this.chapbook.poems.length + 10) ? 0 : this.currentPageSpread;
+					//remove page number (current page)
+					var newPageID = this.currentPageSpread + 1;
+					var afterPoems = this.chapbook.poems.length + 6;
+
+					var precedingPageID = (this.currentPageSpread < 2) ? afterPoems + (4 + this.currentPageSpread): this.currentPageSpread - 1;
+					var followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : newPageID + 1;
+
+					this.addSinglePage("page-" + followingPageID, !(this.currentPageSpread % 2), false); //add a page ahead
+					this.removePage = "#page-" + precedingPageID; //actually remove the current previous page
+
+					var pageShift = d3.select("#page-" + followingPageID);
+					pageShift.classed("offscreen", true).classed("following", true);
+					console.log(pageShift);
+					//kick the tyres and force a recalc
+					window.getComputedStyle(document.getElementById("poems")).height;
+					//window.setTimeout(function(){
+					pageShift.classed("offscreen", false);
+					d3.select("#page-" + precedingPageID).classed("offscreen", true);
+					//}, 0); //not reliable
+					d3.select("#page-" + removePageNum).classed("preceding", true);
+					d3.select("#page-" + newPageID).classed("following", false);
+					console.log("current page spread: " + this.currentPageSpread);
+
+					switch (true) {
+						case this.currentPageSpread == 0: // pre title page
+							this.printPreTitlePage("#page-1");//right
+							break;
+						case this.currentPageSpread == 1: // image
+							this.printImagePage("#page-2");
+							break;
+						case this.currentPageSpread == 2: // title page
+							this.printTitlePage("#page-3");
+							break;
+						case this.currentPageSpread == 3: // imprint
+							this.tabulaRasa("#page-4", 1);
+							this.printImprintPage("#page-4");
+							break;
+						case this.currentPageSpread == 4:
+							this.printContentsPage("#page-5"); //right
+							break;
+						case this.currentPageSpread == 5:
+							this.tabulaRasa("#page-6", 1);
+							break;
+						default:
+							this.printPoemPage("#page-" + newPageID, this.currentPageSpread-6);
+							break;
+						case this.currentPageSpread == afterPoems:
+							this.tabulaRasa("#page-" + newPageID, 0); //move function into page draw
+							this.printImagePage("#page-" + newPageID, postImageSrc);
+							break;
+						case this.currentPageSpread == afterPoems + 1:
+							this.tabulaRasa("#page-" + newPageID, 1);
+							if (this.acknowledgements) {
+								this.printAcknowledgementsPage("#page-" + newPageID);
+							}
+							break;
+						case this.currentPageSpread == afterPoems + 2:
+							this.tabulaRasa("#page-" + newPageID, 0);
+							break;
+						case this.currentPageSpread == afterPoems + 3:
+							this.tabulaRasa("#page-" + newPageID, 1);
+							break;
+						case this.currentPageSpread == afterPoems + 4:
+							this.tabulaRasa("#page-" + newPageID, 0);
+							break;
+					}
+				}
+				//set transition state commenced
+				this.inTransition = true;
+			}
+		}
+
+		ChapbookPrinter.prototype.previousPage = function() {
+			if (!this.inTransition) {
+				if (this.modeDoublePage) {
+					this.currentPageSpread -= 1;
+					if (this.currentPageSpread < 0) {
+						this.currentPageSpread = Math.floor(this.chapbook.poems.length/2) + 5;
+					}
+					
+					var afterPoems = Math.floor(this.chapbook.poems.length/2) + 4; //calculate and keep in object
+
+					var addPageNum = this.currentPageSpread + 1;
+					var unturnPageNum = this.currentPageSpread < afterPoems + 1 ? this.currentPageSpread + 2 : (this.currentPageSpread-afterPoems);
+					var removePageNum = this.currentPageSpread < afterPoems ? this.currentPageSpread + 3 : (this.currentPageSpread-afterPoems) + 1;
+					
+					var firstPage = (this.currentPageSpread*2) - 6;
+
+					this.removePage = "#page-" + removePageNum;
+					this.turningPage = "#page-" + unturnPageNum;
+
+					this.addPage("page-" + addPageNum, true, "#page-" + unturnPageNum);
+					this.unturnPage("#page-" + unturnPageNum);
+
+					switch (true) {
+						case this.currentPageSpread == 0:
+						//unturn last page
+							this.tabulaRasa("#page-1", 0);
+							this.tabulaRasa("#page-1", 1);
+							break;
+						case this.currentPageSpread == 1:
+							this.printPreTitlePage("#page-2");
+							this.printImagePage("#page-2");
+							break;
+						case this.currentPageSpread == 2:
+							this.printTitlePage("#page-3");
+							this.tabulaRasa("#page-3", 1);
+							this.printImprintPage("#page-3");
+							break;
+						case this.currentPageSpread == 3:
+							this.printContentsPage("#page-4");
+							this.tabulaRasa("#page-4", 1);
+							this.printPoemPage("#page-5", 0);
+							break;
+						case this.currentPageSpread == afterPoems:
+							this.tabulaRasa("#page-" + addPageNum, 1);
+							this.printImagePage("#page-" + addPageNum, postImageSrc);
+							if (this.acknowledgements) {
+								this.printAcknowledgementsPage("#page-" + unturnPageNum);
+							}
+							break;
+						case this.currentPageSpread == afterPoems + 1:
+							this.tabulaRasa("#page-" + addPageNum, 1);
+							this.tabulaRasa("#page-" + unturnPageNum, 0);
+							break;
+						default:
+							this.printPoemPage("#page-" + addPageNum, firstPage - 1);
+							this.printPoemPage("#page-" + unturnPageNum, firstPage);
+							break;
+					}
+				} else {
+					var removePageNum = this.currentPageSpread + 1;
+					this.currentPageSpread -= 1;
+					this.currentPageSpread = (this.currentPageSpread < 0) ? this.chapbook.poems.length + 10 : this.currentPageSpread;
+					//remove page number (current page)
+					var newPageID = this.currentPageSpread + 1;
+					var afterPoems = this.chapbook.poems.length + 6;
+
+					var precedingPageID = (this.currentPageSpread < 1) ? afterPoems + 5: this.currentPageSpread;
+					var followingPageID = (this.currentPageSpread + 2) > afterPoems + 4 ? 2 + (this.currentPageSpread - (this.chapbook.poems.length + 10)) : newPageID + 2;
+
+					this.addSinglePage("page-" + precedingPageID, !(this.currentPageSpread % 2), false); //add a page ahead
+					this.removePage = "#page-" + followingPageID; //actually remove the current following page
+					console.log("remove page:" + this.removePage);
+					
+					var pageShift = d3.select("#page-" + precedingPageID);
+					pageShift.classed("offscreen", true).classed("preceding", true);
+					window.getComputedStyle(document.getElementById("poems")).height;
+					pageShift.classed("offscreen", false);
+					
+					d3.select("#page-" + followingPageID).classed("offscreen", true);
+
+					d3.select("#page-" + removePageNum).classed("following", true);
+					d3.select("#page-" + newPageID).classed("preceding", false);
+					console.log("current page spread: " + this.currentPageSpread);
+
+					switch (true) {
+						case this.currentPageSpread == 0: // pre title page
+							this.printPreTitlePage("#page-1");//right
+							break;
+						case this.currentPageSpread == 1: // image
+							this.printImagePage("#page-2");
+							break;
+						case this.currentPageSpread == 2: // title page
+							this.printTitlePage("#page-3");
+							break;
+						case this.currentPageSpread == 3: // imprint
+							this.tabulaRasa("#page-4", 1);
+							this.printImprintPage("#page-4");
+							break;
+						case this.currentPageSpread == 4:
+							this.printContentsPage("#page-5"); //right
+							break;
+						case this.currentPageSpread == 5:
+							this.tabulaRasa("#page-6", 1);
+							break;
+						default:
+							console.log("adding poem:" + (this.currentPageSpread - 6));
+							this.printPoemPage("#page-" + newPageID, this.currentPageSpread-6);
+							break;
+						case this.currentPageSpread == afterPoems:
+							this.tabulaRasa("#page-" + newPageID, 0); //move function into page draw
+							this.printImagePage("#page-" + newPageID, postImageSrc);
+							break;
+						case this.currentPageSpread == afterPoems + 1:
+							this.tabulaRasa("#page-" + newPageID, 1);
+							if (this.acknowledgements) {
+								this.printAcknowledgementsPage("#page-" + newPageID);
+							}
+							break;
+						case this.currentPageSpread == afterPoems + 2:
+							this.tabulaRasa("#page-" + newPageID, 0);
+							break;
+						case this.currentPageSpread == afterPoems + 3:
+							this.tabulaRasa("#page-" + newPageID, 1);
+							break;
+						case this.currentPageSpread == afterPoems + 4:
+							this.tabulaRasa("#page-" + newPageID, 0);
+							break;
+					}
+				}
+				this.inTransition = true;
+			}
+			//d3.event.preventDefault();
+		}
+		ChapbookPrinter.prototype.addPage = function(pageID, turned, before) {
+			var _this = this;
+			var insertLocation = before ? before : "#next-page";
+			var pageAdded = d3.select("#poems").insert("div", insertLocation).attr("id", pageID).attr("class", "page").classed("turned", turned).on("transitionend", function() { _this.resetInTransition() }); //fix this
+			pageAdded.append("div").attr("class", "recto-poem").append("div").attr("class","recto pages");
+			pageAdded.append("div").attr("class", "verso-poem").append("div").attr("class","verso pages");
+
+		}
+
+		ChapbookPrinter.prototype.addSinglePage = function(pageID, isVerso, hasClass) {
+			//append to #poems
+			var _this = this;
+			var pageAdded = d3.select("#poems").insert("div").attr("id", pageID).attr("class", "page").on("transitionend", function() { _this.resetInTransition() }); //fix this
+			var pageClass = isVerso ? "verso-poem" : "recto-poem";
+			pageAdded.append("div").attr("class", pageClass);
+		}
+
+		ChapbookPrinter.prototype.unturnPage = function(pageID) {
+			d3.select(pageID).classed("turned", false).classed("turning", true);
+		}
+
+
+		//update to make reading mode a toggle
+		//chapbookprinter
+		ChapbookPrinter.prototype.singlePageMode = function() {
+			if (this.modeDoublePage && !this.inTransition){
+				this.modeDoublePage = false;
+				d3.select("#single-page").attr("disabled", "disabled");
+				d3.select("#double-page").attr("disabled", null);
+				console.log("current page spread: " + this.currentPageSpread);
+				d3.select("body").classed("single-page-mode", true);
+				//remove pages this.currentPageSpread +1 and this.currentPageSpread +2
+				var versoPage = this.currentPageSpread + 1;
+				var rectoPage = (this.currentPageSpread < (Math.floor(this.chapbook.poems.length/2) + 5)) ? this.currentPageSpread + 2 : 1;
+				var afterPoems = this.chapbook.poems.length + 6; //add this to printer properties? make it a calculation function
+				//remove pages
+				d3.select("#page-" + versoPage).remove();
+				d3.select("#page-" + rectoPage).remove();
+				d3.select("#previous-page").remove();
+				d3.select("#next-page").remove();
+				//convert page format *2 (even recto, odd verso)
+				this.currentPageSpread = this.currentPageSpread*2;
+				//add page
+				var currentPageID = this.currentPageSpread + 1;
+
+				this.addSinglePage("page-" + currentPageID, this.currentPageSpread % 2, true); //add current page
+				//add preceding page
+				var precedingPageID = (this.currentPageSpread == 0) ? afterPoems + 5: this.currentPageSpread;
+				var followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
+
+				this.addSinglePage("page-" + precedingPageID, true, true); //add current page
+				this.addSinglePage("page-" + followingPageID, true, true); //add current page
+
+				d3.select("#page-" + precedingPageID).classed("preceding", true);
+				d3.select("#page-" + followingPageID).classed("following", true);
+
+				switch (true) {
+					case this.currentPageSpread == 0: // pre title page
+						this.printPreTitlePage("#page-1");//right
+						break;
+					case this.currentPageSpread == 1: // image
+						this.printImagePage("#page-2");
+						break;
+					case this.currentPageSpread == 2: // title page
+						this.printTitlePage("#page-3");
+						break;
+					case this.currentPageSpread == 3: // imprint
+						this.tabulaRasa("#page-4", 1);
+						this.printImprintPage("#page-4");
+						break;
+					case this.currentPageSpread == 4:
+						this.printContentsPage("#page-5"); //right
+						break;
+					case this.currentPageSpread == 5:
+						this.tabulaRasa("#page-6", 1);
+						break;
+					default:
+						this.printPoemPage("#page-" + currentPageID, this.currentPageSpread-6);
+						break;
+					case this.currentPageSpread == afterPoems:
+						this.tabulaRasa("#page-" + currentPageID, 0); //move function into page draw
+						this.printImagePage("#page-" + currentPageID, postImageSrc);
+						break;
+					case this.currentPageSpread == afterPoems + 1:
+						this.tabulaRasa("#page-" + currentPageID, 1);
+						if (this.acknowledgements) {
+							this.printAcknowledgementsPage("#page-" + currentPageID);
+						}
+						break;
+					case this.currentPageSpread == afterPoems + 2:
+						this.tabulaRasa("#page-" + currentPageID, 0);
+						break;
+					case this.currentPageSpread == afterPoems + 3:
+						this.tabulaRasa("#page-" + currentPageID, 1);
+						break;
+					case this.currentPageSpread == afterPoems + 4:
+						this.tabulaRasa("#page-" + currentPageID, 0);
+						break;
+				}
+				updateWindow(); //move to reader
+			}
+
+		}
+		ChapbookPrinter.prototype.doublePageMode = function() {
+			console.log("current page spread: " + this.currentPageSpread);
+			if (!this.modeDoublePage && !this.inTransition) {
+				d3.select("#double-page").attr("disabled", "disabled");
+				d3.select("#single-page").attr("disabled", null);
+				this.modeDoublePage = true;
+				d3.select("body").classed("single-page-mode", false);
+				//next and previous
+				d3.select("#poems").insert("a").attr("id", "next-page").on("click", nextPage);
+				d3.select("#poems").insert("a").attr("id", "previous-page").on("click", previousPage);
+
+				//remove the three pages
+
+				var currentPageID = this.currentPageSpread + 1;
+				var afterPoems = this.chapbook.poems.length + 6;
+
+				d3.select("#page-" + currentPageID).remove(); //add current page
+				//add preceding page
+				var precedingPageID = (this.currentPageSpread == 0) ? afterPoems + 5: this.currentPageSpread;
+				var followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
+				console.log("preceding page: " + precedingPageID);
+				console.log("following page: " + followingPageID);
+				console.log("current page spread: " + this.currentPageSpread);
+
+				d3.select("#page-" + precedingPageID).remove();
+				d3.select("#page-" + followingPageID).remove();
+
+				this.currentPageSpread = Math.ceil(this.currentPageSpread/2);
+				console.log("current page spread: " + this.currentPageSpread);
+				
+				if (this.currentPageSpread > (Math.floor(this.chapbook.poems.length/2) + 5)) {
+							this.currentPageSpread = 0;
+						}
+
+				var firstPageNum = this.currentPageSpread + 1;
+				var secondPageNum = (this.currentPageSpread < (Math.floor(this.chapbook.poems.length/2) + 5)) ? this.currentPageSpread + 2 : 1;
+				var firstPage = (this.currentPageSpread*2) - 6;
+
+				afterPoems = Math.floor(this.chapbook.poems.length/2) + 4;
+
+				this.addPage("page-" + firstPageNum, true);
+				this.addPage("page-" + secondPageNum);
+
+				//convert this.currentPageSpread
+				switch (true) {
+					case this.currentPageSpread == 0:
+						this.tabulaRasa("#page-1", 1);
+						this.tabulaRasa("#page-1", 0);				
+						this.printPreTitlePage("#page-2");
+						this.printImagePage("#page-2");
+						break;
+					case this.currentPageSpread == 1:
+						this.printPreTitlePage("#page-2");
+						this.printImagePage("#page-2");				
+						this.printTitlePage("#page-3");
+						this.tabulaRasa("#page-3", 1);
+						this.printImprintPage("#page-3");
+						break;
+					case this.currentPageSpread == 2:
+						this.printTitlePage("#page-3");
+						this.tabulaRasa("#page-3", 1);
+						this.printImprintPage("#page-3");				
+						this.printContentsPage("#page-4");
+						this.tabulaRasa("#page-4", 1);
+						break;
+					case this.currentPageSpread == 3:
+						this.printContentsPage("#page-4");
+						this.tabulaRasa("#page-4", 1);
+						this.printPoemPage("#page-5", 0);
+						break;
+					case this.currentPageSpread == afterPoems:
+						this.tabulaRasa("#page-" + firstPageNum, 1);
+						this.printImagePage("#page-" + firstPageNum, postImageSrc);
+						if (this.acknowledgements) {
+							this.tabulaRasa("#page-" + secondPageNum, 0);
+							this.printAcknowledgementsPage("#page-" + secondPageNum);
+						}
+						break;
+					case this.currentPageSpread == afterPoems + 1:
+						//add blank to last page and to page 1
+						this.tabulaRasa("#page-" + firstPageNum, 1);
+						this.tabulaRasa("#page-" + secondPageNum, 0);
+						this.tabulaRasa("#page-" + secondPageNum, 1);
+						break;
+					default:
+						this.printPoemPage("#page-" + firstPageNum, firstPage - 1);
+						this.printPoemPage("#page-" + secondPageNum, firstPage);
+						break;
+				}
+				updateWindow(); //move to controller
+			}
 		}
 		ChapbookPrinter.prototype.printImprintPage = function(pageID) {
 			var page = this.pageSettings[1];
@@ -782,9 +1228,6 @@ function isFullscreenEnabled() {
 
 			var initY = 40,
 				incrementY = 15;
-
-			//?
-			//this.printLine(svg, "First Published " + this.year, [["class", "imprint"],["dx",40],["dy",initY],["text-anchor","start"]]);
 
 			svg.append("text")
 				.attr("class", "imprint")
@@ -1157,15 +1600,6 @@ function isFullscreenEnabled() {
 
 
 		}
-		ChapbookPrinter.prototype.printPoemPageSpread = function(pageID, poemStartIndex) {
-			if (poemStartIndex == 0) {
-				this.tabulaRasa(pageID, 1);
-				this.printPoemPage(pageID, poemStartIndex);
-			} else {
-				this.printPoemPage(pageID, poemStartIndex);
-				this.printPoemPage(pageID, poemStartIndex+1);
-			}
-		}
 		ChapbookPrinter.prototype.printPoemPage = function(pageID, poemIndex) {
 			//index determines page number and whether recto or verso
 			
@@ -1256,7 +1690,7 @@ function isFullscreenEnabled() {
 			var page = this.pageSettings[(pageIndex % 2)];
 			d3.select(pageID).select("." + page.side + "-poem").classed("no-page",true);
 		}
-		//double spread pages
+
 
 		/* A collection of poems */
 		function Chapbook(title, alternateTitle, author, image, quote, poemsCollected) {
@@ -1272,7 +1706,7 @@ function isFullscreenEnabled() {
 			this.poems.push(poem);
 		}
 		Chapbook.prototype.removePoem = function(poemIndex) {
-
+			//this should do something
 		}
 		Chapbook.prototype.prepareForPublication = function() {
 			var manuscript = this.poems.slice();
@@ -1291,17 +1725,6 @@ function isFullscreenEnabled() {
 			this.poems = manuscript.slice(0,this.poemsCollected);
 		}
 
-		/* make sure join doesn't already exist and add error checking + add to poem */
-		function lineJoin(length, joins) {
-			var source = 0;
-			var target = 0;
-			while ((source == target) || (joins.indexOf(source + "," + target) != -1)) {
-				source = Math.floor(Math.random()*length);
-				target = Math.floor(Math.random()*length);
-			}
-			return [source, target];
-		}
-
 		/* A poem */
 		function Poem(title, words, lines) {
 			this.title = title;
@@ -1314,11 +1737,25 @@ function isFullscreenEnabled() {
 			this.links = [];
 			this.joins = [];
 			for (var i=0; i<lines.length; i++) {
-				var join = lineJoin(words.length, this.joins);
+				var join = this.lineJoin();
 				this.joins.push(join[0] + "," + join[1], join[1] + "," + join[0]);
 				this.links.push({"id" : i, "source": join[0], "target": join[1], "text" : lines[i]});
 			}
 		}
+		Poem.prototype.lineJoin = function() {
+			var length = this.words.length;
+			var source = 0;
+			var target = 0;
+			while ((source == target) || (this.joins.indexOf(source + "," + target) != -1)) {
+				source = Math.floor(Math.random()*length);
+				target = Math.floor(Math.random()*length);
+			}
+			return [source, target];
+		}
+
+
+		/* move functions below here */
+		//move function to reader?
 		function updateWindow(){
 			 var x = window.innerWidth;
 			 var y = window.innerHeight;
@@ -1332,22 +1769,16 @@ function isFullscreenEnabled() {
 			 	y-=6;
 			 	yOffset = 3;
 			 }
-			var xOffset = modeDoublePage ? 0 : 3;
-			if (!modeDoublePage) {
+			var xOffset = poetryChapbookPrinter.modeDoublePage ? 0 : 3;
+			if (!poetryChapbookPrinter.modeDoublePage) {
 				x-=6;
 			}
 			console.log(x);
 
-			 var xRatio = modeDoublePage ? x/1266 : x/602;
+			 var xRatio = poetryChapbookPrinter.modeDoublePage ? x/1266 : x/602;
 			 var yRatio = y/752;
 		
-
-			 var ratio = 1;
-			 if (xRatio <= yRatio) {
-				ratio = xRatio;
-			 } else {
-				ratio = yRatio;
-			 }
+			 var ratio = xRatio <= yRatio ? xRatio : yRatio;
 			 
 			 console.log(ratio);
 
@@ -1356,166 +1787,141 @@ function isFullscreenEnabled() {
 
 			 d3.select("#poems").attr("style", "transform: translate("+ xLoc +","+ yLoc +") scale("+ ratio +");transform-origin: 0 0 0;-webkit-transform: translate("+ xLoc +","+ yLoc +") scale("+ ratio +");-webkit-transform-origin: 0 0 0;");
 
-			 //move to a function and change to 
-
-			 //if (!document.fullscreenElement &&    // alternative standard method
-		     // !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
-
 			if (!inFullscreen()) {
 		      	d3.select("#fullscreen-icon").attr("src", "./images/fullscreen.svg").attr("alt","Go fullscreen").attr("title", "Go fullscreen");
 			 } else {
 			 	
 			 	d3.select("#fullscreen-icon").attr("src", "./images/exit-fullscreen.svg").attr("alt","Exit fullscreen").attr("title", "Exit fullscreen");
 			 }
-			 //d3.select("body").attr("style", "height:" + yActual + "px;");
 		}
-		window.onresize = updateWindow; 
-
-		function initPublishing() {
-			//change to place
-			updateWindow();
-			//scale to window height
-			//var height = window.innerHeight;
-			//var ratio = height/752;
-			//ratio = 1;
-			//var translate = "-" + (376 * ratio) + "px"; 
-			//translate = "0"
-			//var ratioT = ratio * 752;
-			//d3.select("#poems").attr("style", "transform: translateY("+ translate +") scale("+ ratio +");transform-origin:50% 0;");
-			//console.log(window.innerHeight);
-			//console.log(ratio);
-			//console.log(ratioT);
-
-			/*var isFullScreenEnabled;
-
-			if(document.fullscreenEnabled){
-			   isFullScreenEnabled = document.fullscreenEnabled;
-			}
-			else if(document.msFullscreenEnabled){ 
-			   isFullScreenEnabled = document.msFullscreenEnabled;
-			} 
-			else if (document.mozFullScreenEnabled){
-			   isFullScreenEnabled = document.mozFullScreenEnabled;
-			}
-			else if (document.webkitFullscreenEnabled){
-			   isFullScreenEnabled = document.webkitFullscreenEnabled;
-			}*/
-		
-			if (!isFullscreenEnabled()) {
-				d3.select("#fullscreen").remove();
-			}
-
-			//move to chapbook printer
-/*			if (navigator.geolocation) {
-				navigator.geolocation.getCurrentPosition(publishingCityDetermined, publishingCityError, {"enableHighAccuracy" : false, "timeout": 5000, "maximumAge": 10000});
+		//chapbookreader
+		function toggleFullScreen() {
+		  if (!inFullscreen()) {  // current working methods
+		    if (document.documentElement.requestFullscreen) {
+		      document.documentElement.requestFullscreen();
+		    } else if (document.documentElement.msRequestFullscreen) {
+		      document.documentElement.msRequestFullscreen();
+		    } else if (document.documentElement.mozRequestFullScreen) {
+		      document.documentElement.mozRequestFullScreen();
+		    } else if (document.documentElement.webkitRequestFullscreen) {
+		      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+		    }
+		  } else {
+		    if (document.exitFullscreen) {
+		      document.exitFullscreen();
+		    } else if (document.msExitFullscreen) {
+		      document.msExitFullscreen();
+		    } else if (document.mozCancelFullScreen) {
+		      document.mozCancelFullScreen();
+		    } else if (document.webkitExitFullscreen) {
+		      document.webkitExitFullscreen();
+		    }
+		  }
+		}
+		//chapbookreader
+		function toggleControls() {
+			if (withControls) {
+				d3.select("body").classed("with-controls", false).classed("without-controls", true);
+				withControls = false;
+				d3.select("#controls-switch").select("img").attr("src","./images/up-arrow.svg").attr("alt", "Show controls").attr("title", "Show controls");
+				updateWindow();
 			} else {
-				beginPublishing(city, country);
-			}*/
-
-			//try and determine location or fail silently
-
-			//if (navigator.geolocation) {
-			//	navigator.geolocation.getCurrentPosition(publishingCityDetermined);
-			//} 
-			// wait 5 seconds before printing
-
-			window.setTimeout(function() { printChapbook(city, country); }, 5000 );
-
-			
-
-
-			//d3.select("#fullscreen").attr("disabled","disabled");
-			function publishingCityDetermined(geoposition) {
-				//determineLocality(geoposition.coords.latitude, geoposition.coords.longitude, beginPublishing);
-				//determineLocality(42.329084, -71.102961, beginPublishing);
-				//determineLocality(-37.919349, 145.766262, beginPublishing);
-				//determineLocality(48.889230, 2.503272, beginPublishing);
-				//determineLocality(-37.807397, 144.964219, beginPublishing);
-				//determineLocality(50.660651, 75.736325, beginPublishing); //fail
-				//determineLocality(59.562751, -73.853516, beginPublishing);
-				//determineLocality(-3.808276, -61.900391, beginPublishing);
-				//determineLocality(-82.281609, 42.582489, beginPublishing);
-				var geocoder = new google.maps.Geocoder();
-				var latlng = new google.maps.LatLng(geoposition.coords.latitude, geoposition.coords.longitude);
-				var cityName = city;
-				var countryName = country;
-				geocoder.geocode({'latLng': latlng}, function(results, status) {
-					if (status == google.maps.GeocoderStatus.OK) {
-						if (results[0]) {
-							var cityFound = false;
-							for (var i=0;i<results[0].address_components.length;i++) {
-								if ((results[0].address_components[i].types[0]=="locality") && !cityFound ) {
-									cityName = results[0].address_components[i].long_name;
-									cityFound = true;
-								} else if ((results[0].address_components[i].types[0]=="administrative_area_level_2") && !cityFound ){
-									cityName = results[0].address_components[i].long_name;
-									cityFound = true;
-								}
-								if (results[0].address_components[i].types[0]=="country") {
-									countryName = results[0].address_components[i].long_name;
-								}
-							}
-							if (!cityFound) {
-								//reset
-								cityName = city;
-								countryName = country;
-							}
-						} 
-					} 
-					city = cityName;
-					country = countryName;
-				});
-
+				d3.select("body").classed("with-controls", true).classed("without-controls", false);
+				withControls = true;
+				d3.select("#controls-switch").select("img").attr("src","./images/down-arrow.svg").attr("alt", "Hide controls").attr("title", "Hide controls");
+				updateWindow();
 			}
-
-			/*function publishingCityError(error) {
-				beginPublishing(city, country);
-			}
-			function determineLocality(lat, lng, processCity) {
-				var geocoder = new google.maps.Geocoder();
-				var latlng = new google.maps.LatLng(lat, lng);
-				var cityName = city;
-				var countryName = country;
-				geocoder.geocode({'latLng': latlng}, function(results, status) {
-					if (status == google.maps.GeocoderStatus.OK) {
-						if (results[0]) {
-							var cityFound = false;
-							for (var i=0;i<results[0].address_components.length;i++) {
-								if ((results[0].address_components[i].types[0]=="locality") && !cityFound ) {
-									cityName = results[0].address_components[i].long_name;
-									cityFound = true;
-								} else if ((results[0].address_components[i].types[0]=="administrative_area_level_2") && !cityFound ){
-									cityName = results[0].address_components[i].long_name;
-									cityFound = true;
-								}
-								if (results[0].address_components[i].types[0]=="country") {
-									countryName = results[0].address_components[i].long_name;
-								}
-							}
-							if (!cityFound) {
-								//reset
-								cityName = city;
-								countryName = country;
-							}
-						} 
-					} 
-					beginPublishing(cityName, countryName);
-				});
-			} 
-
-			function beginPublishing(cityName, countryName) {
-				city = cityName;
-				country = countryName;
-				printChapbook(city, country);
-			} */
 		}
+
+		//chapbookreader
+		function pageScroll() {
+			console.log("foo" + d3.event.deltaY);
+			if (!inIframe() || inFullscreen()) {
+				if (d3.event.deltaY > 0) {
+					nextPage();
+				}
+				else if (d3.event.deltaY < 0) {
+					previousPage();
+				}
+			}
+		}
+		//chapbookreader
+		function playPauseReading() {
+			if (!isPlaying) {
+				console.log("Playing");
+				isPlaying = true;
+				d3.select("body").classed("reading", true);
+				d3.select("#play-pause").select("img").attr("src","./images/pause.svg").attr("alt","Pause").attr("title","Pause");
+				//start playing -- make sure the book isn't playing?
+				//change play button into a pause button
+				//disabled layout change modes
+				d3.select("#single-page").attr("disabled", "disabled");
+				d3.select("#double-page").attr("disabled", "disabled");
+				poetryChapbookPrinter.nextPage();
+				pageTurnInterval = window.setInterval(
+					function() { poetryChapbookPrinter.nextPage(); }
+					, 3000);
+			} else {
+				console.log("Paused");
+				d3.select("body").classed("reading", false);
+				d3.select("#play-pause").select("img").attr("src","./images/play.svg").attr("alt","Play").attr("title","Play");
+				isPlaying = false;
+				window.clearInterval(pageTurnInterval);
+				if (poetryChapbookPrinter.modeDoublePage) {
+					d3.select("#single-page").attr("disabled", null);
+				} else {
+					d3.select("#double-page").attr("disabled", null);
+				}
+			}
+		}
+		//chapbookreader
+		function shareChapbook() {
+			var sharePanel = addModal("Share");
+			var readerURL = window.location.origin + window.location.pathname;
+			sharePanel.append("h3").text("Link to this chapbook");
+			sharePanel.append("input").attr("id", "chapbook-link").on("click", (function () {
+   this.select(); })).attr("type","text").attr("readonly","readonly").attr("value", readerURL);
+
+			sharePanel.append("h3").text("Embed this chapbook");
+			sharePanel.append("textarea").attr("id", "chapbook-embed").on("click", (function () {
+   this.select(); })).attr("readonly","readonly").attr("cols","60").attr("rows","5").html('&lt;iframe src="' + readerURL + '" style="width:100%;height:400px;" allowfullscreen="allowfullscreen"&gt;&lt;/iframe&gt;');
+		}
+		//chapbookreader
+		function aboutChapbook() {
+			var aboutPanel = addModal("About");
+			//make h3 text dynamic
+			//preload the image? what to do about the cover?
+			aboutPanel.append("h3").html("About <cite>The Durham Poems</cite>");
+			aboutPanel.append("p").html("<img class='cover' src='./images/cover.png' alt='' />These poems are part of a larger collection of biographical poems in print and programmable media concerning the life of scientific lecturer, Spiritualist and radical, William Denton (1823–1883). More information about the series can be found at <a target='_top' href='http://thecodeofthings.com'><cite>The Code of Things</cite></a>.")
+		}
+		//chapbookreader
+		function addModal(title) {
+			var modal = d3.select("body").insert("div", "#poems").attr("id", "modal");
+			modal.append("div").attr("id", "modal-screen");
+			var modalPanel = modal.append("div").attr("id", "modal-panel");
+			var modalTitle = title;
+			var modalName = title.toLowerCase();
+			modalPanel.append("button").attr("type", "button").attr("id","close-modal").on("click", removeModal).append("img").attr("src", "./images/close.svg").attr("alt", "Close " + modalName).attr("title", "Close " + modalName);
+			modalPanel.append("h2").text(modalTitle);
+			d3.select("body").classed("show-modal", true);
+
+			return modalPanel;
+		}
+
+		function removeModal() {
+			d3.select("body").classed("show-modal", false); // hide modal
+			d3.select("#modal").remove(); // remove modal
+		}
+
+		window.onresize = updateWindow;  //put this somewhere?
+
 		// image sourced from http://www.gracesguide.co.uk/File:Im1923TimHack-Erectingshop.jpg and modified and used under the terms of the GNU Free Documentation Licence, Version 1.2
 		var poetryChapbook = new Chapbook("Durham Poems", "Poems on early William Denton", ["Benjamin", "Laird"], "./images/erectingshop.png", {"quote" : "A poem is a small (or large) machine made of words.", "author" : "Williams"}, 9);
 
 		//randomise the secondary headings?
 		//Poems on the Machinery of the Nineteenth Century
 
-		//new poems
+		//new poems - move poems to a json file?
 		poetryChapbook.addPoem(new Poem("A Coat without Buttons", 
 								["Young Denton", "ascetic fever", "Quaker-like", "what need", "for them", "a sensation", "practice of wearing", "master", "the situation", "despite", "the ridicule", "of worldlings"], 
 								[]
@@ -1557,42 +1963,57 @@ function isFullscreenEnabled() {
 						));
 
 		poetryChapbook.prepareForPublication();
+
 		var acknowledgements = {"text" : "I am grateful to the Wellesley Historical Society for access to the Denton family collection and especially to Kathleen Fahey for her time and invaluable assistance with the archive."}
 		//convert to source object?? object types
 		var sources = [
 						{"document" : "Diary. 1839–1842", "collection" : "Denton family collection. Wellesley Historical Society", "authors" : [["Denton", "William"]]},
 						];
 		//sources chapbook or chapbook printer?
-		var poetryChapbookPrinter = new ChapbookPrinter(poetryChapbook, {"name" : "The Code of Things", "url" : "thecodeofthings.com"}, city, country, acknowledgements);
+		var poetryChapbookPrinter = new ChapbookPrinter(poetryChapbook, {"name" : "The Code of Things", "url" : "thecodeofthings.com"}, "Melbourne", "Australia", acknowledgements);
 
 		// call dertermine locality now ... and add wait time to the publishing?
 
 		//image sourced from http://collectionscanada.gc.ca/pam_archives/index.php?fuseaction=genitem.displayItem&rec_nbr=3391580 and no longer in copyright
 		var postImageSrc = "./images/samson.jpg";
 		// use image objects?
-		// preloader //add cover image here
+		// preloader //add cover image here and move to chapbook?
 		var preImage = new Image();
 		var postImage = new Image();
 		preImage.src = poetryChapbook.image;
 		postImage.src = postImageSrc;
 
 		d3.select("#title").text("The " + poetryChapbook.title); //add this in properly
-		addPage("page-1", true); // move this to printer
-		addPage("page-2"); // move this to printer
+
+		//initPrinting() ?
+		poetryChapbookPrinter.addPage("page-1", true); // move this to printer
+		poetryChapbookPrinter.addPage("page-2"); // move this to printer
 
 
 		poetryChapbookPrinter.updatePublishingCity();
-		initPublishing();
+
+		updateWindow();
+	
+		//move to chapbookreader
+		if (!isFullscreenEnabled()) {
+			d3.select("#fullscreen").remove();
+		}
+		window.setTimeout(function() { printChapbook(); }, 5000 );
 
 
-		function printChapbook(cityName, countryName) {
+		//move to chapbook reader -- initReading?
+		function printChapbook() {
+			//change loading to printing
 			d3.select("#loading").remove();
-			//poetryChapbookPrinter.updatePlace(cityName, countryName); //move determine locality into chapbook printer
 			
 			//add move to set up controllers / page turners
 			d3.select("body").on("wheel", pageScroll);
-			d3.select("#next-page").on("click", nextPage);
-			d3.select("#previous-page").on("click", previousPage);
+			d3.select("#next-page").on("click", 
+				function() {poetryChapbookPrinter.nextPage(); }
+				);
+			d3.select("#previous-page").on("click", 
+				function() { poetryChapbookPrinter.previousPage(); }
+				);
 
 			d3.select("#controls-switch").on("click", toggleControls);
 
@@ -1604,12 +2025,20 @@ function isFullscreenEnabled() {
 
 
 			//disable mode change during transition ... if so renable during play?
-			d3.select("#single-page").on("click", singlePageMode).attr("disabled", null);
-			d3.select("#double-page").on("click", doublePageMode).attr("disabled", "disabled");
+			d3.select("#single-page").on("click", 
+				function() { poetryChapbookPrinter.singlePageMode(); }
+				).attr("disabled", null);
+			d3.select("#double-page").on("click", 
+				function() { poetryChapbookPrinter.doublePageMode(); }
+				).attr("disabled", "disabled");
 
 			d3.select("#fullscreen").on("click", toggleFullScreen).attr("disabled", null);
-			d3.select("#next-control").on("click", nextPage).attr("disabled", null);
-			d3.select("#previous-control").on("click", previousPage).attr("disabled", null);
+			d3.select("#next-control").on("click", 
+				function() {poetryChapbookPrinter.nextPage(); }
+				).attr("disabled", null);
+			d3.select("#previous-control").on("click", 
+				function() { poetryChapbookPrinter.previousPage(); }
+				).attr("disabled", null);
 
 
 			/* render initial pages */
@@ -1622,652 +2051,7 @@ function isFullscreenEnabled() {
 			poetryChapbookPrinter.printImagePage("#page-2");
 		}
 
-		function toggleFullScreen() {
-		  if (!inFullscreen()) {  // current working methods
-		    if (document.documentElement.requestFullscreen) {
-		      document.documentElement.requestFullscreen();
-		    } else if (document.documentElement.msRequestFullscreen) {
-		      document.documentElement.msRequestFullscreen();
-		    } else if (document.documentElement.mozRequestFullScreen) {
-		      document.documentElement.mozRequestFullScreen();
-		    } else if (document.documentElement.webkitRequestFullscreen) {
-		      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-		    }
-		  } else {
-		    if (document.exitFullscreen) {
-		      document.exitFullscreen();
-		    } else if (document.msExitFullscreen) {
-		      document.msExitFullscreen();
-		    } else if (document.mozCancelFullScreen) {
-		      document.mozCancelFullScreen();
-		    } else if (document.webkitExitFullscreen) {
-		      document.webkitExitFullscreen();
-		    }
-		  }
-		}
-		function toggleControls() {
-			if (withControls) {
-				d3.select("body").classed("with-controls", false).classed("without-controls", true);
-				withControls = false;
-				d3.select("#controls-switch").select("img").attr("src","./images/up-arrow.svg").attr("alt", "Show controls").attr("title", "Show controls");
-				updateWindow();
-			} else {
-				d3.select("body").classed("with-controls", true).classed("without-controls", false);
-				withControls = true;
-				d3.select("#controls-switch").select("img").attr("src","./images/down-arrow.svg").attr("alt", "Hide controls").attr("title", "Hide controls");
-				updateWindow();
-			}
-		}
-		function addSinglePage(pageID, isVerso, hasClass) {
-			//append to #poems
-			var pageAdded = d3.select("#poems").insert("div").attr("id", pageID).attr("class", "page").on("transitionend", resetInTransitionSingle);
-			var pageClass = isVerso ? "verso-poem" : "recto-poem";
-			pageAdded.append("div").attr("class", pageClass);
-		}
-
-		//update to make reading mode a toggle
-		function singlePageMode() {
-			if (modeDoublePage && !inTransition){
-				modeDoublePage = false;
-				d3.select("#single-page").attr("disabled", "disabled");
-				d3.select("#double-page").attr("disabled", null);
-				console.log("current page spread: " + currentPageSpread);
-				d3.select("body").classed("single-page-mode", true);
-				//remove pages currentPageSpread +1 and currentPageSpread +2
-				var versoPage = currentPageSpread + 1;
-				var rectoPage = (currentPageSpread < (Math.floor(poetryChapbook.poems.length/2) + 5)) ? currentPageSpread + 2 : 1;
-				var afterPoems = poetryChapbook.poems.length + 6;
-				//remove pages
-				d3.select("#page-" + versoPage).remove();
-				d3.select("#page-" + rectoPage).remove();
-				d3.select("#previous-page").remove();
-				d3.select("#next-page").remove();
-				//convert page format *2 (even recto, odd verso)
-				currentPageSpread = currentPageSpread*2;
-				//add page
-				var currentPageID = currentPageSpread + 1;
-
-				addSinglePage("page-" + currentPageID, currentPageSpread % 2, true); //add current page
-				//add preceding page
-				var precedingPageID = (currentPageSpread == 0) ? afterPoems + 5: currentPageSpread;
-				var followingPageID = (currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
-
-				addSinglePage("page-" + precedingPageID, true, true); //add current page
-				addSinglePage("page-" + followingPageID, true, true); //add current page
-
-				d3.select("#page-" + precedingPageID).classed("preceding", true);
-				d3.select("#page-" + followingPageID).classed("following", true);
-
-				switch (true) {
-					case currentPageSpread == 0: // pre title page
-						poetryChapbookPrinter.printPreTitlePage("#page-1");//right
-						break;
-					case currentPageSpread == 1: // image
-						poetryChapbookPrinter.printImagePage("#page-2");
-						break;
-					case currentPageSpread == 2: // title page
-						poetryChapbookPrinter.printTitlePage("#page-3");
-						break;
-					case currentPageSpread == 3: // imprint
-						poetryChapbookPrinter.tabulaRasa("#page-4", 1);
-						poetryChapbookPrinter.printImprintPage("#page-4");
-						break;
-					case currentPageSpread == 4:
-						poetryChapbookPrinter.printContentsPage("#page-5"); //right
-						break;
-					case currentPageSpread == 5:
-						poetryChapbookPrinter.tabulaRasa("#page-6", 1);
-						break;
-					default:
-						poetryChapbookPrinter.printPoemPage("#page-" + currentPageID, currentPageSpread-6);
-						break;
-					case currentPageSpread == afterPoems:
-						poetryChapbookPrinter.tabulaRasa("#page-" + currentPageID, 0); //move function into page draw
-						poetryChapbookPrinter.printImagePage("#page-" + currentPageID, postImageSrc);
-						break;
-					case currentPageSpread == afterPoems + 1:
-						poetryChapbookPrinter.tabulaRasa("#page-" + currentPageID, 1);
-						if (poetryChapbookPrinter.acknowledgements) {
-							poetryChapbookPrinter.printAcknowledgementsPage("#page-" + currentPageID);
-						}
-						break;
-					case currentPageSpread == afterPoems + 2:
-						poetryChapbookPrinter.tabulaRasa("#page-" + currentPageID, 0);
-						break;
-					case currentPageSpread == afterPoems + 3:
-						poetryChapbookPrinter.tabulaRasa("#page-" + currentPageID, 1);
-						break;
-					case currentPageSpread == afterPoems + 4:
-						poetryChapbookPrinter.tabulaRasa("#page-" + currentPageID, 0);
-						break;
-				}
-				updateWindow();
-			}
-
-		}
-		function doublePageMode() {
-			console.log("current page spread: " + currentPageSpread);
-			if (!modeDoublePage && !inTransition) {
-				d3.select("#double-page").attr("disabled", "disabled");
-				d3.select("#single-page").attr("disabled", null);
-				modeDoublePage = true;
-				d3.select("body").classed("single-page-mode", false);
-				//next and previous
-				d3.select("#poems").insert("a").attr("id", "next-page").on("click", nextPage);
-				d3.select("#poems").insert("a").attr("id", "previous-page").on("click", previousPage);
-
-				//remove the three pages
-
-				var currentPageID = currentPageSpread + 1;
-				var afterPoems = poetryChapbook.poems.length + 6;
-
-				d3.select("#page-" + currentPageID).remove(); //add current page
-				//add preceding page
-				var precedingPageID = (currentPageSpread == 0) ? afterPoems + 5: currentPageSpread;
-				var followingPageID = (currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
-				console.log("preceding page: " + precedingPageID);
-				console.log("following page: " + followingPageID);
-				console.log("current page spread: " + currentPageSpread);
-
-				d3.select("#page-" + precedingPageID).remove();
-				d3.select("#page-" + followingPageID).remove();
-
-				currentPageSpread = Math.ceil(currentPageSpread/2);
-				console.log("current page spread: " + currentPageSpread);
-				
-				if (currentPageSpread > (Math.floor(poetryChapbook.poems.length/2) + 5)) {
-							currentPageSpread = 0;
-						}
-
-				var firstPageNum = currentPageSpread + 1;
-				var secondPageNum = (currentPageSpread < (Math.floor(poetryChapbook.poems.length/2) + 5)) ? currentPageSpread + 2 : 1;
-				var firstPage = (currentPageSpread*2) - 6;
-
-				afterPoems = Math.floor(poetryChapbook.poems.length/2) + 4;
-
-				addPage("page-" + firstPageNum, true);
-				addPage("page-" + secondPageNum);
-
-				//convert currentPageSpread
-				switch (true) {
-					case currentPageSpread == 0:
-						poetryChapbookPrinter.tabulaRasa("#page-1", 1);
-						poetryChapbookPrinter.tabulaRasa("#page-1", 0);				
-						poetryChapbookPrinter.printPreTitlePage("#page-2");
-						poetryChapbookPrinter.printImagePage("#page-2");
-						break;
-					case currentPageSpread == 1:
-						poetryChapbookPrinter.printPreTitlePage("#page-2");
-						poetryChapbookPrinter.printImagePage("#page-2");				
-						poetryChapbookPrinter.printTitlePage("#page-3");
-						poetryChapbookPrinter.tabulaRasa("#page-3", 1);
-						poetryChapbookPrinter.printImprintPage("#page-3");
-						break;
-					case currentPageSpread == 2:
-						poetryChapbookPrinter.printTitlePage("#page-3");
-						poetryChapbookPrinter.tabulaRasa("#page-3", 1);
-						poetryChapbookPrinter.printImprintPage("#page-3");				
-						poetryChapbookPrinter.printContentsPage("#page-4");
-						poetryChapbookPrinter.tabulaRasa("#page-4", 1);
-						break;
-					case currentPageSpread == 3:
-						poetryChapbookPrinter.printContentsPage("#page-4");
-						poetryChapbookPrinter.tabulaRasa("#page-4", 1);
-						poetryChapbookPrinter.printPoemPage("#page-5", 0);
-						break;
-					case currentPageSpread == afterPoems:
-						poetryChapbookPrinter.tabulaRasa("#page-" + firstPageNum, 1);
-						poetryChapbookPrinter.printImagePage("#page-" + firstPageNum, postImageSrc);
-						if (poetryChapbookPrinter.acknowledgements) {
-							poetryChapbookPrinter.tabulaRasa("#page-" + secondPageNum, 0);
-							poetryChapbookPrinter.printAcknowledgementsPage("#page-" + secondPageNum);
-						}
-						break;
-					case currentPageSpread == afterPoems + 1:
-						//add blank to last page and to page 1
-						poetryChapbookPrinter.tabulaRasa("#page-" + firstPageNum, 1);
-						poetryChapbookPrinter.tabulaRasa("#page-" + secondPageNum, 0);
-						poetryChapbookPrinter.tabulaRasa("#page-" + secondPageNum, 1);
-						break;
-					default:
-						poetryChapbookPrinter.printPoemPage("#page-" + firstPageNum, firstPage - 1);
-						poetryChapbookPrinter.printPoemPage("#page-" + secondPageNum, firstPage);
-						break;
-				}
-				updateWindow();
-			}
-			
-
-		}
-		function pageScroll() {
-			console.log("foo" + d3.event.deltaY);
-			if (!inIframe() || inFullscreen()) {
-				if (d3.event.deltaY > 0) {
-					nextPage();
-				}
-				else if (d3.event.deltaY < 0) {
-					previousPage();
-				}
-			}
-		}
-		function playPauseReading() {
-			if (!isPlaying) {
-				console.log("Playing");
-				isPlaying = true;
-				d3.select("body").classed("reading", true);
-				d3.select("#play-pause").select("img").attr("src","./images/pause.svg").attr("alt","Pause").attr("title","Pause");
-				//start playing -- make sure the book isn't playing?
-				//change play button into a pause button
-				//disabled layout change modes
-				d3.select("#single-page").attr("disabled", "disabled");
-				d3.select("#double-page").attr("disabled", "disabled");
-				nextPage();
-				pageTurnInterval = window.setInterval(nextPage, 3000);
-			} else {
-				console.log("Paused");
-				d3.select("body").classed("reading", false);
-				d3.select("#play-pause").select("img").attr("src","./images/play.svg").attr("alt","Play").attr("title","Play");
-				isPlaying = false;
-				window.clearInterval(pageTurnInterval);
-				if (modeDoublePage) {
-					d3.select("#single-page").attr("disabled", null);
-				} else {
-					d3.select("#double-page").attr("disabled", null);
-				}
-			}
-		}
-		function shareChapbook() {
-			var sharePanel = addModal("Share");
-			var readerURL = window.location.origin + window.location.pathname;
-			sharePanel.append("h3").text("Link to this chapbook");
-			sharePanel.append("input").attr("id", "chapbook-link").on("click", (function () {
-   this.select(); })).attr("type","text").attr("readonly","readonly").attr("value", readerURL);
-
-			sharePanel.append("h3").text("Embed this chapbook");
-			sharePanel.append("textarea").attr("id", "chapbook-embed").on("click", (function () {
-   this.select(); })).attr("readonly","readonly").attr("cols","60").attr("rows","5").html('&lt;iframe src="' + readerURL + '" style="width:100%;height:400px;" allowfullscreen="allowfullscreen"&gt;&lt;/iframe&gt;');
-		}
-
-		function aboutChapbook() {
-			var aboutPanel = addModal("About");
-			//make h3 text dynamic
-			//preload the image? what to do about the cover?
-			aboutPanel.append("h3").html("About <cite>The Durham Poems</cite>");
-			aboutPanel.append("p").html("<img class='cover' src='./images/cover.png' alt='' />These poems are part of a larger collection of biographical poems in print and programmable media concerning the life of scientific lecturer, Spiritualist and radical, William Denton (1823–1883). More information about the series can be found at <a target='_top' href='http://thecodeofthings.com'><cite>The Code of Things</cite></a>.")
-		}
-
-		function addModal(title) {
-			var modal = d3.select("body").insert("div", "#poems").attr("id", "modal");
-			modal.append("div").attr("id", "modal-screen");
-			var modalPanel = modal.append("div").attr("id", "modal-panel");
-			var modalTitle = title;
-			var modalName = title.toLowerCase();
-			modalPanel.append("button").attr("type", "button").attr("id","close-modal").on("click", removeModal).append("img").attr("src", "./images/close.svg").attr("alt", "Close " + modalName).attr("title", "Close " + modalName);
-			modalPanel.append("h2").text(modalTitle);
-			d3.select("body").classed("show-modal", true);
-
-			return modalPanel;
-		}
-
-		function removeModal() {
-			d3.select("body").classed("show-modal", false); // hide modal
-			d3.select("#modal").remove(); // remove modal
-		}
-
-
-		function nextPage() {
-			//increment the page spread and render
-			if (!inTransition) {
-				if (modeDoublePage) {
-					currentPageSpread += 1;
-					if (currentPageSpread > (Math.floor(poetryChapbook.poems.length/2) + 5)) {
-						currentPageSpread = 0;
-					}
-
-					var removePageNum = currentPageSpread > 0 ? currentPageSpread : Math.floor(poetryChapbook.poems.length/2) + 6;
-					var turnPageNum = currentPageSpread + 1;
-					var addPageNum = (currentPageSpread < (Math.floor(poetryChapbook.poems.length/2) + 5)) ? currentPageSpread + 2 : 1;
-
-					var firstPage = (currentPageSpread*2) - 6;
-
-					var afterPoems = Math.floor(poetryChapbook.poems.length/2) + 4;
-
-					removePage = "#page-" + removePageNum;
-					turningPage = "#page-" + turnPageNum;
-					addPage("page-" + addPageNum);
-
-					d3.select("#page-" + turnPageNum).classed("turned", true).classed("turning", true);
-
-					switch (true) {
-						case currentPageSpread == 0:
-							poetryChapbookPrinter.printPreTitlePage("#page-2");
-							poetryChapbookPrinter.printImagePage("#page-2");
-							break;
-						case currentPageSpread == 1:
-							poetryChapbookPrinter.printTitlePage("#page-3");
-							poetryChapbookPrinter.tabulaRasa("#page-3", 1);
-							poetryChapbookPrinter.printImprintPage("#page-3");
-							break;
-						case currentPageSpread == 2:
-							poetryChapbookPrinter.printContentsPage("#page-4");
-							poetryChapbookPrinter.tabulaRasa("#page-4", 1);
-							break;
-						case currentPageSpread == 3:
-							poetryChapbookPrinter.printPoemPage("#page-5", 0);
-							break;
-						case currentPageSpread == afterPoems:
-							poetryChapbookPrinter.tabulaRasa("#page-" + turnPageNum, 1);
-							poetryChapbookPrinter.printImagePage("#page-" + turnPageNum, postImageSrc);
-							if (poetryChapbookPrinter.acknowledgements) {
-								poetryChapbookPrinter.printAcknowledgementsPage("#page-" + addPageNum);
-							}
-							break;
-						case currentPageSpread == afterPoems + 1:
-							//add blank to last page and to page 1
-							poetryChapbookPrinter.tabulaRasa("#page-" + turnPageNum, 1);
-							poetryChapbookPrinter.tabulaRasa("#page-" + addPageNum, 0);
-							break;
-						default:
-							poetryChapbookPrinter.printPoemPage("#page-" + addPageNum, firstPage);
-							poetryChapbookPrinter.printPoemPage("#page-" + turnPageNum, firstPage - 1);
-							break;
-					}
-				} else {
-					var removePageNum = currentPageSpread + 1;
-					currentPageSpread += 1;
-					currentPageSpread = (currentPageSpread > poetryChapbook.poems.length + 10) ? 0 : currentPageSpread;
-					//remove page number (current page)
-					var newPageID = currentPageSpread + 1;
-					var afterPoems = poetryChapbook.poems.length + 6;
-
-					var precedingPageID = (currentPageSpread < 2) ? afterPoems + (4 + currentPageSpread): currentPageSpread - 1;
-					var followingPageID = (currentPageSpread + 1) > afterPoems + 4 ? 1 : newPageID + 1;
-
-					addSinglePage("page-" + followingPageID, !(currentPageSpread % 2), false); //add a page ahead
-					removePage = "#page-" + precedingPageID; //actually remove the current previous page
-
-					var pageShift = d3.select("#page-" + followingPageID);
-					pageShift.classed("offscreen", true).classed("following", true);
-					console.log(pageShift);
-					//kick the tyres and force a recalc
-					window.getComputedStyle(document.getElementById("poems")).height;
-					//window.setTimeout(function(){
-					pageShift.classed("offscreen", false);
-					d3.select("#page-" + precedingPageID).classed("offscreen", true);
-					//}, 0); //not reliable
-					d3.select("#page-" + removePageNum).classed("preceding", true);
-					d3.select("#page-" + newPageID).classed("following", false);
-					console.log("current page spread: " + currentPageSpread);
-
-					switch (true) {
-						case currentPageSpread == 0: // pre title page
-							poetryChapbookPrinter.printPreTitlePage("#page-1");//right
-							break;
-						case currentPageSpread == 1: // image
-							poetryChapbookPrinter.printImagePage("#page-2");
-							break;
-						case currentPageSpread == 2: // title page
-							poetryChapbookPrinter.printTitlePage("#page-3");
-							break;
-						case currentPageSpread == 3: // imprint
-							poetryChapbookPrinter.tabulaRasa("#page-4", 1);
-							poetryChapbookPrinter.printImprintPage("#page-4");
-							break;
-						case currentPageSpread == 4:
-							poetryChapbookPrinter.printContentsPage("#page-5"); //right
-							break;
-						case currentPageSpread == 5:
-							poetryChapbookPrinter.tabulaRasa("#page-6", 1);
-							break;
-						default:
-							poetryChapbookPrinter.printPoemPage("#page-" + newPageID, currentPageSpread-6);
-							break;
-						case currentPageSpread == afterPoems:
-							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0); //move function into page draw
-							poetryChapbookPrinter.printImagePage("#page-" + newPageID, postImageSrc);
-							break;
-						case currentPageSpread == afterPoems + 1:
-							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 1);
-							if (poetryChapbookPrinter.acknowledgements) {
-								poetryChapbookPrinter.printAcknowledgementsPage("#page-" + newPageID);
-							}
-							break;
-						case currentPageSpread == afterPoems + 2:
-							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0);
-							break;
-						case currentPageSpread == afterPoems + 3:
-							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 1);
-							break;
-						case currentPageSpread == afterPoems + 4:
-							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0);
-							break;
-					}
-				}
-				//set transition state commenced
-				inTransition = true;
-			}
-			//d3.event.preventDefault();
-
-		}
-
-		function previousPage() {
-			if (!inTransition) {
-				if (modeDoublePage) {
-					currentPageSpread -= 1;
-					if (currentPageSpread < 0) {
-						currentPageSpread = Math.floor(poetryChapbook.poems.length/2) + 5;
-					}
-					
-					var afterPoems = Math.floor(poetryChapbook.poems.length/2) + 4;
-
-					var addPageNum = currentPageSpread + 1;
-					var unturnPageNum = currentPageSpread < afterPoems + 1 ? currentPageSpread + 2 : (currentPageSpread-afterPoems);
-					var removePageNum = currentPageSpread < afterPoems ? currentPageSpread + 3 : (currentPageSpread-afterPoems) + 1;
-					
-					var firstPage = (currentPageSpread*2) - 6;
-
-					removePage = "#page-" + removePageNum;
-					turningPage = "#page-" + unturnPageNum;
-
-					addPage("page-" + addPageNum, true, "#page-" + unturnPageNum);
-					unturnPage("#page-" + unturnPageNum);
-
-					switch (true) {
-						case currentPageSpread == 0:
-						//unturn last page
-							poetryChapbookPrinter.tabulaRasa("#page-1", 0);
-							poetryChapbookPrinter.tabulaRasa("#page-1", 1);
-							break;
-						case currentPageSpread == 1:
-							poetryChapbookPrinter.printPreTitlePage("#page-2");
-							poetryChapbookPrinter.printImagePage("#page-2");
-							break;
-						case currentPageSpread == 2:
-							poetryChapbookPrinter.printTitlePage("#page-3");
-							poetryChapbookPrinter.tabulaRasa("#page-3", 1);
-							poetryChapbookPrinter.printImprintPage("#page-3");
-							break;
-						case currentPageSpread == 3:
-							poetryChapbookPrinter.printContentsPage("#page-4");
-							poetryChapbookPrinter.tabulaRasa("#page-4", 1);
-							poetryChapbookPrinter.printPoemPage("#page-5", 0);
-							break;
-						case currentPageSpread == afterPoems:
-							poetryChapbookPrinter.tabulaRasa("#page-" + addPageNum, 1);
-							poetryChapbookPrinter.printImagePage("#page-" + addPageNum, postImageSrc);
-							if (poetryChapbookPrinter.acknowledgements) {
-								poetryChapbookPrinter.printAcknowledgementsPage("#page-" + unturnPageNum);
-							}
-							break;
-						case currentPageSpread == afterPoems + 1:
-							poetryChapbookPrinter.tabulaRasa("#page-" + addPageNum, 1);
-							poetryChapbookPrinter.tabulaRasa("#page-" + unturnPageNum, 0);
-							break;
-						default:
-							poetryChapbookPrinter.printPoemPage("#page-" + addPageNum, firstPage - 1);
-							poetryChapbookPrinter.printPoemPage("#page-" + unturnPageNum, firstPage);
-							break;
-					}
-				} else {
-					var removePageNum = currentPageSpread + 1;
-					currentPageSpread -= 1;
-					currentPageSpread = (currentPageSpread < 0) ? poetryChapbook.poems.length + 10 : currentPageSpread;
-					//remove page number (current page)
-					var newPageID = currentPageSpread + 1;
-					var afterPoems = poetryChapbook.poems.length + 6;
-
-					var precedingPageID = (currentPageSpread < 1) ? afterPoems + 5: currentPageSpread;
-					var followingPageID = (currentPageSpread + 2) > afterPoems + 4 ? 2 + (currentPageSpread - (poetryChapbook.poems.length + 10)) : newPageID + 2;
-
-					addSinglePage("page-" + precedingPageID, !(currentPageSpread % 2), false); //add a page ahead
-					removePage = "#page-" + followingPageID; //actually remove the current following page
-					console.log("remove page:" + removePage);
-					
-					var pageShift = d3.select("#page-" + precedingPageID);
-					pageShift.classed("offscreen", true).classed("preceding", true);
-					window.getComputedStyle(document.getElementById("poems")).height;
-					pageShift.classed("offscreen", false);
-					
-					d3.select("#page-" + followingPageID).classed("offscreen", true);
-
-					d3.select("#page-" + removePageNum).classed("following", true);
-					d3.select("#page-" + newPageID).classed("preceding", false);
-					console.log("current page spread: " + currentPageSpread);
-
-					switch (true) {
-						case currentPageSpread == 0: // pre title page
-							poetryChapbookPrinter.printPreTitlePage("#page-1");//right
-							break;
-						case currentPageSpread == 1: // image
-							poetryChapbookPrinter.printImagePage("#page-2");
-							break;
-						case currentPageSpread == 2: // title page
-							poetryChapbookPrinter.printTitlePage("#page-3");
-							break;
-						case currentPageSpread == 3: // imprint
-							poetryChapbookPrinter.tabulaRasa("#page-4", 1);
-							poetryChapbookPrinter.printImprintPage("#page-4");
-							break;
-						case currentPageSpread == 4:
-							poetryChapbookPrinter.printContentsPage("#page-5"); //right
-							break;
-						case currentPageSpread == 5:
-							poetryChapbookPrinter.tabulaRasa("#page-6", 1);
-							break;
-						default:
-							console.log("adding poem:" + (currentPageSpread - 6));
-							poetryChapbookPrinter.printPoemPage("#page-" + newPageID, currentPageSpread-6);
-							break;
-						case currentPageSpread == afterPoems:
-							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0); //move function into page draw
-							poetryChapbookPrinter.printImagePage("#page-" + newPageID, postImageSrc);
-							break;
-						case currentPageSpread == afterPoems + 1:
-							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 1);
-							if (poetryChapbookPrinter.acknowledgements) {
-								poetryChapbookPrinter.printAcknowledgementsPage("#page-" + newPageID);
-							}
-							break;
-						case currentPageSpread == afterPoems + 2:
-							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0);
-							break;
-						case currentPageSpread == afterPoems + 3:
-							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 1);
-							break;
-						case currentPageSpread == afterPoems + 4:
-							poetryChapbookPrinter.tabulaRasa("#page-" + newPageID, 0);
-							break;
-					}
-				}
-				inTransition = true;
-			}
-			//d3.event.preventDefault();
-		}
-		function addPage(pageID, turned, before) {
-			var insertLocation = before ? before : "#next-page";
-			var pageAdded = d3.select("#poems").insert("div", insertLocation).attr("id", pageID).attr("class", "page").classed("turned", turned).on("transitionend", resetInTransition);
-			pageAdded.append("div").attr("class", "recto-poem").append("div").attr("class","recto pages");
-			pageAdded.append("div").attr("class", "verso-poem").append("div").attr("class","verso pages");
-
-		}
-		function unturnPage(pageID) {
-			d3.select(pageID).classed("turned", false).classed("turning", true);
-		}
-		//remove as no longer used
-		function renderPageSpread() {
-			// render pre title page
-			if (currentPageSpread == 0) {
-				poetryChapbookPrinter.tabulaRasa("#page-1", 1);
-				poetryChapbookPrinter.printPreTitlePage("#page-2");
-			} 
-			// render image page and title page
-			else if (currentPageSpread == 1) {
-				console.log("foo");
-				d3.select("#page-2").classed("turned", true);
-				
-				removePage = "#page-1";
-				addPage("page-3");
-
-				poetryChapbookPrinter.printTitlePage("#page-3");
-				poetryChapbookPrinter.tabulaRasa("#page-3", 1);
-				poetryChapbookPrinter.printImprintPage("#page-3");
-			}
-			// render imprint and contents page
-			else if (currentPageSpread == 2) {
-				d3.select("#page-3").classed("turned", true);
-
-				removePage = "#page-2";
-				addPage("page-4");
-
-				poetryChapbookPrinter.printContentsPage("#page-4");
-				poetryChapbookPrinter.tabulaRasa("#page-4", 1);
-			}
-			//inital poem
-			else if (currentPageSpread == 3) {
-				d3.select("#page-4").classed("turned", true);
-				
-				removePage = "#page-3";
-				addPage("page-5");
-
-				poetryChapbookPrinter.printPoemPage("#page-5", 0);
-				//poetryChapbookPrinter.printPoemPage("#page-5", 1);
-				
-			}
-			else if (currentPageSpread < poetryChapbook.poems.length) {
-				console.log("page spread: " + currentPageSpread);
-				console.log("poems length: " + poetryChapbook.poems.length);
-
-				var turnPageNum = currentPageSpread + 1;
-				var removePageNum = currentPageSpread;
-				var addPageNum = currentPageSpread + 2;
-				//7-2 = 5
-				d3.select("#page-" + turnPageNum).classed("turned", true);
-				//d3.select("#page-" + removePageNum).remove();
-				removePage = "#page-" + removePageNum;
-
-				// move to add page function
-				addPage("page-" + addPageNum);
-				
-				//4 (x2 - 6),    5 (x2 - 6),    6 (x2 - 6),     7
-				//2/3,  4/5,  6/7,   8/9
-				var firstPage = (currentPageSpread*2) - 6;
-
-				poetryChapbookPrinter.printPoemPage("#page-" + turnPageNum, firstPage - 1);
-				poetryChapbookPrinter.printPoemPage("#page-" + addPageNum, firstPage);
-				//
-			}
-			else if (currentPageSpread < (poetryChapbook.poems.length + 1)) {
-				poetryChapbookPrinter.tabulaRasa("#page-1", 0);
-				poetryChapbookPrinter.printImagePage("#page-1", postImageSrc);
-				if (poetryChapbookPrinter.acknowledgements) {
-					poetryChapbookPrinter.printAcknowledgementsPage("#page-1");
-				}
-			}
-			else {
-				poetryChapbookPrinter.tabulaRasa("#page-1", 0);
-				poetryChapbookPrinter.tabulaRasa("#page-1", 1);
-			}
-		}
+		
 
 		</script>
 
