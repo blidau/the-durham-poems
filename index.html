@@ -5,11 +5,13 @@
 		<title>The Durham Poems</title>
 		<meta name="application-name" content="Durham Poems" />
 		<link rel="manifest" type="application/manifest+json" href="manifest.webmanifest" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link href='//fonts.googleapis.com/css?family=Goudy+Bookletter+1911' rel='stylesheet' type='text/css' />
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0" />
 		<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyDQqDxv7wuWp8CeZNkIC-EtplXPLk7gp90"></script>
 		<script type="text/javascript" src="./d3/d3.min.js"></script>
+		
+		<meta name="apple-mobile-web-app-title" content="Durham Poems" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		<link rel="apple-touch-icon" href="./images/icon.png" />
 		<link rel="apple-touch-icon" sizes="76x76" href="./images/icon-76x76.png" />
 		<link rel="apple-touch-icon" sizes="120x120" href="./images/icon-120x120.png" />
@@ -17,19 +19,11 @@
 		<link rel="apple-touch-icon" sizes="167x167" href="./images/icon-167x167.png" />
 		<link rel="apple-touch-icon" sizes="180x180" href="./images/icon-180x180.png" />
 
-		<!-- check startup image use or remove / startup image not currently working in chrome-->
+		<!-- check startup image use and add additional or remove / startup image not currently working in chrome-->
 		<link rel="apple-touch-startup-image" href="./images/cover-960x1440.png" />
+
 		<meta name="mobile-web-app-capable" content="yes" />
 		<link rel="icon" sizes="192x192" href="./images/icon-192x192.png" />
-
-		<!--
-			apple: https://developer.apple.com/library/ios/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html 
-		-->
-
-		<meta name="apple-mobile-web-app-title" content="Durham Poems" />
-		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-		
 		<link rel="shortcut icon" type="image/x-icon" href="./images/favicon.ico" />
 
 		<meta name="description" content="A series of poems on William Denton's early life in Darlington and Shildon covering the years 1823 to 1842." />
@@ -58,9 +52,18 @@
 		<meta property="dc:publisher" content="The Code of Things" />
 		<link rel="dc:type" href="http://purl.org/dc/dcmitype/InteractiveResource" />
 
-		<!-- to do: generalise and clean up clear function (eg Tabula rasa), check positioning, check page number/TOC for acknowledgements etc., move functions into chapbook reader? alt text on images used in the chapbook, move poems into a json file, chrome icons, loading images, ServiceWorker cache, double check ipad issues, move fonts offline, standard preload for all images, fix length lookups in loops, add key page turn (left right arrows), splash screens, move and set mime type for webmanifest -->
+		<!-- to do: generalise and clean up clear function (eg Tabula rasa), check positioning, check page number/TOC for acknowledgements etc., move poems into a json file, chrome icons, double check ipad issues, splash screens, test Windows and Linux -->
 		<link rel="canonical" href="https://poetry.thecodeofthings.com/the-durham-poems/working/" />
 		<style type="text/css">
+			/* goudy-bookletter-1911-regular - latin */
+			@font-face {
+				font-family: 'Goudy Bookletter 1911';
+				font-style: normal;
+				font-weight: 400;
+				src: local('Goudy Bookletter 1911'), local('GoudyBookletter1911'),
+					url('./fonts/goudy-bookletter-1911-v6-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+ */
+					url('./fonts/goudy-bookletter-1911-v6-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+			}
 
 			* { -webkit-font-smoothing: subpixel-antialiased; } /* put somewhere sensible not needed? */
 			html { height: 100%; position: fixed; width: 100%; background-color: #666; }
@@ -165,44 +168,32 @@
 				margin: 0;
 		      -webkit-perspective: 50000px;
 		         -moz-perspective: 50000px;
-		           -o-perspective: 50000px;
 		              perspective: 50000px;
 				box-sizing: border-box;
 				-moz-box-sizing: border-box;
 				-webkit-box-sizing: border-box; }
 
 			.page { height:750px;width:600px;
-				/* border:1px solid red; */
 				z-index:0;
 				border:1px solid #000;
-				/* border-left:none; */
 				position: absolute;
 				top:0;
 				right:31px;
-				/* overflow: hidden; */
 				background-color: #EEE;
-				/* box-sizing: border-box;
-				-moz-box-sizing: border-box;
-				-webkit-box-sizing: border-box; */
       -webkit-transition: -webkit-transform 0.5s linear;
          -moz-transition: -moz-transform 0.5s linear;
-           -o-transition: -o-transform 0.5s linear;
               transition: transform 0.5s linear;
 		-webkit-transform: rotateY( 0deg ) translateZ(-0.01px); /* translateZ set to -0.01px to stop a Safari flicker issue */
 		 -moz-transform: rotateY( 0deg ) translateZ(-0.01px);
-		   -o-transform: rotateY( 0deg ) translateZ(-0.01px);
 		      transform: rotateY( 0deg ) translateZ(-0.01px);
 	     -webkit-transform-style: preserve-3d;
          -moz-transform-style: preserve-3d;
-           -o-transform-style: preserve-3d;
               transform-style: preserve-3d;
-
 			}
 			#poems .page { 
 
 	     -webkit-transform-origin: left center; 
          -moz-transform-origin: left center; 
-           -o-transform-origin: left center; 
               transform-origin: left center; 
 
 			}
@@ -210,7 +201,6 @@
 				z-index: 1;
 				-webkit-transform: rotateY( -180deg ) translateZ(0.01px); /* translateZ set to -1px to stop a Safari flicker issue / Opx doesn't work -- maybe actual number forces acceleration  */
 				 -moz-transform: rotateY( -180deg ) translateZ(0.01px);
-				   -o-transform: rotateY( -180deg ) translateZ(0.01px);
 				      transform: rotateY( -180deg ) translateZ(0.01px);
 			}
 			#poems .page.turning {
@@ -226,31 +216,21 @@
 
 		      -webkit-transform-style: preserve-3d;
 		         -moz-transform-style: preserve-3d;
-		           -o-transform-style: preserve-3d;
 		              transform-style: preserve-3d;
 				
 				-webkit-backface-visibility: hidden;
 				-moz-backface-visibility: hidden;
-				-o-backface-visibility: hidden;
 				backface-visibility: hidden;
 
 			}
 			#poems * { /* fix a strange artifact bug -- bottom lefthand square on verso pages during transitions */
 				background-color: transparent;
 			}
-
-			.page .recto-poem {
-
-			}
-
 			#poems .page .verso-poem {
-
       -webkit-transform: rotateY( 180deg );
          -moz-transform: rotateY( 180deg );
-           -o-transform: rotateY( 180deg );
               transform: rotateY( 180deg );
 			}
-
 			#poems .pages {
 				width:45px;
 				height: 750px;
@@ -304,12 +284,10 @@
 				background: #FFF url("./images/next-pages.png") repeat top left;
 				background-size: 72px auto;
 				border-left:none;
-				
 				position:absolute;
 				top: 0;
 				right: 3px;
 			}
-
 			#poems #previous-page:link, #poems #next-page:link {
 				background-color: #333;
 				color: #000;
@@ -349,6 +327,7 @@
 				box-sizing: border-box;
 				-moz-box-sizing: border-box;
 				-webkit-box-sizing: border-box;
+
 				-moz-user-select: none;
 				-khtml-user-select: none;
 				-webkit-user-select: none;
@@ -358,14 +337,12 @@
 
 			#fullscreen, #previous-control, #next-control, #single-page, #double-page, #about, #share, #close-modal, #play-pause { cursor: pointer; }
 
-			#play-pause { position:absolute; right: 270px; top:5px;}
 			button img { height: 25px; width:auto; border:none; }
 
 			button::-moz-focus-inner { /* remove extra padding from Firefox */
 				padding: 0;
 				border: 0
 			}
-
 			#about {
 				position:absolute; right: 315px; top:5px;
 				height: 25px; width: 25px;
@@ -383,32 +360,22 @@
 			#about abbr {
 				text-decoration: none;
 			}
-
-			#share { position:absolute; right: 235px; top:5px;}
-			/* #share img { height: 25px; width:auto; } */
-
 			#close-modal { position:absolute; right: 0; top:0; }
 			#close-modal img { height: 20px; width:auto; }
 
+			#play-pause { position:absolute; right: 270px; top:5px;}
+			#share { position:absolute; right: 235px; top:5px;}
 			#single-page { position:absolute; right: 200px; top:5px; }
-			/* #single-page img {height: 25px; width: auto; } */
 			#double-page  { position:absolute; right: 150px; top:5px; }
-			/* #double-page img { height: 25px; width:auto; } */
 			#fullscreen { position:absolute; right: 110px; top:5px;}
-			/* #fullscreen img { height: 25px; width:auto; }  */
-			
 			#previous-control { position:absolute; right: 70px; top:5px; }
-			/* #previous-control img { height: 25px; width:auto; } */
-
 			#next-control { position:absolute; right: 30px; top:5px; }
-			/* #next-control img { height: 25px; width:auto; } */
-			
+
 			button { padding:1px; margin: 0; border: none; background-color: transparent; color:#FFF; display:block; height:25px; box-sizing: content-box;
 				-moz-box-sizing: content-box;
 				-webkit-box-sizing: content-box; min-width: 25px; text-align: center; }
 			button:focus { outline: none; }
 			button:hover, button:active { outline: none; opacity:0.5; } 
-
 			a:link, a:visited {
 				color:#000;
 			}
@@ -419,7 +386,6 @@
 				opacity: 0.5;
 				cursor: default;
 			}
-
 			#controls-tab { position:absolute; width:40px; height: 10px; background-color: #444; bottom:37px; right:70px; overflow:hidden; border-radius: 5px 5px 0 0; transition: bottom 1s, height 1s, opacity 1s; opacity:0.6;
 				-moz-user-select: none;
 				-khtml-user-select: none;
@@ -449,18 +415,15 @@
 			#modal-panel {
 				position:absolute; 
 				z-index: 100;
-
 				width:420px;
 				height:230px;
-				
 				background-color: #DDD;
 				background-color: #EEE;
 				color:#000;
 				top: 50%;
 				-webkit-transform: translateY(-50%);
 				-moz-transform: translateY(-50%);
-				-o-transform: translateY(-50%);
-  				transform: translateY(-50%); /* add specific */
+  				transform: translateY(-50%);
 				margin-left: auto;
 				margin-right: auto;
 				left: 0;
@@ -520,7 +483,6 @@
 				-moz-box-sizing: border-box;
 				-webkit-box-sizing: border-box;
 			}
-
 			#modal {
 				display:none;
 			}
@@ -542,21 +504,18 @@
 				right:332px;
       -webkit-transition: top 0.5s ease;
          -moz-transition: top 0.5s ease;
-           -o-transition: top 0.5s ease;
               transition: top 0.5s ease;
               transform: none;
 			}
 			.single-page-mode #poems .page.turned {
-				-webkit-transform: none; /* add specific */
-				-moz-transform: none; /* add specific */
-				-o-transform: none; /* add specific */
-				transform: none; /* add specific */
+				-webkit-transform: none; 
+				-moz-transform: none; 
+				transform: none; 
 			}
 			.single-page-mode #poems .page .verso-poem {
-				-webkit-transform: none; /* add specific */
-				-moz-transform: none; /* add specific */
-				-o-transform: none; /* add specific */
-				transform: none; /* add specific */
+				-webkit-transform: none; 
+				-moz-transform: none; 
+				transform: none; 
 			}
 			.single-page-mode #poems .page.following {
 				top: 753px;
@@ -573,17 +532,15 @@
 			.single-page-mode.reading #poems .page {
       -webkit-transition: top 1s linear;
          -moz-transition: top 1s linear;
-           -o-transition: top 1s linear;
               transition: top 1s linear;
 			}
 			.reading #poems .page {
       -webkit-transition: -webkit-transform 4s linear;
          -moz-transition: -moz-transform 4s linear;
-           -o-transition: -o-transform 4s linear;
               transition: transform 4s linear;
 			}
 
-			@media screen and (max-width: 420px) {
+			@media screen and (max-width: 440px) {
 
 				#modal-panel {
 					position:absolute; 
@@ -601,6 +558,26 @@
 					-moz-box-sizing: border-box;
 					-webkit-box-sizing: border-box;					
 				}
+			}
+			@media screen and (max-width: 350px) {
+				#about { right: 280px; }
+				#play-pause { right: 240px; }
+				#share { right: 210px; }
+				#single-page { right: 170px; }
+				#double-page  { right: 130px; }
+				#fullscreen { right: 90px; }
+				#previous-control { right: 50px; }
+				#next-control { right: 20px; }
+			}
+			@media screen and (max-width: 310px) {
+				#about { right: 270px; }
+				#play-pause { right: 230px; }
+				#share { right: 200px; }
+				#single-page { right: 160px; }
+				#double-page  { right: 120px; }
+				#fullscreen { right: 80px; }
+				#previous-control { right: 40px; }
+				#next-control { right: 10px; }
 			}
 
 			/* preloader */
@@ -634,15 +611,16 @@
 		<script type="text/javascript">
 		"use strict";
 		
-		function ChapbookPrinter(chapbook, publisher, city, country, acknowledgements, sources) {
-			//keep publishing city contained within the chapbook printer
+		function ChapbookPrinter(chapbook, publisher, city, country, images, quotes, acknowledgements) {
+			
 			this.chapbook = chapbook;
 			this.acknowledgements = acknowledgements;
-			this.sources = sources;
 			this.publisher = publisher;
+			this.images = images;
+			this.quotes = quotes;
 			this.city = city; 
 			this.country = country; 
-			this.year = new Date().getUTCFullYear(); //change to current year
+			this.year = new Date().getUTCFullYear(); 
 
 
 			this.currentPageSpread = 0;
@@ -671,21 +649,30 @@
 				}
 			];
 			this.startingPage = 3;
+			this.updatePublishingCity();
 
-			//initialise printing?
+			/* render initial pages */
+			this.addPage("page-1", true); // move this to printer
+			this.addPage("page-2"); // move this to printer
+
+			this.tabulaRasa("#page-1", 0);
+			this.tabulaRasa("#page-1", 1);
+
+			this.printPreTitlePage("#page-2");
+			this.printImagePage("#page-2", 0);
 		}
 
 		ChapbookPrinter.prototype.determinePublishingCity = function(geoposition) {
-			var geocoder = new google.maps.Geocoder();
-			var latlng = new google.maps.LatLng(geoposition.coords.latitude, geoposition.coords.longitude);
-			var _this = this;
-			var _city = this.city;
-			var _country = this.country;
+			var geocoder = new google.maps.Geocoder(),
+				latlng = new google.maps.LatLng(geoposition.coords.latitude, geoposition.coords.longitude),
+				_this = this,
+				_city = this.city,
+				_country = this.country,
+				cityFound = false;
 			geocoder.geocode({'latLng': latlng}, function(results, status) {
 				if (status == google.maps.GeocoderStatus.OK) {
 					if (results[0]) {
-						var cityFound = false;
-						for (var i=0;i<results[0].address_components.length;i++) {
+						for (var i=0, resultsAddressComponentsLength=results[0].address_components.length;i<resultsAddressComponentsLength;i++) {
 							if ((results[0].address_components[i].types[0]=="locality") && !cityFound ) {
 								_city = results[0].address_components[i].long_name;
 								cityFound = true;
@@ -734,13 +721,11 @@
 						this.currentPageSpread = 0;
 					}
 
-					var removePageNum = this.currentPageSpread > 0 ? this.currentPageSpread : Math.floor(this.chapbook.poems.length/2) + 6;
-					var turnPageNum = this.currentPageSpread + 1;
-					var addPageNum = (this.currentPageSpread < (Math.floor(this.chapbook.poems.length/2) + 5)) ? this.currentPageSpread + 2 : 1;
-
-					var firstPage = (this.currentPageSpread*2) - 6;
-
-					var afterPoems = Math.floor(this.chapbook.poems.length/2) + 4;
+					var removePageNum = this.currentPageSpread > 0 ? this.currentPageSpread : Math.floor(this.chapbook.poems.length/2) + 6,
+						turnPageNum = this.currentPageSpread + 1,
+						addPageNum = (this.currentPageSpread < (Math.floor(this.chapbook.poems.length/2) + 5)) ? this.currentPageSpread + 2 : 1,
+						firstPage = (this.currentPageSpread*2) - 6,
+						afterPoems = Math.floor(this.chapbook.poems.length/2) + 4;
 
 					this.removePage = "#page-" + removePageNum;
 					this.turningPage = "#page-" + turnPageNum;
@@ -751,7 +736,7 @@
 					switch (true) {
 						case this.currentPageSpread == 0:
 							this.printPreTitlePage("#page-2");
-							this.printImagePage("#page-2");
+							this.printImagePage("#page-2", 0);
 							break;
 						case this.currentPageSpread == 1:
 							this.printTitlePage("#page-3");
@@ -768,7 +753,7 @@
 							break;
 						case this.currentPageSpread == afterPoems:
 							this.tabulaRasa("#page-" + turnPageNum, 1);
-							this.printImagePage("#page-" + turnPageNum, postImageSrc);
+							this.printImagePage("#page-" + turnPageNum, 1);
 							if (this.acknowledgements) {
 								this.printAcknowledgementsPage("#page-" + addPageNum);
 							}
@@ -788,11 +773,10 @@
 					this.currentPageSpread += 1;
 					this.currentPageSpread = (this.currentPageSpread > this.chapbook.poems.length + 10) ? 0 : this.currentPageSpread;
 					//remove page number (current page)
-					var newPageID = this.currentPageSpread + 1;
-					var afterPoems = this.chapbook.poems.length + 6;
-
-					var precedingPageID = (this.currentPageSpread < 2) ? afterPoems + (4 + this.currentPageSpread): this.currentPageSpread - 1;
-					var followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : newPageID + 1;
+					var newPageID = this.currentPageSpread + 1,
+						afterPoems = this.chapbook.poems.length + 6,
+						precedingPageID = (this.currentPageSpread < 2) ? afterPoems + (4 + this.currentPageSpread): this.currentPageSpread - 1,
+						followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : newPageID + 1;
 
 					this.addSinglePage("page-" + followingPageID, !(this.currentPageSpread % 2), false); //add a page ahead
 					this.removePage = "#page-" + precedingPageID; //actually remove the current previous page
@@ -802,29 +786,27 @@
 					//kick the tyres and force a recalc
 					//https://timtaubert.de/blog/2012/09/css-transitions-for-dynamically-created-dom-elements/
 					window.getComputedStyle(document.getElementById("poems")).height;
-					//window.setTimeout(function(){
 					pageShift.classed("offscreen", false);
 					d3.select("#page-" + precedingPageID).classed("offscreen", true);
-					//}, 0); //not reliable
 					d3.select("#page-" + removePageNum).classed("preceding", true);
 					d3.select("#page-" + newPageID).classed("following", false);
 
 					switch (true) {
-						case this.currentPageSpread == 0: // pre title page
-							this.printPreTitlePage("#page-1");//right
+						case this.currentPageSpread == 0: 
+							this.printPreTitlePage("#page-1");
 							break;
-						case this.currentPageSpread == 1: // image
-							this.printImagePage("#page-2");
+						case this.currentPageSpread == 1: 
+							this.printImagePage("#page-2", 0);
 							break;
-						case this.currentPageSpread == 2: // title page
+						case this.currentPageSpread == 2: 
 							this.printTitlePage("#page-3");
 							break;
-						case this.currentPageSpread == 3: // imprint
+						case this.currentPageSpread == 3: 
 							this.tabulaRasa("#page-4", 1);
 							this.printImprintPage("#page-4");
 							break;
 						case this.currentPageSpread == 4:
-							this.printContentsPage("#page-5"); //right
+							this.printContentsPage("#page-5"); 
 							break;
 						case this.currentPageSpread == 5:
 							this.tabulaRasa("#page-6", 1);
@@ -835,7 +817,7 @@
 							break;
 						case this.currentPageSpread == afterPoems:
 							this.tabulaRasa("#page-" + newPageID, 0); //move function into page draw
-							this.printImagePage("#page-" + newPageID, postImageSrc);
+							this.printImagePage("#page-" + newPageID, 1);
 							break;
 						case this.currentPageSpread == afterPoems + 1:
 							this.tabulaRasa("#page-" + newPageID, 1);
@@ -867,13 +849,11 @@
 						this.currentPageSpread = Math.floor(this.chapbook.poems.length/2) + 5;
 					}
 					
-					var afterPoems = Math.floor(this.chapbook.poems.length/2) + 4; //calculate and keep in object
-
-					var addPageNum = this.currentPageSpread + 1;
-					var unturnPageNum = this.currentPageSpread < afterPoems + 1 ? this.currentPageSpread + 2 : (this.currentPageSpread-afterPoems);
-					var removePageNum = this.currentPageSpread < afterPoems ? this.currentPageSpread + 3 : (this.currentPageSpread-afterPoems) + 1;
-					
-					var firstPage = (this.currentPageSpread*2) - 6;
+					var afterPoems = Math.floor(this.chapbook.poems.length/2) + 4, //calculate and keep in object
+						addPageNum = this.currentPageSpread + 1,
+						unturnPageNum = this.currentPageSpread < afterPoems + 1 ? this.currentPageSpread + 2 : (this.currentPageSpread-afterPoems),
+						removePageNum = this.currentPageSpread < afterPoems ? this.currentPageSpread + 3 : (this.currentPageSpread-afterPoems) + 1,
+						firstPage = (this.currentPageSpread*2) - 6;
 
 					this.removePage = "#page-" + removePageNum;
 					this.turningPage = "#page-" + unturnPageNum;
@@ -883,13 +863,12 @@
 
 					switch (true) {
 						case this.currentPageSpread == 0:
-						//unturn last page
 							this.tabulaRasa("#page-1", 0);
 							this.tabulaRasa("#page-1", 1);
 							break;
 						case this.currentPageSpread == 1:
 							this.printPreTitlePage("#page-2");
-							this.printImagePage("#page-2");
+							this.printImagePage("#page-2", 0);
 							break;
 						case this.currentPageSpread == 2:
 							this.printTitlePage("#page-3");
@@ -904,7 +883,7 @@
 							break;
 						case this.currentPageSpread == afterPoems:
 							this.tabulaRasa("#page-" + addPageNum, 1);
-							this.printImagePage("#page-" + addPageNum, postImageSrc);
+							this.printImagePage("#page-" + addPageNum, 1);
 							if (this.acknowledgements) {
 								this.printAcknowledgementsPage("#page-" + unturnPageNum);
 							}
@@ -922,15 +901,15 @@
 					var removePageNum = this.currentPageSpread + 1;
 					this.currentPageSpread -= 1;
 					this.currentPageSpread = (this.currentPageSpread < 0) ? this.chapbook.poems.length + 10 : this.currentPageSpread;
+
 					//remove page number (current page)
-					var newPageID = this.currentPageSpread + 1;
-					var afterPoems = this.chapbook.poems.length + 6;
+					var newPageID = this.currentPageSpread + 1,
+						afterPoems = this.chapbook.poems.length + 6,
+						precedingPageID = (this.currentPageSpread < 1) ? afterPoems + 5: this.currentPageSpread,
+						followingPageID = (this.currentPageSpread + 2) > afterPoems + 4 ? 2 + (this.currentPageSpread - (this.chapbook.poems.length + 10)) : newPageID + 2;
 
-					var precedingPageID = (this.currentPageSpread < 1) ? afterPoems + 5: this.currentPageSpread;
-					var followingPageID = (this.currentPageSpread + 2) > afterPoems + 4 ? 2 + (this.currentPageSpread - (this.chapbook.poems.length + 10)) : newPageID + 2;
-
-					this.addSinglePage("page-" + precedingPageID, !(this.currentPageSpread % 2), false); //add a page ahead
-					this.removePage = "#page-" + followingPageID; //actually remove the current following page
+					this.addSinglePage("page-" + precedingPageID, !(this.currentPageSpread % 2), false); 
+					this.removePage = "#page-" + followingPageID; 
 					
 					var pageShift = d3.select("#page-" + precedingPageID);
 					pageShift.classed("offscreen", true).classed("preceding", true);
@@ -941,14 +920,14 @@
 
 					d3.select("#page-" + removePageNum).classed("following", true);
 					d3.select("#page-" + newPageID).classed("preceding", false);
-					console.log("current page spread: " + this.currentPageSpread);
+					
 
 					switch (true) {
 						case this.currentPageSpread == 0: // pre title page
 							this.printPreTitlePage("#page-1");//right
 							break;
 						case this.currentPageSpread == 1: // image
-							this.printImagePage("#page-2");
+							this.printImagePage("#page-2", 0);
 							break;
 						case this.currentPageSpread == 2: // title page
 							this.printTitlePage("#page-3");
@@ -965,12 +944,11 @@
 							this.printQuotePage("#page-6");
 							break;
 						default:
-							console.log("adding poem:" + (this.currentPageSpread - 6));
 							this.printPoemPage("#page-" + newPageID, this.currentPageSpread-6);
 							break;
 						case this.currentPageSpread == afterPoems:
 							this.tabulaRasa("#page-" + newPageID, 0); //move function into page draw
-							this.printImagePage("#page-" + newPageID, postImageSrc);
+							this.printImagePage("#page-" + newPageID, 1);
 							break;
 						case this.currentPageSpread == afterPoems + 1:
 							this.tabulaRasa("#page-" + newPageID, 1);
@@ -993,41 +971,119 @@
 			}
 		}
 		ChapbookPrinter.prototype.addPage = function(pageID, turned, before) {
-			var _this = this;
-			var insertLocation = before ? before : "#next-page";
-			var pageAdded = d3.select("#poems").insert("div", insertLocation).attr("id", pageID).attr("class", "page").classed("turned", turned).on("transitionend", function() { _this.resetInTransition() }); //fix this
-			pageAdded.append("div").attr("class", "recto-poem").append("div").attr("class","recto pages");
-			pageAdded.append("div").attr("class", "verso-poem").append("div").attr("class","verso pages");
+			var _this = this,
+				insertLocation = before ? before : "#next-page",
+				touchX = 0,
+				pageAdded = d3.select("#poems").insert("div", insertLocation).attr("id", pageID).attr("class", "page").classed("turned", turned).on("transitionend", function() { _this.resetInTransition() }),
+				rectoPage = pageAdded.append("div").attr("class", "recto-poem"),
+				versoPage = pageAdded.append("div").attr("class", "verso-poem");
+
+			rectoPage.append("div").attr("class","recto pages");
+			rectoPage.on("click", 
+					function() { 
+						if (d3.event.defaultPrevented) return;
+						_this.nextPage(); }
+				);
+			rectoPage.on("touchmove", 
+					function() { 
+						d3.event.preventDefault();
+						if (touchX == 0) {
+							touchX = d3.event.changedTouches[0].pageX;
+						}
+					}
+				);
+			rectoPage.on("touchend", 
+					function() { 
+						if (d3.event.defaultPrevented) return;
+						var deltaX = touchX - d3.event.changedTouches[0].pageX;
+						if ((deltaX > 0) || (touchX==0)) {
+							_this.nextPage();
+						}
+						else if (deltaX < 0) {
+							_this.previousPage();
+						}
+						touchX = 0;
+					}
+				);
+			versoPage.append("div").attr("class","verso pages");
+			versoPage.on("click", 
+					function() { 
+						if (d3.event.defaultPrevented) return;
+						_this.previousPage(); }
+				);
+			versoPage.on("touchmove", 
+					function() { 
+						d3.event.preventDefault();
+						if (touchX == 0) {
+							touchX = d3.event.changedTouches[0].pageX;
+						}
+					}
+				);
+			versoPage.on("touchend", 
+					function() { 
+						if (d3.event.defaultPrevented) return;
+						var deltaX = touchX - d3.event.changedTouches[0].pageX;
+						if (deltaX > 0) {
+							_this.nextPage();
+						}
+						else if ((deltaX < 0) || (touchX==0)) {
+							_this.previousPage();
+						}
+						touchX = 0;
+					}
+				);
 
 		}
-
 		ChapbookPrinter.prototype.addSinglePage = function(pageID, isVerso, hasClass) {
 			//append to #poems
-			var _this = this;
-			var pageAdded = d3.select("#poems").insert("div").attr("id", pageID).attr("class", "page").on("transitionend", function() { _this.resetInTransition() }); //fix this
-			var pageClass = isVerso ? "verso-poem" : "recto-poem";
-			pageAdded.append("div").attr("class", pageClass);
+			var _this = this,
+				touchY = 0,
+				pageAdded = d3.select("#poems").insert("div").attr("id", pageID).attr("class", "page").on("transitionend", function() { _this.resetInTransition() }),
+				pageClass = isVerso ? "verso-poem" : "recto-poem",
+				newPage = pageAdded.append("div").attr("class", pageClass);
+
+			newPage.on("click", 
+					function() { 
+						if (d3.event.defaultPrevented) return;
+						_this.nextPage(); }
+				);
+			newPage.on("touchmove", 
+					function() { 
+						d3.event.preventDefault();
+						if (touchY == 0) {
+							touchY = d3.event.changedTouches[0].pageY;
+						}
+					}
+				);
+			newPage.on("touchend", 
+					function() { 
+						if (d3.event.defaultPrevented) return;
+						var deltaY = touchY - d3.event.changedTouches[0].pageY;
+						if ((deltaY > 0) || (touchY==0)) {
+							_this.nextPage();
+						}
+						else if (deltaY < 0) {
+							_this.previousPage();
+						}
+						touchY = 0;
+					}
+				);
 		}
 
 		ChapbookPrinter.prototype.unturnPage = function(pageID) {
 			d3.select(pageID).classed("turned", false).classed("turning", true);
 		}
 
-
-		//update to make reading mode a toggle
-		// move to reader
-		//split function so interface altering elements are moved to reader and page altering elements are kept in printer
 		ChapbookPrinter.prototype.singlePageMode = function() {
 			if (this.modeDoublePage && !this.inTransition){
 				this.modeDoublePage = false;
 				d3.select("#single-page").attr("disabled", "disabled");
 				d3.select("#double-page").attr("disabled", null);
-				console.log("current page spread: " + this.currentPageSpread);
 				d3.select("body").classed("single-page-mode", true);
 				//remove pages this.currentPageSpread +1 and this.currentPageSpread +2
-				var versoPage = this.currentPageSpread + 1;
-				var rectoPage = (this.currentPageSpread < (Math.floor(this.chapbook.poems.length/2) + 5)) ? this.currentPageSpread + 2 : 1;
-				var afterPoems = this.chapbook.poems.length + 6; //add this to printer properties? make it a calculation function
+				var versoPage = this.currentPageSpread + 1,
+					rectoPage = (this.currentPageSpread < (Math.floor(this.chapbook.poems.length/2) + 5)) ? this.currentPageSpread + 2 : 1,
+					afterPoems = this.chapbook.poems.length + 6; //add this to printer properties? make it a calculation function
 				//remove pages
 				d3.select("#page-" + versoPage).remove();
 				d3.select("#page-" + rectoPage).remove();
@@ -1040,8 +1096,8 @@
 
 				this.addSinglePage("page-" + currentPageID, this.currentPageSpread % 2, true); //add current page
 				//add preceding page
-				var precedingPageID = (this.currentPageSpread == 0) ? afterPoems + 5: this.currentPageSpread;
-				var followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
+				var precedingPageID = (this.currentPageSpread == 0) ? afterPoems + 5: this.currentPageSpread,
+					followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
 
 				this.addSinglePage("page-" + precedingPageID, true, true); //add current page
 				this.addSinglePage("page-" + followingPageID, true, true); //add current page
@@ -1054,7 +1110,7 @@
 						this.printPreTitlePage("#page-1");//right
 						break;
 					case this.currentPageSpread == 1: // image
-						this.printImagePage("#page-2");
+						this.printImagePage("#page-2", 0);
 						break;
 					case this.currentPageSpread == 2: // title page
 						this.printTitlePage("#page-3");
@@ -1075,7 +1131,7 @@
 						break;
 					case this.currentPageSpread == afterPoems:
 						this.tabulaRasa("#page-" + currentPageID, 0); //move function into page draw
-						this.printImagePage("#page-" + currentPageID, postImageSrc);
+						this.printImagePage("#page-" + currentPageID, 1);
 						break;
 					case this.currentPageSpread == afterPoems + 1:
 						this.tabulaRasa("#page-" + currentPageID, 1);
@@ -1093,17 +1149,16 @@
 						this.tabulaRasa("#page-" + currentPageID, 0);
 						break;
 				}
-				//updateWindow(); //move to reader
 			}
 		}
-		// move to reader
 		ChapbookPrinter.prototype.doublePageMode = function() {
-			console.log("current page spread: " + this.currentPageSpread);
 			if (!this.modeDoublePage && !this.inTransition) {
 				var _this = this;
+				
 				d3.select("#double-page").attr("disabled", "disabled");
 				d3.select("#single-page").attr("disabled", null);
 				this.modeDoublePage = true;
+				
 				d3.select("body").classed("single-page-mode", false);
 				//next and previous
 				d3.select("#poems").insert("a").attr("id", "next-page").on("click", 
@@ -1115,30 +1170,27 @@
 
 				//remove the three pages
 
-				var currentPageID = this.currentPageSpread + 1;
-				var afterPoems = this.chapbook.poems.length + 6;
+				var currentPageID = this.currentPageSpread + 1,
+					afterPoems = this.chapbook.poems.length + 6;
 
 				d3.select("#page-" + currentPageID).remove(); //add current page
+				
 				//add preceding page
-				var precedingPageID = (this.currentPageSpread == 0) ? afterPoems + 5: this.currentPageSpread;
-				var followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
-				console.log("preceding page: " + precedingPageID);
-				console.log("following page: " + followingPageID);
-				console.log("current page spread: " + this.currentPageSpread);
+				var precedingPageID = (this.currentPageSpread == 0) ? afterPoems + 5: this.currentPageSpread,
+					followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
 
 				d3.select("#page-" + precedingPageID).remove();
 				d3.select("#page-" + followingPageID).remove();
 
 				this.currentPageSpread = Math.ceil(this.currentPageSpread/2);
-				console.log("current page spread: " + this.currentPageSpread);
 				
 				if (this.currentPageSpread > (Math.floor(this.chapbook.poems.length/2) + 5)) {
 							this.currentPageSpread = 0;
 						}
 
-				var firstPageNum = this.currentPageSpread + 1;
-				var secondPageNum = (this.currentPageSpread < (Math.floor(this.chapbook.poems.length/2) + 5)) ? this.currentPageSpread + 2 : 1;
-				var firstPage = (this.currentPageSpread*2) - 6;
+				var firstPageNum = this.currentPageSpread + 1,
+					secondPageNum = (this.currentPageSpread < (Math.floor(this.chapbook.poems.length/2) + 5)) ? this.currentPageSpread + 2 : 1,
+					firstPage = (this.currentPageSpread*2) - 6;
 
 				afterPoems = Math.floor(this.chapbook.poems.length/2) + 4;
 
@@ -1151,11 +1203,11 @@
 						this.tabulaRasa("#page-1", 1);
 						this.tabulaRasa("#page-1", 0);				
 						this.printPreTitlePage("#page-2");
-						this.printImagePage("#page-2");
+						this.printImagePage("#page-2", 0);
 						break;
 					case this.currentPageSpread == 1:
 						this.printPreTitlePage("#page-2");
-						this.printImagePage("#page-2");				
+						this.printImagePage("#page-2", 0);				
 						this.printTitlePage("#page-3");
 						this.tabulaRasa("#page-3", 1);
 						this.printImprintPage("#page-3");
@@ -1176,7 +1228,7 @@
 						break;
 					case this.currentPageSpread == afterPoems:
 						this.tabulaRasa("#page-" + firstPageNum, 1);
-						this.printImagePage("#page-" + firstPageNum, postImageSrc);
+						this.printImagePage("#page-" + firstPageNum, 1);
 						if (this.acknowledgements) {
 							this.tabulaRasa("#page-" + secondPageNum, 0);
 							this.printAcknowledgementsPage("#page-" + secondPageNum);
@@ -1193,161 +1245,149 @@
 						this.printPoemPage("#page-" + secondPageNum, firstPage);
 						break;
 				}
-				//updateWindow(); //move to controller
 			}
 		}
 		ChapbookPrinter.prototype.printImprintPage = function(pageID) {
-			var page = this.pageSettings[1];
-			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+			var page = this.pageSettings[1],
+				svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+			
 			//remove current poem if it exists
 			svgRoot.select("." + page.side + "-page-svg").remove();
-			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
-			
-			var yLayoutPosition = 40,
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500"),
+				xLayoutPosition = 40,
+				yLayoutPosition = 50,
 				yIncrement = 15;
 
-			var initY = 40,
-				incrementY = 15;
-
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition)
 				.attr("text-anchor", "start")
-				.text("First Published " + this.year); //or fix the date ...
+				.text("First published " + this.year); //or fix the date ...
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
-				.text("By " + this.publisher.name);
+				.text("by " + this.publisher.name);
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text(this.publisher.url);
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=(2*yIncrement))
 				.attr("text-anchor", "start")
 				.text("© " + this.chapbook.author.join(" ") + " " + this.year);
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=(2*yIncrement))
 				.attr("text-anchor", "start")
 				.text("Designed by Benjamin Laird");
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("Typeset with D3");
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
-				.text("In Goudy Bookletter 1911");
+				.text("in Goudy Bookletter 1911");
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=(2*yIncrement))
 				.attr("text-anchor", "start")
 				.text("Printed and bound in HTML, SVG, CSS and JavaScript");
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("Distributed by the Internet");
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=(2*yIncrement))
 				.attr("text-anchor", "start")
 				.text(this.chapbook.author.reverse().join(", "));
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text(this.chapbook.title + " / " + this.chapbook.author.reverse().join(" "));
 			
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
 				.text("URI " + window.location.origin + window.location.pathname);
 
-			/* the following copyright statement is satirical and not to be taken literally */
-			
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=(2*yIncrement))
 				.attr("text-anchor", "start")
-				.text("All rights reserved.");
+				.text("This work is licensed");
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
-				.text("No part of this publication may be");
+				.text("under the Creative Commons");
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
-				.text("reproduced, stored in a retrieval system or");
+				.text("Attribution-ShareAlike 4.0");
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
-				.text("transmitted in any form or by any means");
+				.text("International License");
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
-				.text("electronic, mechanical, photocopying or");
+				.text("To view a copy of this license, visit");
 
 			svg.append("text")
 				.attr("class", "imprint")
-				.attr("dx", 40)
+				.attr("dx", xLayoutPosition)
 				.attr("dy", yLayoutPosition+=yIncrement)
 				.attr("text-anchor", "start")
-				.text("otherwise without the prior permission of");
-
-			svg.append("text")
-				.attr("class", "imprint")
-				.attr("dx", 40)
-				.attr("dy", yLayoutPosition+=yIncrement)
-				.attr("text-anchor", "start")
-				.text("the publisher.");
+				.text("https://creativecommons.org/licenses/by-sa/4.0/");
 
 		}
 		ChapbookPrinter.prototype.printTitlePage = function(pageID) {
-			var page = this.pageSettings[0];
-			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+			var page = this.pageSettings[0],
+				svgRoot = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
 			svgRoot.select("." + page.side + "-page-svg").remove();
 			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
@@ -1356,14 +1396,14 @@
 				.attr("dx", 200)
 				.attr("dy", 40)
 				.attr("text-anchor", "middle")
-				.text("THE"); //split out the first word? //title article (if title article insert here otherwise ignore and use title article to create a full title property)
+				.text(this.chapbook.title.split(" ")[0].toUpperCase()); //split out the first word? //title article (if title article insert here otherwise ignore and use title article to create a full title property)
 
 			svg.append("text")
 				.attr("id", "main-title")
 				.attr("dx", 200)
 				.attr("dy", 90)
 				.attr("text-anchor", "middle")
-				.text(this.chapbook.title.toUpperCase() + ";");
+				.text(this.chapbook.title.split(" ").slice(1).join(" ").toUpperCase() + ";");
 			
 			svg.append("text")
 				.attr("class", "inter-title")
@@ -1405,14 +1445,14 @@
 				.attr("dx", 200)
 				.attr("dy", 360)
 				.attr("text-anchor", "middle")
-				.text("“" + this.chapbook.quote.quote + "”");
+				.text("“" + this.quotes[0].quote + "”");
 
 			svg.append("text")
 				.attr("class", "quote-author")
 				.attr("dx", 310)
 				.attr("dy", 375)
 				.attr("text-anchor", "end")
-				.text(this.chapbook.quote.author + ".");
+				.text(this.quotes[0].author + ".");
 
 			svg.append("text")
 				.attr("id", "place")
@@ -1436,8 +1476,9 @@
 				.text(this.year + ".");
 		}
 		ChapbookPrinter.prototype.printPreTitlePage = function(pageID) {
-			var page = this.pageSettings[0];
-			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+			var page = this.pageSettings[0],
+				svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+
 			//remove current poem if it exists
 			svgRoot.select("." + page.side + "-page-svg").remove();
 			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
@@ -1447,74 +1488,70 @@
 				.attr("dx", 200)
 				.attr("dy", 180)
 				.attr("text-anchor", "middle")
-				.text(("The " + this.chapbook.title).toUpperCase());
+				.text((this.chapbook.title).toUpperCase());
 			
 		}
 		ChapbookPrinter.prototype.printQuotePage = function(pageID) {
-			var page = this.pageSettings[1];
-			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+			var page = this.pageSettings[1],
+				svgRoot = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
 			svgRoot.select("." + page.side + "-page-svg").remove();
-			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
-
-			//add loop in for length of lines
+			
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500"),
+				text = svg.append("text")
+					.attr("class", "quote")
+					.attr("dx", 0)
+					.attr("dy", 200)
+					.attr("text-anchor", "start"),
+				words = ("“" + this.quotes[1].quote + "”").split(/\s+/).reverse(),
+				word,
+				width = 280,
+				line = [],
+				lineNumber = 0,
+				lineHeight = 15,
+				dy = 200,
+				tspan = text.append("tspan").attr("x", 50).attr("y", 0).attr("dy", dy);
+			
+			while (word = words.pop()) {
+				line.push(word);
+				tspan.text(line.join(" "));
+				if (tspan.node().getComputedTextLength() > width) {
+					line.pop();
+					tspan.text(line.join(" "));
+					line = [word];
+					tspan = text.append("tspan").attr("x", 60).attr("y", 0).attr("dy", ++lineNumber * lineHeight + dy).text(word);
+				}
+			}
 
 			svg.append("text")
-				.attr("class", "quote")
-				.attr("dx", 50)
-				.attr("dy", 200)
-				.attr("text-anchor", "start")
-				.text("“The town I once knew has departed and a new town with the old");
-
-			svg.append("text")
-				.attr("class", "quote")
-				.attr("dx", 60)
-				.attr("dy", 215)
-				.attr("text-anchor", "start")
-				.text("name is here.”");
-
-			var quoteLine = svg.append("text")
 				.attr("class", "quote")
 				.attr("dx", 110)
-				.attr("dy", 230)
-				.attr("text-anchor", "start");
-
-			quoteLine.append("tspan")
-				.attr("class", "quote-author")
-				.text("William Denton");
-
-			quoteLine.append("tspan")
-				.text(", Darlington, 25 December 1876");
+				.attr("dy", ++lineNumber * lineHeight + dy)
+				.attr("text-anchor", "start")
+				.text(this.quotes[1].author + ", " + this.quotes[1].place + ", " + this.quotes[1].date);
 			
 		}
-		ChapbookPrinter.prototype.printImagePage = function(pageID, specificImage, pageOrientation) {
-			var page = this.pageSettings[1];
-			var primary = d3.select(pageID).select("." + page.side + "-poem");
+		ChapbookPrinter.prototype.printImagePage = function(pageID, imageIndex) {
+			var page = this.pageSettings[1],
+				primary = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
 			primary.select("." + page.side + "-page-svg").remove();
-			console.log(specificImage);
 			primary.select("img").remove() //replace once clear function works correctly
-
-			if (!specificImage) {
-				primary.append("img")
-					.attr("src", this.chapbook.image)
-					.attr("id", "featured-image");
-			} else {
-				primary.append("img")
-					.attr("src", specificImage)
-					.attr("id", "featured-image");
-			}
+			primary.append("img")
+				.attr("src", this.images[imageIndex].src)
+				.attr("alt", this.images[imageIndex].alt)
+				.attr("id", "featured-image");
 		}
 		ChapbookPrinter.prototype.printContentsPage = function(pageID) {
-			var page = this.pageSettings[0];
-			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+			var page = this.pageSettings[0],
+				svgRoot = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
 			svgRoot.select("." + page.side + "-page-svg").remove();
-			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
-			var yLoc = 90;
-			var xLocTitle = 70;
-			var xLocPage = 320;
-			var increment = 20;
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500"),
+				yLoc = 90,
+				xLocTitle = 70,
+				xLocPage = 320,
+				increment = 20;
 
 			svg.append("text")
 				.attr("id", "contents-title")
@@ -1523,7 +1560,7 @@
 				.attr("text-anchor", "middle")
 				.text("CONTENTS");
 
-			for (var i=0;i<this.chapbook.poems.length;i++) {
+			for (var i=0, chapbookLength = this.chapbook.poems.length;i<chapbookLength;i++) {
 				svg.append("text")
 					.attr("class", "contents-poem-title")
 					.attr("dx", xLocTitle)
@@ -1540,16 +1577,18 @@
 			}
 		}
 		ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
-			var page = this.pageSettings[0];
-			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+			var page = this.pageSettings[0],
+				svgRoot = d3.select(pageID).select("." + page.side + "-poem");
+			
 			//remove current poem if it exists
 			svgRoot.select("." + page.side + "-page-svg").remove();
-			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
-			var yLoc = 70;
-			var xLocTitle = 70;
-			var xLocText = 50;
-			var xLocPage = 320;
-			var increment = 20;
+
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500"),
+				yLoc = 70,
+				xLocTitle = 70,
+				xLocText = 50,
+				xLocPage = 320,
+				increment = 20;
 
 			svg.append("text")
 				.attr("class", "acknowledments-title")
@@ -1559,83 +1598,56 @@
 				.text("Acknowledgements".toUpperCase());
 
 			var text = svg.append("text")
-				.attr("class", "acknowledgements")
-				.attr("dx", 0)
-				.attr("dy", yLoc)
-				.attr("text-anchor", "start");
-			
-			var words = this.acknowledgements.text.split(/\s+/).reverse();
-			var word;
-			var width = 280;
-			var line = [];
-			var lineNumber = 0;
-			var lineHeight = 14; // pixels
-			var y = 12;
-			var dy = parseFloat(text.attr("dy"));
-			var tspan = text.text(null).append("tspan").attr("x", (((xLocPage-xLocTitle)/2) + xLocTitle)-140).attr("y", y).attr("dy", dy);
+					.attr("class", "acknowledgements")
+					.attr("dx", 0)
+					.attr("dy", yLoc)
+					.attr("text-anchor", "start"),
+				words = this.acknowledgements.text.split(/\s+/).reverse(),
+				word,
+				width = 280,
+				line = [],
+				wordSpacing,
+				lineNumber = 0,
+				lineHeight = 14,
+				y = 12,
+				dy = parseFloat(text.attr("dy")),
+				tspan = text.append("tspan").attr("x", (((xLocPage-xLocTitle)/2) + xLocTitle)-140).attr("y", y).attr("dy", dy);
+
 			while (word = words.pop()) {
 				line.push(word);
-				tspan.text(line.join(" ")); //last line when we've run out of words which is not justified
+				tspan.text(line.join(" "));
 				if (tspan.node().getComputedTextLength() > width) {
 					line.pop();
 					tspan.text(line.join(" "));
-					var wordSpacing = (width - tspan.node().getComputedTextLength()) / (line.length-1);
-					//apply wordspacing recalculate and reapply for a Chrome bug ...
+					wordSpacing = ((width - tspan.node().getComputedTextLength()) / (line.length-1)).toFixed(5);
 					tspan.attr("word-spacing", wordSpacing);
-					wordSpacing = (width - tspan.node().getComputedTextLength()) / (line.length-1);
-					tspan.attr("word-spacing", wordSpacing);
-					wordSpacing = (width - tspan.node().getComputedTextLength()) / (line.length-1);
-					tspan.attr("word-spacing", wordSpacing);
-					wordSpacing = (width - tspan.node().getComputedTextLength()) / (line.length-1);
-					tspan.attr("word-spacing", wordSpacing);
-
 					line = [word];
 					tspan = text.append("tspan").attr("x", (((xLocPage-xLocTitle)/2) + xLocTitle)-140).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy).text(word);
 				}
 			}
-			if (this.sources) {
-				var startLineNum = lineNumber * lineHeight + dy + 60;
-				svg.append("text")
-					.attr("class", "acknowledments-title")
-					.attr("dx", (((xLocPage-xLocTitle)/2) + xLocTitle))
-					.attr("dy", startLineNum)
-					.attr("text-anchor", "middle")
-					.text("Sources".toUpperCase());
-				for (var i=0; i<sources.length; i++) {
-					//print a source
-					//add title and then start adding and computing words? title wrapping?
-				}
-			}
-
-
-
 		}
 		ChapbookPrinter.prototype.printPoemPage = function(pageID, poemIndex) {
 			//index determines page number and whether recto or verso
 			
-			var pageNumber = poemIndex + this.startingPage;
-			var page = this.pageSettings[(poemIndex % 2)];
-			var poem = this.chapbook.poems[poemIndex];
+			var pageNumber = poemIndex + this.startingPage,
+				page = this.pageSettings[(poemIndex % 2)],
+				poem = this.chapbook.poems[poemIndex],
+				svgRoot = d3.select(pageID).select("." + page.side + "-poem");
 
-			//d3.select("#featured-image").remove();
-
-			var svgRoot = d3.select(pageID).select("." + page.side + "-poem");
 			//remove current poem if it exists
-			console.log(pageID);
 			svgRoot.select("." + page.side + "-page-svg").remove();
 
-			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500");
-	
-			var force = d3.layout.force()
-				.gravity(.05)
-				.distance(100)
-				.charge(-50)
-				.size([page.width, page.height])
-				.nodes(poem.nodes)
-				.links(poem.links);
-
-			var link = svg.selectAll(".link-" + poemIndex + "-" + page.side)
-			  .data(poem.links, function(d){return d.id;});
+			var svg = svgRoot.append("svg").attr("class", page.side + "-page-svg").attr("viewBox", "0 0 400 500"),
+				force = d3.layout.force()
+					.gravity(.05)
+					.distance(100)
+					.charge(-50)
+					.size([page.width, page.height])
+					.nodes(poem.nodes)
+					.links(poem.links),
+				drag = force.drag(),
+				link = svg.selectAll(".link-" + poemIndex + "-" + page.side)
+					.data(poem.links, function(d){return d.id;});
 			
 			link.enter().insert("text")
 				.attr("class", "text")
@@ -1654,19 +1666,24 @@
 
 			//add nodes
 			var node = svg.selectAll(".node-" + poemIndex + "-" + page.side)
-			  .data(poem.nodes, function(d){return d.id;});
-			
-			var nodeG = node.enter().insert("g")
-			  .classed("node-" + page.side, true)
-			  .classed("node-" + poemIndex + "-" + page.side, true)
-			  .attr("id", function(d){return "n-" + poemIndex + "-" + page.side + "-" + d.id;})
-			  .call(force.drag);
+					.data(poem.nodes, function(d){return d.id;}),
+				nodeG = node.enter().insert("g")
+					.classed("node-" + page.side, true)
+					.classed("node-" + poemIndex + "-" + page.side, true)
+					.attr("id", function(d){return "n-" + poemIndex + "-" + page.side + "-" + d.id;})
+					.call(drag);
+
+			drag.on("drag", function() {
+					d3.event.sourceEvent.stopPropagation(); // silence other listeners
+			}).on("dragend", function() {
+					d3.event.sourceEvent.stopPropagation(); // silence other listeners
+			});
 			
 			nodeG.append("text")
-			  .attr("dx", 0)
-			  .attr("dy", 0)
-			  .attr("text-anchor", "middle")
-			  .text(function(d) { return d.text });
+				.attr("dx", 0)
+				.attr("dy", 0)
+				.attr("text-anchor", "middle")
+				.text(function(d) { return d.text });
 
 			node.exit().remove();
 			force.on("tick", function() {
@@ -1703,13 +1720,11 @@
 
 
 		/* A collection of poems */
-		function Chapbook(title, alternateTitle, author, image, quote, poemsCollected) {
+		function Chapbook(title, alternateTitle, author, poemsCollected) {
 			this.poems = [];
 			this.title = title;
 			this.alternateTitle = alternateTitle;
 			this.author = author;
-			this.image = image;
-			this.quote = quote;
 			this.poemsCollected = poemsCollected;
 		}
 		Chapbook.prototype.addPoem = function(poem) {
@@ -1719,14 +1734,14 @@
 			//this should do something
 		}
 		Chapbook.prototype.prepareForPublication = function() {
-			var manuscript = this.poems.slice();
-			var index = manuscript.length;
-			var value, randomIndex;
+			var manuscript = this.poems.slice(),
+				index = manuscript.length,
+				value, 
+				randomIndex;
 
 			while(0 != index) {
 				randomIndex = Math.floor(Math.random() * index);
 				index -= 1;
-
 				value = manuscript[index];
 				manuscript[index] = manuscript[randomIndex];
 				manuscript[randomIndex] = value;
@@ -1741,21 +1756,21 @@
 			this.words = words;
 			this.lines = lines;
 			this.nodes = [];
-			for (var i=0; i<words.length; i++) {
+			for (var i=0, wordsLength=words.length; i<wordsLength; i++) {
 				this.nodes.push({"id" : i, "text" : words[i]})
 			}
 			this.links = [];
 			this.joins = [];
-			for (var i=0; i<lines.length; i++) {
+			for (var i=0, linesLength=lines.length; i<linesLength; i++) {
 				var join = this.lineJoin();
 				this.joins.push(join[0] + "," + join[1], join[1] + "," + join[0]);
 				this.links.push({"id" : i, "source": join[0], "target": join[1], "text" : lines[i]});
 			}
 		}
 		Poem.prototype.lineJoin = function() {
-			var length = this.words.length;
-			var source = 0;
-			var target = 0;
+			var length = this.words.length,
+				source = 0,
+				target = 0;
 			while ((source == target) || (this.joins.indexOf(source + "," + target) != -1)) {
 				source = Math.floor(Math.random()*length);
 				target = Math.floor(Math.random()*length);
@@ -1763,66 +1778,143 @@
 			return [source, target];
 		}
 
-		function ChapbookReader(chapbookPrinter) {
+		function ChapbookReader(chapbookPrinter, paratext) {
 			this.chapbookPrinter = chapbookPrinter;
+			this.paratext = paratext;
 			this.isPlaying = false;
 			this.pageTurnInterval = null;
 			this.withControls = true;
 
+			var _this = this;
+
+			//add window listeners
+			window.addEventListener('resize', function () {
+				_this.updateWindow();  //put this somewhere?
+			});
+			window.addEventListener('orientationchange', function () {
+				_this.updateWindow();  //put this somewhere?
+			});
+
+			if (!this.isFullscreenEnabled()) {
+				d3.select("#fullscreen").remove();
+			}
+			
+				
+			//add move to set up controllers / page turners
+			d3.select("body").on("wheel", 
+				function() { _this.pageScroll(); }
+				);
+			d3.select("#next-page").on("click", 
+				function() { _this.chapbookPrinter.nextPage(); }
+				);
+			d3.select("#previous-page").on("click", 
+				function() { _this.chapbookPrinter.previousPage(); }
+				);
+			d3.select(window).on("keydown", 
+				function() { 
+					var key = d3.event.key ? d3.event.key : d3.event.code;
+					console.log("key: " + d3.event.key);
+					console.log("code: " + d3.event.code);
+					console.log(key);
+					switch (key) {
+						case "ArrowRight":
+						case "ArrowDown":
+						case "Right":
+						case "Down":
+							_this.chapbookPrinter.nextPage();
+						break;
+						case "ArrowLeft":
+						case "ArrowUp":
+						case "Left":
+						case "Up":
+							_this.chapbookPrinter.previousPage();
+						break;
+					}
+				}
+				);
+			d3.select("#controls-switch").on("click", 
+				function() { _this.toggleControls(); }
+				);
+
+			//make sure the buttons contain the correct disabled/enabled state (possible bug?)
+			d3.select("#play-pause").on("click", 
+				function() { _this.playPauseReading(); }
+				).attr("disabled", null);
+
+			d3.select("#about").on("click", 
+				function() { _this.aboutChapbook(); }
+				).attr("disabled", null);
+			d3.select("#share").on("click", 
+				function() { _this.shareChapbook(); }
+				).attr("disabled", null);
+
+
+			//disable mode change during transition ... if so renable during play?
+			d3.select("#single-page").on("click", 
+				function() { 
+					_this.chapbookPrinter.singlePageMode(); 
+					_this.updateWindow();
+				}
+				).attr("disabled", null);
+			d3.select("#double-page").on("click", 
+				function() { 
+					_this.chapbookPrinter.doublePageMode(); 
+					_this.updateWindow();
+				}
+				).attr("disabled", "disabled");
+
+			d3.select("#fullscreen").on("click", 
+				function() { _this.toggleFullScreen(); }
+				).attr("disabled", null);
+			d3.select("#next-control").on("click", 
+				function() { _this.chapbookPrinter.nextPage(); }
+				).attr("disabled", null);
+			d3.select("#previous-control").on("click", 
+				function() { _this.chapbookPrinter.previousPage(); }
+				).attr("disabled", null);
+
+			/* disable double page if IE */
+			if (this.isIE()) {
+				this.chapbookPrinter.singlePageMode(); 
+				d3.select("#single-page").attr("disabled", "disabled");
+				d3.select("#double-page").attr("disabled", "disabled");
+			}
+			this.updateWindow();
 		}
 		
 		ChapbookReader.prototype.updateWindow = function(){
-			 var x = window.innerWidth;
-			 var y = window.innerHeight;
-			 var yOffset = 0;
-			 var yActual = y;
-			 if (this.withControls) {
-			 	y-=80;
-			 	yOffset = 40;
-			 } else {
-			 	y-=6;
-			 	yOffset = 3;
-			 }
-			var xOffset = this.chapbookPrinter.modeDoublePage ? 0 : 3;
-			if (!this.chapbookPrinter.modeDoublePage) {
-				x-=6;
-			}
-			console.log(x);
+			var x = this.chapbookPrinter.modeDoublePage ? window.innerWidth : window.innerWidth - 6,
+				y = this.withControls ? window.innerHeight - 80 : window.innerHeight - 6,
+				xOffset = this.chapbookPrinter.modeDoublePage ? 0 : 3,
+				yOffset = this.withControls ? 40 : 3,
+				xRatio = this.chapbookPrinter.modeDoublePage ? x/1266 : x/602,
+				yRatio = y/752,
+				ratio = xRatio <= yRatio ? xRatio : yRatio,
+				xLoc = ((x - (ratio*1266))/2 + xOffset).toFixed(10) + "px", // toFixed add because of an issue with Safari and very small numbers using e notation/format
+				yLoc = ((y - (ratio*752))/2 + yOffset).toFixed(10) + "px";
 
-			 var xRatio = this.chapbookPrinter.modeDoublePage ? x/1266 : x/602;
-			 var yRatio = y/752;
-		
-			 var ratio = xRatio <= yRatio ? xRatio : yRatio;
-			 
-			 console.log(ratio);
-
-			 var xLoc = ((x - (ratio*1266))/2 + xOffset).toFixed(10) + "px"; //toFixed add because of an issue with Safari and very small numbers using e notation/format			 
-			 var yLoc = ((y - (ratio*752))/2 + yOffset).toFixed(10) + "px";
-
-			 d3.select("#poems").attr("style", "transform: translate("+ xLoc +","+ yLoc +") scale("+ ratio +");transform-origin: 0 0 0;-webkit-transform: translate("+ xLoc +","+ yLoc +") scale("+ ratio +");-webkit-transform-origin: 0 0 0;");
+			d3.select("#poems").attr("style", "transform: translate("+ xLoc +","+ yLoc +") scale("+ ratio +");transform-origin: 0 0 0;-webkit-transform: translate("+ xLoc +","+ yLoc +") scale("+ ratio +");-webkit-transform-origin: 0 0 0;");
 
 			if (!this.inFullscreen()) {
-		      	d3.select("#fullscreen-icon").attr("src", "./images/fullscreen.svg").attr("alt","Go fullscreen").attr("title", "Go fullscreen");
-			 } else {
-			 	
-			 	d3.select("#fullscreen-icon").attr("src", "./images/exit-fullscreen.svg").attr("alt","Exit fullscreen").attr("title", "Exit fullscreen");
-			 }
-		}
-		// http://stackoverflow.com/questions/326069/how-to-identify-if-a-webpage-is-being-loaded-inside-an-iframe-or-directly-into-t
-		//chapbookreader
-		ChapbookReader.prototype.inIframe = function() {
-			var _inIframe;
-			try {
-				_inIframe = window.self !== window.top;
-			} catch (error) {
-				_inIframe = true;
+				d3.select("#fullscreen-icon").attr("src", "./images/fullscreen.svg").attr("alt","Go fullscreen").attr("title", "Go fullscreen");
+			} else {
+				
+				d3.select("#fullscreen-icon").attr("src", "./images/exit-fullscreen.svg").attr("alt","Exit fullscreen").attr("title", "Exit fullscreen");
 			}
-			return _inIframe;
+		}
+		ChapbookReader.prototype.inIFrame = function() {
+			var _inIFrame;
+			try {
+				_inIFrame = window.self !== window.top;
+			} catch (error) {
+				_inIFrame = true;
+			}
+			return _inIFrame;
 		}
 		//https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API
 		ChapbookReader.prototype.inFullscreen = function() {
 			return document.fullscreenElement ||    // alternative standard method
-			document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+				document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
 		}
 		ChapbookReader.prototype.isFullscreenEnabled = function() {
 			var _isFullscreenEnabled;
@@ -1842,27 +1934,27 @@
 			return _isFullscreenEnabled;
 		}
 		ChapbookReader.prototype.toggleFullScreen = function() {
-		  if (!this.inFullscreen()) {  // current working methods
-		    if (document.documentElement.requestFullscreen) {
-		      document.documentElement.requestFullscreen();
-		    } else if (document.documentElement.msRequestFullscreen) {
-		      document.documentElement.msRequestFullscreen();
-		    } else if (document.documentElement.mozRequestFullScreen) {
-		      document.documentElement.mozRequestFullScreen();
-		    } else if (document.documentElement.webkitRequestFullscreen) {
-		      document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-		    }
-		  } else {
-		    if (document.exitFullscreen) {
-		      document.exitFullscreen();
-		    } else if (document.msExitFullscreen) {
-		      document.msExitFullscreen();
-		    } else if (document.mozCancelFullScreen) {
-		      document.mozCancelFullScreen();
-		    } else if (document.webkitExitFullscreen) {
-		      document.webkitExitFullscreen();
-		    }
-		  }
+			if (!this.inFullscreen()) {  // current working methods
+				if (document.documentElement.requestFullscreen) {
+					document.documentElement.requestFullscreen();
+				} else if (document.documentElement.msRequestFullscreen) {
+					document.documentElement.msRequestFullscreen();
+				} else if (document.documentElement.mozRequestFullScreen) {
+					document.documentElement.mozRequestFullScreen();
+				} else if (document.documentElement.webkitRequestFullscreen) {
+					document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+				}
+			} else {
+				if (document.exitFullscreen) {
+					document.exitFullscreen();
+				} else if (document.msExitFullscreen) {
+					document.msExitFullscreen();
+				} else if (document.mozCancelFullScreen) {
+					document.mozCancelFullScreen();
+				} else if (document.webkitExitFullscreen) {
+					document.webkitExitFullscreen();
+				}
+			}
 		}
 		ChapbookReader.prototype.toggleControls = function() {
 			if (this.withControls) {
@@ -1878,7 +1970,7 @@
 			}
 		}
 		ChapbookReader.prototype.pageScroll = function() {
-			if (!this.inIframe() || this.inFullscreen()) {
+			if (!this.inIFrame() || this.inFullscreen()) {
 				if (d3.event.deltaY > 0) {
 					this.chapbookPrinter.nextPage();
 				}
@@ -1887,57 +1979,62 @@
 				}
 			}
 		}
+		/* Internet Explorer versions 11 and below don't support preserve-3d, this is a compromise (and Microsoft Edge isn't available on Windows before version 10) */
+		ChapbookReader.prototype.isIE = function() {
+			var userAgent = window.navigator.userAgent;
+			if ((userAgent.indexOf('MSIE ')>0) || (userAgent.indexOf('Trident/')>0)) {
+				return true;
+			}
+			return false;
+		}
 		ChapbookReader.prototype.playPauseReading = function() {
-			if (!this.isPlaying) {
-				this.isPlaying = true;
+			var _this = this;
+			if (!_this.isPlaying) {
+				_this.isPlaying = true;
 				d3.select("body").classed("reading", true);
 				d3.select("#play-pause").select("img").attr("src","./images/pause.svg").attr("alt","Pause").attr("title","Pause");
-				//start playing -- make sure the book isn't playing?
-				//change play button into a pause button
-				//disabled layout change modes
 				d3.select("#single-page").attr("disabled", "disabled");
 				d3.select("#double-page").attr("disabled", "disabled");
-				this.chapbookPrinter.nextPage();
-				this.pageTurnInterval = window.setInterval(
-					function() { poetryChapbookPrinter.nextPage(); }
+				_this.chapbookPrinter.nextPage();
+				_this.pageTurnInterval = window.setInterval(
+					function() { _this.chapbookPrinter.nextPage(); }
 					, 5000);
 			} else {
 				d3.select("body").classed("reading", false);
 				d3.select("#play-pause").select("img").attr("src","./images/play.svg").attr("alt","Play").attr("title","Play");
-				this.isPlaying = false;
+				_this.isPlaying = false;
 				window.clearInterval(this.pageTurnInterval);
-				if (this.chapbookPrinter.modeDoublePage) {
-					d3.select("#single-page").attr("disabled", null);
-				} else {
-					d3.select("#double-page").attr("disabled", null);
+				if (!_this.isIE()) {
+					if (_this.chapbookPrinter.modeDoublePage) {
+						d3.select("#single-page").attr("disabled", null);
+					} else {
+						d3.select("#double-page").attr("disabled", null);
+					}
 				}
 			}
 		}
 		ChapbookReader.prototype.shareChapbook = function() {
-			var sharePanel = this.addModal("Share");
-			var readerURL = window.location.origin + window.location.pathname;
+			var sharePanel = this.addModal("Share"),
+				readerURL = window.location.origin + window.location.pathname;
 			sharePanel.append("h3").text("Link to this chapbook");
-			sharePanel.append("input").attr("id", "chapbook-link").on("click", (function () {
-   this.select(); })).attr("type","text").attr("readonly","readonly").attr("value", readerURL);
-
+			sharePanel.append("input").attr("id", "chapbook-link").on("click", (function () { this.select(); })).attr("type","text").attr("readonly","readonly").attr("value", readerURL);
 			sharePanel.append("h3").text("Embed this chapbook");
-			sharePanel.append("textarea").attr("id", "chapbook-embed").on("click", (function () {
-   this.select(); })).attr("readonly","readonly").attr("cols","60").attr("rows","5").html('&lt;iframe src="' + readerURL + '" style="width:100%;height:400px;" allowfullscreen="allowfullscreen"&gt;&lt;/iframe&gt;');
+			sharePanel.append("textarea").attr("id", "chapbook-embed").on("click", (function () { this.select(); })).attr("readonly","readonly").attr("cols","60").attr("rows","5").html('&lt;iframe src="' + readerURL + '" style="width:100%;height:400px;" allowfullscreen="allowfullscreen"&gt;&lt;/iframe&gt;');
 		}
 		ChapbookReader.prototype.aboutChapbook = function() {
 			var aboutPanel = this.addModal("About");
-			//make h3 text dynamic
-			//preload the image? what to do about the cover?
-			aboutPanel.append("h3").html("About <cite>The Durham Poems</cite>");
-			aboutPanel.append("p").html("<img class='cover' src='./images/cover.png' alt='' />These poems are part of a larger collection of biographical poems concerning the life of scientific lecturer, Spiritualist and radical, William Denton (1823–1883). More information about the series can be found at <a target='_top' href='https://thecodeofthings.com'><cite>The Code of Things</cite></a>.")
+			aboutPanel.append("h3").html("About <cite>" + this.chapbookPrinter.chapbook.title + "</cite>");
+			aboutPanel.append("p").html(this.paratext);
 		}
 		ChapbookReader.prototype.addModal = function(title) {
-			var modal = d3.select("body").insert("div", "#poems").attr("id", "modal");
+			var _this = this,
+				modal = d3.select("body").insert("div", "#poems").attr("id", "modal");
 			modal.append("div").attr("id", "modal-screen");
-			var modalPanel = modal.append("div").attr("id", "modal-panel");
-			var modalTitle = title;
-			var _this = this;
-			var modalName = title.toLowerCase();
+
+			var modalPanel = modal.append("div").attr("id", "modal-panel"),
+				modalTitle = title,
+				modalName = title.toLowerCase();
+			
 			modalPanel.append("button").attr("type", "button").attr("id","close-modal").on("click", 
 					function () { _this.removeModal(); }
 				).append("img").attr("src", "./images/close.svg").attr("alt", "Close " + modalName).attr("title", "Close " + modalName);
@@ -1952,214 +2049,106 @@
 			d3.select("#modal").remove(); // remove modal
 		}
 
-		// image sourced from http://www.gracesguide.co.uk/File:Im1923TimHack-Erectingshop.jpg and modified and used under the terms of the GNU Free Documentation Licence, Version 1.2
-		//"Poems on early William Denton"
-		//"Poems covering the years 1823 to 1842"
-		//"Poems on early William Denton, the years 1823 to 1842"
-		//"Poems on early William Denton, the years 1823–1842"
-		var poetryChapbook = new Chapbook("Durham Poems", "Poems on William Denton, years 1823–1842", ["Benjamin", "Laird"], "./images/erectingshop.png", {"quote" : "A poem is a small (or large) machine made of words.", "author" : "Williams"}, 15);
+		/* Add chapbook */
+		var poetryChapbook = new Chapbook("The Durham Poems", "Poems on William Denton, years 1823–1842", ["Benjamin", "Laird"], 15);
 
-		//randomise the secondary headings?
-		//Poems on the Machinery of the Nineteenth Century
-
-		//new poems - move poems to a json file?
+		/* Add poems to chapbook */
 		poetryChapbook.addPoem(new Poem("A Coat without Buttons", 
-								["Young Denton", "ascetic fever", "Quaker-like", "what need", "for them", "a sensation", "practice of wearing", "master", "the situation", "despite", "the ridicule", "of worldlings"], 
-								[]
-								));
+			["Young Denton", "ascetic fever", "Quaker-like", "what need", "for them", "a sensation", "practice of wearing", "master", "the situation", "despite", "the ridicule", "of worldlings"], 
+			[]
+		));
 		poetryChapbook.addPoem(new Poem("The Methodist Library", 
-								["“Saint’s Rest”", "“Pilgrim’s Progress”", "“The Methodist Magazine”", "him", "he", "books", "his taste", "Sunday School", "the Bible", "ritualism", "eight years", "avidity"], 
-								["and volumes of", "were speaking", "figuratively", "swallowed", "with", "soon began", "a relish for", "attended", "recited", "reached", "assembled", "through", "was"]
-								));
-
+			["“Saint’s Rest”", "“Pilgrim’s Progress”", "“The Methodist Magazine”", "him", "he", "books", "his taste", "Sunday School", "the Bible", "ritualism", "eight years", "avidity"], 
+			["and volumes of", "were speaking", "figuratively", "swallowed", "with", "soon began", "a relish for", "attended", "recited", "reached", "assembled", "through", "was"]
+		));
 		poetryChapbook.addPoem(new Poem("Machinist", 
-								["problem", "rule", "sphere", "cone", "frustum", "solidity", "product", "diameter", "read", "metallurgy", "find", "difference", "sum", "square"], 
-								["÷", "¼", "30 pages", "+", "−", "×", "½", "10 pages", "of the", "of their", "will give the", "will be", "2 chapters", "being"]
-								));
-
+			["problem", "rule", "sphere", "cone", "frustum", "solidity", "product", "diameter", "read", "metallurgy", "find", "difference", "sum", "square"], 
+			["÷", "¼", "30 pages", "+", "−", "×", "½", "10 pages", "of the", "of their", "will give the", "will be", "2 chapters", "being"]
+		));
 		poetryChapbook.addPoem(new Poem("Hammer in Hand", 
-								["geologist’s hammer", "hand", "silver spoon", "poverty", "genius", "love", "honor", "germ-principle", "world", "denizen"], 
-								["into", "with", "neither", "in", "indigenous to", "became", "of", "what of", "loosen", "to"]
-								));
-
+			["geologist’s hammer", "hand", "silver spoon", "poverty", "genius", "love", "honor", "germ-principle", "world", "denizen"], 
+			["into", "with", "neither", "in", "indigenous to", "became", "of", "what of", "loosen", "to"]
+		));
 		poetryChapbook.addPoem(new Poem("Strata", 
-								["granite", "metamorphic", "Cambrian", "Silurian", "Devonian", "Carboniferous", "Permian", "Secondary", "Tertiary", "Quaternary"], 
-								["layered", "through", "on", "under", "over", "splitting", "excavating", "compressing", "ejecting", "leeching"]
-								));
+			["granite", "metamorphic", "Cambrian", "Silurian", "Devonian", "Carboniferous", "Permian", "Secondary", "Tertiary", "Quaternary"], 
+			["layered", "through", "on", "under", "over", "splitting", "excavating", "compressing", "ejecting", "leeching"]
+		));
 		poetryChapbook.addPoem(new Poem("Principles of Geology",
-									["geology", "history", "doctrine", "connexions", "light", "lakes", "valleys", "mountains", "volcanoes", "physical sciences", "moral"],
-									["compared to", "brought to", "as", "and", "is", "are", "can", "belonged to", "changed to", "related to", "acquainted with"]
-									));
+			["geology", "history", "doctrine", "connexions", "light", "lakes", "valleys", "mountains", "volcanoes", "physical sciences", "moral"],
+			["compared to", "brought to", "as", "and", "is", "are", "can", "belonged to", "changed to", "related to", "acquainted with"]
+		));
 		poetryChapbook.addPoem(new Poem("Character is the Growth of Time", 
-						["solid", "rock", "love", "beauty", "world", "ours", "battlefields", "fights", "Alpine peaks", "lives", "words", "compute"], 
-						["as", "and", "devoid of", "utterly", "of", "forced into", "rise to", "is", "are", "can"]
-						));
+			["solid", "rock", "love", "beauty", "world", "ours", "battlefields", "fights", "Alpine peaks", "lives", "words", "compute"], 
+			["as", "and", "devoid of", "utterly", "of", "forced into", "rise to", "is", "are", "can"]
+		));
 		poetryChapbook.addPoem(new Poem("Samson, Hercules and John Buddle", 
-						["cylinders", "cast iron", "box-like frames", "valve gear", "pumps", "throttle", "reversing lever", "vertically", "parallel motion", "wheels", "slides", "axles", "brackets", "chilled tread"], 
-						["fitted over", "resting on", "giving", "assembled", "guided by", "fixed upon", "bolted to", "renewed", "with a", "capacity of", "working", "rivetted to", "attached", "reduced to"]
-						));
+			["cylinders", "cast iron", "box-like frames", "valve gear", "pumps", "throttle", "reversing lever", "vertically", "parallel motion", "wheels", "slides", "axles", "brackets", "chilled tread"], 
+			["fitted over", "resting on", "giving", "assembled", "guided by", "fixed upon", "bolted to", "renewed", "with a", "capacity of", "working", "rivetted to", "attached", "reduced to"]
+		));
 		poetryChapbook.addPoem(new Poem("A New Teacher, William Shotton", 
-						["rara avis", "phrenology", "electricity", "Baptist", "practical lessons", "religious subjects", "his lips", "galvanic battery", "revolution", "soul", "students"], 
-						["and", "conclusions on", "working within", "experiments with", "his own", "making", "anti-methodistic", "delighted to", "listening", "impressing", "marvelled at"]
-						));
+			["rara avis", "phrenology", "electricity", "Baptist", "practical lessons", "religious subjects", "his lips", "galvanic battery", "revolution", "soul", "students"], 
+			["and", "conclusions on", "working within", "experiments with", "his own", "making", "anti-methodistic", "delighted to", "listening", "impressing", "marvelled at"]
+		));
 		poetryChapbook.addPoem(new Poem("Mr Hackworth’s Shildon", 
-						["Mr Hackworth", "file", "New Shildon", "superintendent", "locomotive", "Soho", "Stockton", "Darlington", "Conscience!", "employer", "railway", "machinery"], 
-						["&", "small regard for", "the old", "living in", "to be a", "as fine as a", "repair some", "go", "via", "told", "is not", "talked of", "returned"]
-						));
-
+			["Mr Hackworth", "file", "New Shildon", "superintendent", "locomotive", "Soho", "Stockton", "Darlington", "Conscience!", "employer", "railway", "machinery"], 
+			["&", "small regard for", "the old", "living in", "to be a", "as fine as a", "repair some", "go", "via", "told", "is not", "talked of", "returned"]
+		));
 		poetryChapbook.addPoem(new Poem("Currier", 
-						["paid", "half-crown", "week", "eleven years old", "earn", "distaste", "hired", "wages", "foreman", "boy", "independent", "work", "business", "spirit", "genius"], 
-						["flung", "considered", "little account", "privilege of", "accomplished", "at the", "a", "for", "and", "valiantly", "growing", "but not the", "with the", "used to"]
-						));
-
+			["paid", "half-crown", "week", "eleven years old", "earn", "distaste", "hired", "wages", "foreman", "boy", "independent", "work", "business", "spirit", "genius"], 
+			["flung", "considered", "little account", "privilege of", "accomplished", "at the", "a", "for", "and", "valiantly", "growing", "but not the", "with the", "used to"]
+		));
 		poetryChapbook.addPoem(new Poem("The Spirit of Reform", 
-						["old Methodist society", "a split", "debate", "his powers", "the devil", "the disguise", "commotion", "multitudes", "rule", "authority", "Popery", "nothing", "a voice", "the church", "the religious world"], 
-						["in", "wore", "stirred up", "grew tired of", "of", "and", "better than", "have", "hence", "desired", "excited", "to them", "had", "was", "sides with"]
-						));
-
+			["old Methodist society", "a split", "debate", "his powers", "the devil", "the disguise", "commotion", "multitudes", "rule", "authority", "Popery", "nothing", "a voice", "the church", "the religious world"], 
+			["in", "wore", "stirred up", "grew tired of", "of", "and", "better than", "have", "hence", "desired", "excited", "to them", "had", "was", "sides with"]
+		));
 		poetryChapbook.addPoem(new Poem("Joseph Barker", 
-						["Gospel", "Christianity", "religion", "Christ", "questions", "observations", "triumphant", "Socialism", "Socialists", "society", "good", "evil", "New Testament", "who", "principled", "what"], 
-						["is", "professes", "advocates", "exposes", "charges", "of", "tendency of", "had", "increases", "itself", "opening the", "the true", "considers", "their", "our", "quote", "manifests"]
-						));
+			["Gospel", "Christianity", "religion", "Christ", "questions", "observations", "triumphant", "Socialism", "Socialists", "society", "good", "evil", "New Testament", "who", "principled", "what"], 
+			["is", "professes", "advocates", "exposes", "charges", "of", "tendency of", "had", "increases", "itself", "opening the", "the true", "considers", "their", "our", "quote", "manifests"]
+		));
 		poetryChapbook.addPoem(new Poem("Methodist-minister-grocer", 
-						["Methodist world", "Lord’s chosen vessel", "unsound", "dishonesty", "cheating", "false", "weight", "lead", "scale", "the public", "example", "morals", "piece"], 
-						["was", "chosen", "on", "denounced", "injurious", "adding", "as", "strictly", "is", "eschewed", "not", "with", "placing"]
-						));
+			["Methodist world", "Lord’s vessel", "unsound", "dishonesty", "cheating", "false", "weight", "lead", "scale", "the public", "example", "morals", "piece"], 
+			["was", "chosen", "on", "denounced", "injurious", "adding", "as", "strictly", "is", "eschewed", "not", "with", "placing"]
+		));
 		poetryChapbook.addPoem(new Poem("Man Considered as a Physical Being", 
-						["human", "mind", "body", "bones", "muscles", "nerves", "bloodvessels", "nutrition", "respiration", "thought", "mechanical", "science", "principle", "physical", "creation", "Creator", "man"], 
-						["consists of", "organs of", "in harmony with", "law of", "perfect", "constructed on", "and", "infringement of", "with", "on", "pursuing", "bestowed by", "arrive at", "prosecuted in", "incomplete", "beside", "adaption of", "in relation to", "influence"]
-						));
+			["human", "mind", "body", "bones", "muscles", "nerves", "bloodvessels", "nutrition", "respiration", "thought", "mechanical", "science", "principle", "physical", "creation", "Creator", "man"], 
+			["consists of", "organs of", "in harmony with", "law of", "perfect", "constructed on", "and", "infringement of", "with", "on", "pursuing", "bestowed by", "arrive at", "prosecuted in", "incomplete", "beside", "adaption of", "in relation to", "influence"]
+		));
 		poetryChapbook.addPoem(new Poem("Man Considered as an Organised Being", 
-						["organic", "laws", "food", "first", "obedience", "the earth", "harmony", "mode", "choice", "pleasure", "pain", "death", "sleep", "health"], 
-						["subsists on", "obeyed", "sowed", "producing", "supplying", "in", "frames",  "source of", "inflicted", "and", "if", "with", "has", "supplied with"]
-						));
+			["organic", "laws", "food", "first", "obedience", "the earth", "harmony", "mode", "choice", "pleasure", "pain", "death", "sleep", "health"], 
+			["subsists on", "obeyed", "sowed", "producing", "supplying", "in", "frames",  "source of", "inflicted", "and", "if", "with", "has", "supplied with"]
+		));
+		poetryChapbook.addPoem(new Poem("True Religion", 
+			["men", "religion", "not", "I", "myself", "countries", "religious", "things", "Jesus", "teacher", "New Testament", "his disciples"], 
+			["true", "worship", "of", "is", "believe", "all", "naturally", "and", "preached", "practiced", "taught", "with", "heavenly"]
+		));
+		poetryChapbook.addPoem(new Poem("Improvement of the Mind", 
+			["subject", "well being", "happiness", "state", "existence", "felicity", "man", "animal", "helpless", "mind", "soul", "balloon", "diving bell", "depths", "clouds", "depths", "practice", "observation"], 
+			["interested", "connected", "of", "beneficial", "future", "in", "looking at", "acquainted", "perceives", "descends", "teaches", "and", "makes up for", "elevated", "weakness of", "or", "with", "learn by"]
+		));
+		poetryChapbook.addPoem(new Poem("Temperance", 
+			["meaning", "drinks", "subject", "together", "us", "disease", "injurious", "moral", "passions", "propensities", "branch", "I", "remains", "health", "a man’s body", "by God"], 
+			["intoxicating", "abstaining", "called", "of", "eating", "drinking", "to", "in", "in government of", "and our", "upon", "believe", "said", "taught", "much"]
+		));
+		poetryChapbook.addPoem(new Poem("Composed of Solids and Fluids", 
+			["waste", "solids", "fluids", "hunger", "thirst", "composition", "ale", "dirty water", "coarse food"], 
+			["of", "causes", "14 oz. of", "10 oz. of", "1 oz. of", "3 gallons of", "6 shilling for", "3 penny worth of"]
+		));
+		poetryChapbook.addPoem(new Poem("Railway Tunnel", 
+			["Geological studies", "fossils", "impetus", "Shildon", "specimens", "debris", "soul", "books", "nothing", "studies", "impulse"], 
+			["formation", "among", "found", "was", "were", "frequently", "his", "took to", "hunted", "own", "stimulated", "obtained from"]
+		));
 
-
-
-		// "The town I once knew has departed and a new town with the old name is here."
-		// William Denton, Darlington, 25 December 1876
-
+		/* Sort and select poems for publication */
 		poetryChapbook.prepareForPublication();
 
-		var acknowledgements = {"text" : "I am grateful to the Wellesley Historical Society for access to the Denton family collection and especially to Kathleen Fahey for her time and invaluable assistance with the archive."}
-		//convert to source object?? object types
-		// add
-		var sources = [
-						{"document" : "Diary. 1839–1842", "collection" : "Denton family collection. Wellesley Historical Society", "authors" : [["Denton", "William"]]},
-						];
-		//sources chapbook or chapbook printer?
-		var poetryChapbookPrinter = new ChapbookPrinter(poetryChapbook, {"name" : "The Code of Things", "url" : "thecodeofthings.com"}, "Melbourne", "Australia", acknowledgements);
-
-		//image sourced from http://collectionscanada.gc.ca/pam_archives/index.php?fuseaction=genitem.displayItem&rec_nbr=3391580 and no longer in copyright
-		var postImageSrc = "./images/samson.jpg";
-		// use image objects?
-		// preloader //add cover image here and move to chapbook?
-		//var preImage = new Image();
-		//var postImage = new Image();
-		//preImage.src = poetryChapbook.image;
-		//postImage.src = postImageSrc;
-
-		var poetryChapbookReader = new ChapbookReader(poetryChapbookPrinter);
-
-		//window.onresize = function() {
-		//	poetryChapbookReader.updateWindow();  //put this somewhere?
-		//}
-		//put somewhere sensible -- kick on orientation change
-		window.addEventListener('resize', function () {
-			poetryChapbookReader.updateWindow();  //put this somewhere?
-		});
-		window.addEventListener('orientationchange', function () {
-			poetryChapbookReader.updateWindow();  //put this somewhere?
-		});
-
-		//d3.select("#title").text("The " + poetryChapbook.title); //add this in properly
-
-		//initPrinting() ?
-		poetryChapbookPrinter.addPage("page-1", true); // move this to printer
-		poetryChapbookPrinter.addPage("page-2"); // move this to printer
-
-
-		poetryChapbookPrinter.updatePublishingCity();
-
-		poetryChapbookReader.updateWindow();
-	
-		//move to chapbookreader
-		if (!poetryChapbookReader.isFullscreenEnabled()) {
-			d3.select("#fullscreen").remove();
-		}
-		//window.setTimeout(function() { printChapbook(); }, 5000 );
-		printChapbook();
-
-
-		//move to chapbook reader -- initReading?
-		function printChapbook() {
-			//change loading to printing
-			d3.select("#loading").remove();
-			
-			//add move to set up controllers / page turners
-			d3.select("body").on("wheel", 
-				function() { poetryChapbookReader.pageScroll(); }
-				);
-			d3.select("#next-page").on("click", 
-				function() { poetryChapbookPrinter.nextPage(); }
-				);
-			d3.select("#previous-page").on("click", 
-				function() { poetryChapbookPrinter.previousPage(); }
-				);
-
-			d3.select("#controls-switch").on("click", 
-				function() { poetryChapbookReader.toggleControls(); }
-				);
-
-			//make sure the buttons contain the correct disabled/enabled state (possible bug?)
-			d3.select("#play-pause").on("click", 
-				function() { poetryChapbookReader.playPauseReading(); }
-				).attr("disabled", null);
-
-			d3.select("#about").on("click", 
-				function() { poetryChapbookReader.aboutChapbook(); }
-				).attr("disabled", null);
-			d3.select("#share").on("click", 
-				function() { poetryChapbookReader.shareChapbook(); }
-				).attr("disabled", null);
-
-
-			//disable mode change during transition ... if so renable during play?
-			d3.select("#single-page").on("click", 
-				function() { 
-					poetryChapbookPrinter.singlePageMode(); 
-					poetryChapbookReader.updateWindow();
-				}
-				).attr("disabled", null);
-			d3.select("#double-page").on("click", 
-				function() { 
-					poetryChapbookPrinter.doublePageMode(); 
-					poetryChapbookReader.updateWindow();
-				}
-				).attr("disabled", "disabled");
-
-			d3.select("#fullscreen").on("click", 
-				function() { poetryChapbookReader.toggleFullScreen(); }
-				).attr("disabled", null);
-			d3.select("#next-control").on("click", 
-				function() { poetryChapbookPrinter.nextPage(); }
-				).attr("disabled", null);
-			d3.select("#previous-control").on("click", 
-				function() { poetryChapbookPrinter.previousPage(); }
-				).attr("disabled", null);
-
-
-			/* render initial pages */
-
-			poetryChapbookPrinter.tabulaRasa("#page-1", 0);
-			poetryChapbookPrinter.tabulaRasa("#page-1", 1);
-
-			poetryChapbookPrinter.printPreTitlePage("#page-2");
-			//poetryChapbookPrinter.printCoverPage("#page-2");
-			poetryChapbookPrinter.printImagePage("#page-2");
-		}
-
+		/* Publish chapbook */
 		
+		//Samson image sourced from http://collectionscanada.gc.ca/pam_archives/index.php?fuseaction=genitem.displayItem&rec_nbr=3391580 and no longer in copyright
+		//Hackworth's erecting shop image sourced from http://www.gracesguide.co.uk/File:Im1923TimHack-Erectingshop.jpg and modified and used under the terms of the GNU Free Documentation Licence, Version 1.2
+		var poetryChapbookPrinter = new ChapbookPrinter(poetryChapbook, {"name" : "The Code of Things", "url" : "https://thecodeofthings.com"}, "Melbourne", "Australia", [{"src" :"./images/erectingshop.png", "alt" : "Hackworth's erecting shop in Shildon as it appears to-day"},  {"src": "./images/samson.jpg", alt : "Samson"}], [{"quote" : "A poem is a small (or large) machine made of words.", "author" : "Williams"}, {"quote": "The town I once knew has departed and a new town with the old name is here.", "author" : "William Denton", "place" : "Darlington", "date" : "25 December 1876"}], {"text" : "I am grateful to the Wellesley Historical Society for access to the Denton family collection and especially to Kathleen Fahey for her time and invaluable assistance with the archive."});
+		
+		/* Read chapbook */
+		var poetryChapbookReader = new ChapbookReader(poetryChapbookPrinter, "<img class='cover' src='./images/cover.png' alt='' />These poems are part of a larger collection of biographical poems concerning the life of scientific lecturer, Spiritualist and radical, William Denton (1823–1883). More information about the series can be found at <a target='_top' href='https://thecodeofthings.com'><cite>The Code of Things</cite></a>.");
 
 		</script>
 
