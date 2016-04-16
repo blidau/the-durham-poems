@@ -1,0 +1,524 @@
+/* goudy-bookletter-1911-regular - latin */
+@font-face {
+	font-family: 'Goudy Bookletter 1911';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Goudy Bookletter 1911'), local('GoudyBookletter1911'),
+		url('../fonts/goudy-bookletter-1911-v6-latin-regular.woff2') format('woff2'), /* Chrome 26+, Opera 23+ */
+		url('../fonts/goudy-bookletter-1911-v6-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+* { -webkit-font-smoothing: subpixel-antialiased; } /* put somewhere sensible not needed? */
+html { height: 100%; position: fixed; width: 100%; background-color: #666; }
+body { background-color: #666; /* background-color: #000; */ padding:0; margin:0; height:100%; width:100%; overflow: hidden; } /* make body 100% / 100% > */
+h1 { font-family: 'Goudy Bookletter 1911', serif; color: #FFF; text-align: center; padding:10px 0 0; margin:0; vertical-align: middle; line-height: 20px; font-weight: normal; 
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none; cursor:default;}
+svg { position:absolute; top:0; left:0; height:auto; min-width:100%; }
+
+svg text::-webkit-selection { background: transparent; }
+svg text::-moz-selection { background: transparent; }
+svg text::selection { background: transparent; }
+
+svg tspan::-webkit-selection { background: transparent; }
+svg tspan::-moz-selection { background: transparent; }
+svg tspan::selection { background: transparent; }
+
+svg path::-webkit-selection { background: transparent; }
+svg path::-moz-selection { background: transparent; }
+svg path::selection { background: transparent; }
+
+svg textPath::-webkit-selection { background: transparent; }
+svg textPath::-moz-selection { background: transparent; }
+svg textpath::selection { background: transparent; }
+
+/* alter so that there is selection on inputs */
+::-webkit-selection { background: transparent; }
+::-moz-selection { background: transparent; }
+::selection { background: transparent; }
+
+textarea, input { outline: none; }
+input::-webkit-selection, textarea::-webkit-selection { background-color: #DDD; }
+input::-moz-selection, textarea::-moz-selection { background-color: #DDD; }
+input::selection,  textarea::selection { background-color: #DDD; }
+
+/* *::-webkit-selection { background: none; }
+*::-moz-selection { background: none; }
+*::selection { background: none; } */
+
+img { /* stop selection highlight */
+	pointer-events: none;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.link-verso, .link-recto {
+	/*stroke: #000;
+	stroke-width:2px;*/
+	pointer-events: none;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+.imprint, .inter-title, .quote {
+	font: 10px 'Goudy Bookletter 1911';
+	pointer-events: none;
+}
+.quote-author {
+	font: 10px 'Goudy Bookletter 1911';
+	font-style: italic;
+	pointer-events: none;
+}
+.node-verso text, .node-recto text {
+	font: 12px 'Goudy Bookletter 1911';
+	cursor: move;
+}
+.acknowledgements {
+	font: 12px 'Goudy Bookletter 1911';
+	pointer-events: none;
+}
+.text, .folio, #sub-alternate-title, #publisher, #year, .contents-poem-title, .contents-poem-page-number {
+	font: 12px 'Goudy Bookletter 1911';
+	pointer-events: none;
+}
+.header, #author, #place, #contents-title, .acknowledments-title {
+	font: 14px 'Goudy Bookletter 1911';
+	pointer-events: none;
+}
+#main-alternate-title {
+	font: 16px 'Goudy Bookletter 1911';
+	pointer-events: none;
+}
+#main-pre-title {
+	font: 20px 'Goudy Bookletter 1911';
+	pointer-events: none;
+}
+#main-title {
+	font: 28px 'Goudy Bookletter 1911';
+	pointer-events: none;
+}
+#poems {
+	width: 1266px;
+	height: 752px;
+	margin: 0;
+  -webkit-perspective: 50000px;
+     -moz-perspective: 50000px;
+          perspective: 50000px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box; }
+
+.page { height:750px;width:600px;
+	z-index:0;
+	border:1px solid #000;
+	position: absolute;
+	top:0;
+	right:31px;
+	background-color: #EEE;
+-webkit-transition: -webkit-transform 0.5s linear;
+-moz-transition: -moz-transform 0.5s linear;
+  transition: transform 0.5s linear;
+-webkit-transform: rotateY( 0deg ) translateZ(-0.01px); /* translateZ set to -0.01px to stop a Safari flicker issue */
+-moz-transform: rotateY( 0deg ) translateZ(-0.01px);
+  transform: rotateY( 0deg ) translateZ(-0.01px);
+-webkit-transform-style: preserve-3d;
+-moz-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+#poems .page { 
+
+-webkit-transform-origin: left center; 
+-moz-transform-origin: left center; 
+  transform-origin: left center; 
+
+}
+#poems .page.turned {
+	z-index: 1;
+	-webkit-transform: rotateY( -180deg ) translateZ(0.01px); /* translateZ set to -1px to stop a Safari flicker issue / Opx doesn't work -- maybe actual number forces acceleration  */
+	 -moz-transform: rotateY( -180deg ) translateZ(0.01px);
+	      transform: rotateY( -180deg ) translateZ(0.01px);
+}
+#poems .page.turning {
+	z-index: 2;
+}
+
+#poems .recto-poem,
+#poems .verso-poem {
+	background-color:#EEE;
+	height:750px;
+	width:600px; 
+	position: absolute;
+
+  -webkit-transform-style: preserve-3d;
+     -moz-transform-style: preserve-3d;
+          transform-style: preserve-3d;
+	
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+	backface-visibility: hidden;
+
+}
+#poems * { /* fix a strange artifact bug -- bottom lefthand square on verso pages during transitions */
+	background-color: transparent;
+}
+#poems .page .verso-poem {
+-webkit-transform: rotateY( 180deg );
+-moz-transform: rotateY( 180deg );
+  transform: rotateY( 180deg );
+}
+#poems .pages {
+	width:45px;
+	height: 750px;
+	background-color: #EEE;
+	float:left;
+	
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box; 
+}
+#poems .recto {
+	background-image: linear-gradient(to right, #000 0%, #EEE 100%);
+	position: absolute;
+	top: 0;
+	left: -1px;
+}
+#poems .verso {
+	background-image: linear-gradient(to left, #000 0%, #EEE 100%);
+	position: absolute;
+	top: 0;
+	right: -1px;
+}
+#featured-image {
+	width: 70%;
+	height: auto;
+	position:absolute;
+	top:25%;
+	left:15%;
+}
+#featured-image::selection { background: none; }
+
+#previous-page, #next-page {
+	width:28px;
+	height:750px;
+	border:1px solid #000;
+	display: block;
+	text-decoration: none;
+	color:#000;
+	cursor: pointer;
+}
+#poems #previous-page {
+	background: #FFF url("../images/previous-pages.png") repeat top right;
+	background-size: 72px auto;
+	border-right:none;
+	
+	position:absolute;
+	top: 0;
+	left: 3px;
+}
+#poems #next-page {
+	background: #FFF url("../images/next-pages.png") repeat top left;
+	background-size: 72px auto;
+	border-left:none;
+	position:absolute;
+	top: 0;
+	right: 3px;
+}
+#poems #previous-page:link, #poems #next-page:link {
+	background-color: #333;
+	color: #000;
+}
+#poems #previous-page:focus, #poems #next-page:focus,
+#poems #previous-page:hover, #poems #next-page:hover,
+#poems #previous-page:active, #poems #next-page:active {
+	background-color: #CCC;
+	color: #FFF;
+}
+#poems #previous-page span, #poems #next-page span {
+	display:block; 
+	float:none;
+	background-color: transparent;
+	height:750px;
+	width:100%;				
+	/* support of user-select problematic? */
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+#poems .verso-poem.no-page { background-color: #000; }
+#poems .verso-poem.no-page .pages, #poems .verso-poem.no-page .verso { background-color: #000; background-image: none; }
+
+header { height: 37px; background-color: #000; z-index: 10;
+	position:absolute; top:0; left:0; width:100%; 
+	transition: top 1s;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box; }
+
+menu { height: 37px; background-color: #000; 
+	position:absolute; bottom:0; left:0; width:100%; 
+	transition: bottom 1s;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+#fullscreen, #previous-control, #next-control, #single-page, #double-page, #about, #share, #close-modal, #play-pause { cursor: pointer; }
+
+button img { height: 25px; width:auto; border:none; }
+
+button::-moz-focus-inner { /* remove extra padding from Firefox */
+	padding: 0;
+	border: 0
+}
+#about {
+	position:absolute; right: 315px; top:5px;
+	height: 25px; width: 25px;
+	border: 2px solid #FFF;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;				
+	font-family: 'Goudy Bookletter 1911', serif;
+	text-align: center;
+	border-radius: 50%;
+	font-size: 1.4em;
+	line-height: 0.8em;
+	vertical-align: top;
+}
+#about abbr {
+	text-decoration: none;
+}
+#close-modal { position:absolute; right: 0; top:0; }
+#close-modal img { height: 20px; width:auto; }
+
+#play-pause { position:absolute; right: 270px; top:5px;}
+#share { position:absolute; right: 235px; top:5px;}
+#single-page { position:absolute; right: 200px; top:5px; }
+#double-page  { position:absolute; right: 150px; top:5px; }
+#fullscreen { position:absolute; right: 110px; top:5px;}
+#previous-control { position:absolute; right: 70px; top:5px; }
+#next-control { position:absolute; right: 30px; top:5px; }
+
+button { padding:1px; margin: 0; border: none; background-color: transparent; color:#FFF; display:block; height:25px; box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	-webkit-box-sizing: content-box; min-width: 25px; text-align: center; }
+button:focus { outline: none; }
+button:hover, button:active { outline: none; opacity:0.5; } 
+a:link, a:visited {
+	color:#000;
+}
+a:focus, a:hover, a:active { 
+
+}
+#double-page[disabled="disabled"], #single-page[disabled="disabled"] {
+	opacity: 0.5;
+	cursor: default;
+}
+#controls-tab { position:absolute; width:40px; height: 10px; background-color: #444; bottom:37px; right:70px; overflow:hidden; border-radius: 5px 5px 0 0; transition: bottom 1s, height 1s, opacity 1s; opacity:0.6;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none; }
+#controls-tab:hover { height:25px; opacity:1;}
+#controls-switch { padding:0; display:block; height:25px; width:40px; cursor: pointer; }
+#controls-switch img { width: 30px; height: auto; padding:5px; }
+
+.without-controls header { top:-37px; }
+.without-controls menu { bottom:-37px; }
+.without-controls #controls-tab { bottom: 0; }
+
+menu { list-style-type: none; padding: 0; margin: 0; }
+menu li { padding: 0; margin: 0; }
+
+#modal-screen {
+	position:absolute; 
+	z-index: 50;
+	background-color: #000;
+	width:100%;
+	height: 100%;
+	opacity: 0.5;
+}
+
+#modal-panel {
+	position:absolute; 
+	z-index: 100;
+	width:420px;
+	height:230px;
+	background-color: #DDD;
+	background-color: #EEE;
+	color:#000;
+	top: 50%;
+	-webkit-transform: translateY(-50%);
+	-moz-transform: translateY(-50%);
+		transform: translateY(-50%);
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
+	border: 10px solid #000;
+	border-radius: 5px;
+	overflow: hidden;
+}
+#modal-panel h2 {
+	background-color: #000;
+	color:#FFF;
+	font-family: 'Goudy Bookletter 1911', serif;
+	margin: 0;
+	padding: 0 0 5px 0;
+	line-height: 1em;
+	font-weight: normal;
+}
+#modal-panel h3 {
+	font-family: 'Goudy Bookletter 1911', serif;
+	margin: 10px 0 5px 10px;
+	padding: 0;
+	font-weight: normal;
+}
+#modal-panel p {
+	font-family: 'Goudy Bookletter 1911', serif;
+	margin: 10px;
+	text-align: justify;
+}
+#modal-panel img.cover {
+	width:80px;
+	height:auto;
+	float:left;
+	margin: 4px 8px 0 0;
+}
+#modal-panel input {
+	border: 1px solid #666;
+	width: 400px;
+	font-family: sans-serif;
+	font-size: 0.8em;
+	margin: 0 0 0 10px;
+	padding:3px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+#modal-panel textarea {
+	resize:none;
+	overflow: hidden;
+	border: 1px solid #666;
+	width: 400px;
+	height: 53px;
+	font-family: sans-serif;
+	font-size: 0.8em;
+	margin: 0 0 0 10px;
+	padding:3px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+#modal {
+	display:none;
+}
+.show-modal #modal {
+	display:block;
+}
+/* the book, not actually a book but made to appear like one (like the act of biography) */
+
+/* single page mode */
+.single-page-mode #poems #previous-page,
+.single-page-mode #poems #next-page {
+	display:none;
+}
+.single-page-mode #poems .pages {
+	display:none;
+}
+.single-page-mode #poems .page {
+	top:0px;
+	right:332px;
+-webkit-transition: top 0.5s ease;
+-moz-transition: top 0.5s ease;
+  transition: top 0.5s ease;
+  transform: none;
+}
+.single-page-mode #poems .page.turned {
+	-webkit-transform: none; 
+	-moz-transform: none; 
+	transform: none; 
+}
+.single-page-mode #poems .page .verso-poem {
+	-webkit-transform: none; 
+	-moz-transform: none; 
+	transform: none; 
+}
+.single-page-mode #poems .page.following {
+	top: 753px;
+}
+.single-page-mode #poems .page.preceding {
+	top: -753px;
+}
+.single-page-mode #poems .page.offscreen.following {
+	top: 1506px;
+}
+.single-page-mode #poems .page.offscreen.preceding {
+	top: -1506px;
+}
+.single-page-mode.reading #poems .page {
+-webkit-transition: top 1s linear;
+-moz-transition: top 1s linear;
+  transition: top 1s linear;
+}
+.reading #poems .page {
+-webkit-transition: -webkit-transform 4s linear;
+-moz-transition: -moz-transform 4s linear;
+  transition: transform 4s linear;
+}
+
+@media screen and (max-width: 440px) {
+
+	#modal-panel {
+		position:absolute; 
+		z-index: 100;
+
+		width:100%;
+		height:270px;
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;
+	}
+	#modal-panel input, #modal-panel textarea {
+		width:95%;
+		box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		-webkit-box-sizing: border-box;					
+	}
+}
+@media screen and (max-width: 350px) {
+	#about { right: 280px; }
+	#play-pause { right: 240px; }
+	#share { right: 210px; }
+	#single-page { right: 170px; }
+	#double-page  { right: 130px; }
+	#fullscreen { right: 90px; }
+	#previous-control { right: 50px; }
+	#next-control { right: 20px; }
+}
+@media screen and (max-width: 310px) {
+	#about { right: 270px; }
+	#play-pause { right: 230px; }
+	#share { right: 200px; }
+	#single-page { right: 160px; }
+	#double-page  { right: 120px; }
+	#fullscreen { right: 80px; }
+	#previous-control { right: 40px; }
+	#next-control { right: 10px; }
+}
