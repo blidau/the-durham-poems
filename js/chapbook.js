@@ -1057,6 +1057,7 @@ ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
       word,
       width = 280,
       line = [],
+      altLine = [],
       lineLength,
       wordSpacing,
       lineNumber = -1,
@@ -1064,11 +1065,12 @@ ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
       y = 12,
       dy,
       tspan,
+      acknowledgementsLength,
       open = false,
       j;
 
    this.tabulaRasa(pageID, 0);
-   if (!this.acknowledgementsRendered) {
+   if (this.acknowledgementsRendered == null) {
       svg = d3.select(pageID+">." + page.side + "-page")
          .append("svg")
          .attr("class", page.side + "-page-svg")
@@ -1081,7 +1083,7 @@ ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
          .attr("text-anchor", "middle")
          .text("Acknowledgements".toUpperCase());
 
-      for(var i=0;i<this.acknowledgements.text.length;i++) {
+      for(var i=0, acknowledgementsLength=this.acknowledgements.text.length;i<acknowledgementsLength;i++) {
          text = svg.append("text")
             .attr("class", "acknowledgements")
             .attr("dx", 0)
@@ -1096,9 +1098,10 @@ ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
          words = this.acknowledgements.text[i].split(/\s+/).reverse();
          while (word = words.pop()) {
             line.push(word);
-            tspan.html(line.join(" "));
+            tspan.text(line.join(" "));
             if (tspan.node().getComputedTextLength() > width) {
                line.pop();
+               altLine = line.slice();
                if (open) {
                   line[0] = '<tspan style="font-style:italic">' + line[0];
                }
@@ -1106,12 +1109,15 @@ ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
                   if (line[j].search(/\*/) > -1) {
                      if (open) {
                         line[j] = line[j].replace(/\*/, "</tspan>");
+                        altLine[j] = altLine[j].replace(/\*/, "");
                         open = false;
                      } else {
                         line[j] = line[j].replace(/\*/, '<tspan style="font-style:italic">');
+                        altLine[j] = altLine[j].replace(/\*/, "");
                         open = true;
                         if (line[j].search(/\*/) > -1) {
                            line[j] = line[j].replace(/\*/, "</tspan>");
+                           altLine[j] = altLine[j].replace(/\*/, "");
                            open = false;
                         }
                      }
@@ -1120,6 +1126,7 @@ ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
                if (open) {
                   line[line.length-1] = line[line.length-1] + '</tspan>';
                }
+               tspan.text(altLine.join(" "));
                tspan.html(line.join(" "));
                wordSpacing = ((width - tspan.node().getComputedTextLength()) / (line.length-1)).toFixed(5);
                tspan.attr("word-spacing", wordSpacing);
@@ -1128,6 +1135,7 @@ ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
                tspan = text.append("tspan").attr("x", (((xLocPage-xLocTitle)/2) + xLocTitle)-140).attr("y", y).attr("dy", ++lineNumber * lineHeight + yLoc).text(word);
             }
          }
+         altLine = line.slice();
          if (open) {
             line[0] = '<tspan style="font-style:italic">' + line[0];
          }
@@ -1135,12 +1143,15 @@ ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
             if (line[j].search(/\*/) > -1) {
                if (open) {
                   line[j] = line[j].replace(/\*/, "</tspan>");
+                  altLine[j] = altLine[j].replace(/\*/, "");
                   open = false;
                } else {
                   line[j] = line[j].replace(/\*/, '<tspan style="font-style:italic">');
+                  altLine[j] = altLine[j].replace(/\*/, "");
                   open = true;
                   if (line[j].search(/\*/) > -1) {
                      line[j] = line[j].replace(/\*/, "</tspan>");
+                     altLine[j] = altLine[j].replace(/\*/, "");
                      open = false;
                   }
                }
@@ -1150,6 +1161,7 @@ ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
             line[line.length-1] = line[line.length-1] + '</tspan>';
             open = false;
          }
+         tspan.text(altLine.join(" "));
          tspan.html(line.join(" "));
          line=[];
       }
