@@ -920,7 +920,7 @@ ChapbookPrinter.prototype.printTitlePage = function(pageID) {
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=20)
       .attr("text-anchor", "middle")
-      .text(this.publisher.name.toUpperCase() + ",");
+      .text(this.publisher.name.toUpperCase() + ".");
 
    svg.append("text")
       .attr("id", "year")
