@@ -25,8 +25,8 @@
         "src": "./images/cover-960x1440.png",
         "sizes": "960x1440"
       }],
-  "scope": "/the-durham-poems/working/",
-  "start_url": "/the-durham-poems/working/",
+  "scope": "/the-durham-poems/sod/",
+  "start_url": "/the-durham-poems/sod/",
   "display": "fullscreen",
   "background_color": "#000"
 }
