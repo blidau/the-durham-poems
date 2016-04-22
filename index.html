@@ -1,190 +1,212 @@
 <!DOCTYPE html>
-<html prefix="dc: http://purl.org/dc/terms/ og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#" lang="en-AU">
-	<head>
-		<meta charset="UTF-8" />
-		<title>The Durham Poems</title>
-		<meta name="application-name" content="Durham Poems" />
-		<meta name="mobile-web-app-capable" content="yes" />
-		<link rel="manifest" type="application/manifest+json" href="manifest.webmanifest" />
-		
-		<meta name="apple-mobile-web-app-title" content="Durham Poems" />
-		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<html prefix="dc: http://purl.org/dc/terms/ og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# cc: http://creativecommons.org/ns#" lang="en-AU">
+   <head>
+      <meta charset="UTF-8" />
+      <title>The Durham Poems</title>
+      <meta name="application-name" content="Durham Poems" />
+      <meta name="mobile-web-app-capable" content="yes" />
+      <link rel="manifest" type="application/manifest+json" href="manifest.webmanifest" />
+      
+      <meta name="apple-mobile-web-app-title" content="Durham Poems" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black" />
 
-		<link rel="icon" sizes="192x192" href="./images/icon-192x192.png" />
-		<link rel="shortcut icon" type="image/x-icon" href="./images/favicon.ico" />
+      <link rel="icon" sizes="192x192" href="./images/icon-192x192.png" />
+      <link rel="shortcut icon" type="image/x-icon" href="./images/favicon.ico" />
 
-		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0" />
-		
-		<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyDQqDxv7wuWp8CeZNkIC-EtplXPLk7gp90"></script>
-		<script type="text/javascript" src="./d3/d3.min.js"></script>
-		<script type="text/javascript" src="./js/chapbook.js"></script>
-		
-		<link rel="apple-touch-icon" href="./images/icon.png" />
-		<link rel="apple-touch-icon" sizes="76x76" href="./images/icon-76x76.png" />
-		<link rel="apple-touch-icon" sizes="120x120" href="./images/icon-120x120.png" />
-		<link rel="apple-touch-icon" sizes="152x152" href="./images/icon-152x152.png" />
-		<link rel="apple-touch-icon" sizes="167x167" href="./images/icon-167x167.png" />
-		<link rel="apple-touch-icon" sizes="180x180" href="./images/icon-180x180.png" />
+      <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, initial-scale=1.0" />
+      
+      <link rel="apple-touch-icon" href="./images/icon.png" />
+      <link rel="apple-touch-icon" sizes="76x76" href="./images/icon-76x76.png" />
+      <link rel="apple-touch-icon" sizes="120x120" href="./images/icon-120x120.png" />
+      <link rel="apple-touch-icon" sizes="152x152" href="./images/icon-152x152.png" />
+      <link rel="apple-touch-icon" sizes="167x167" href="./images/icon-167x167.png" />
+      <link rel="apple-touch-icon" sizes="180x180" href="./images/icon-180x180.png" />
 
-		<!-- check startup image use and add additional or remove / startup image not currently working in chrome-->
-		<link rel="apple-touch-startup-image" href="./images/cover-960x1440.png" />
+      <link rel="apple-touch-startup-image" href="./images/cover-960x1440.png" />
 
-		<meta name="description" content="A series of poems on William Denton's early life in Darlington and Shildon covering the years 1823 to 1842." />
+      <meta name="description" content="A series of poems on William Denton's early life in Darlington and Shildon covering the years 1823 to 1842." />
+      <link rel="canonical" href="https://poetry.thecodeofthings.com/the-durham-poems/working/" />
 
-		<!-- Twitter Card -->
-		<meta property="twitter:card" content="summary" />
-		<meta property="twitter:title" content="The Durham Poems" />
-		<meta property="twitter:site" content="@thecodeofthings" />
-		<meta property="twitter:description" content="A series of poems concerning the early life of William Denton (1823–1883) in Darlington and Shildon covering the years 1823 to 1842." />
-		<meta property="twitter:image" content="https://poetry.thecodeofthings.com/the-durham-poems/working/images/cover-1200x1200.png" />
+      <!-- Twitter Card -->
+      <meta property="twitter:card" content="summary" />
+      <meta property="twitter:title" content="The Durham Poems" />
+      <meta property="twitter:site" content="@thecodeofthings" />
+      <meta property="twitter:description" content="A series of poems concerning the early life of William Denton (1823–1883) in Darlington and Shildon covering the years 1823 to 1842." />
+      <meta property="twitter:image" content="https://poetry.thecodeofthings.com/the-durham-poems/working/images/cover-1200x1200.png" />
 
-		<!-- Open Graph -->
-		<meta property="og:title" content="The Durham Poems" />
-		<meta property="og:image" content="https://poetry.thecodeofthings.com/the-durham-poems/working/images/cover-2400x1260.png" />
-		<meta property="og:url" content="https://poetry.thecodeofthings.com/the-durham-poems/working/" />
-		<meta property="og:description" content="A series of poems concerning the early life of William Denton (1823–1883) in Darlington and Shildon covering the years 1823 to 1842." />
+      <!-- Open Graph -->
+      <meta property="og:title" content="The Durham Poems" />
+      <meta property="og:image" content="https://poetry.thecodeofthings.com/the-durham-poems/working/images/cover-2400x1260.png" />
+      <meta property="og:url" content="https://poetry.thecodeofthings.com/the-durham-poems/working/" />
+      <meta property="og:description" content="A series of poems concerning the early life of William Denton (1823–1883) in Darlington and Shildon covering the years 1823 to 1842." />
 
-		<!-- Dublin Core -->
-		<meta property="dc:title" content="The Durham Poems" />
-		<meta property="dc:description" content="A series of poems concerning the early life of William Denton (1823–1883) in Darlington and Shildon covering the years 1823 to 1842." />
-		<meta property="dc:identifier" content="https://poetry.thecodeofthings.com/the-durham-poems/working" />
-		<meta property="dc:creator" content="Benjamin Laird" />
-		<meta property="dc:publisher" content="The Code of Things" />
-		<link rel="dc:type" href="http://purl.org/dc/dcmitype/InteractiveResource" />
+      <!-- Creative Commons -->
+      <link rel="cc:license" href="http://creativecommons.org/licenses/by-sa/4.0/" />
+      <meta property="cc:attributionName" content="Benjamin Laird" />
 
-		<!-- to do: generalise and clean up clear function (eg Tabula rasa), check positioning, check page number/TOC for acknowledgements etc., move poems into a json file, chrome icons, double check ipad issues, splash screens, test Windows and Linux -->
-		<link rel="canonical" href="https://poetry.thecodeofthings.com/the-durham-poems/working/" />
-		<link rel="stylesheet" type="text/css" href="./css/chapbook.css" />
-		<style type="text/css">
-			/* image preloader */
-			body:after {
-				display: none;
-				content: 	url("./images/cover.png") 
-							url("./images/up-arrow.svg")
-							url("./images/close.svg")
-							url("./images/samson.jpg")
-							url("./images/erectingshop.png");
-			}
-		</style>
-	</head>
-	<body>
-		<header><h1 id="title">The Durham Poems</h1></header>
-		<div id="poems">
-		</div>
-		<div id="controls-tab"><button type="button" id="controls-switch"><img alt="Hide controls" title="Hide controls" src="./images/down-arrow.svg" /></button></div>
-		<menu>
-			<li><button type="button" id="about"><abbr title="About">i</abbr></button></li>
-			<li><button type="button" id="play-pause"><img alt="Play" title="Play" src="./images/play.svg" /></button></li>
-			<li><button type="button" id="share"><img alt="Share" title="Share" src="./images/share.svg" /></button></li>
-			<li><button type="button" id="single-page"><img alt="Single page" title="Show single page view" src="./images/single-page.svg" /></button></li>
-			<li><button type="button" id="double-page"><img alt="Double page" title="Show double page view" src="./images/double-page.svg" /></button></li>
-			<li><button type="button" id="fullscreen"><img id="fullscreen-icon" alt="Fullscreen" title="Go fullscreen" src="./images/fullscreen.svg" /></button></li>
-			<li><button type="button" id="previous-control"><img alt="Previous page" title="Previous page" src="./images/previous-arrow.svg" /></button></li>
-			<li><button type="button" id="next-control"><img alt="Next page" title="Next page" src="./images/next-arrow.svg" /></button></li>
-		</menu>
-		<script type="text/javascript">
-			"use strict";
-			
-			/* Add chapbook */
-			var poetryChapbook = new Chapbook("The Durham Poems", "Poems on William Denton, years 1823–1842", ["Benjamin", "Laird"], 15);
+      <!-- Dublin Core -->
+      <meta property="dc:title" content="The Durham Poems" />
+      <meta property="dc:description" content="A series of poems concerning the early life of William Denton (1823–1883) in Darlington and Shildon covering the years 1823 to 1842." />
+      <meta property="dc:identifier" content="https://poetry.thecodeofthings.com/the-durham-poems/working" />
+      <meta property="dc:creator" content="Benjamin Laird" />
+      <meta property="dc:publisher" content="The Code of Things" />
+      <link rel="dc:type" href="http://purl.org/dc/dcmitype/InteractiveResource" />
 
-			/* Add poems to chapbook */
-			poetryChapbook.addPoem(new Poem("A Coat without Buttons", 
-				["Young Denton", "ascetic fever", "Quaker-like", "what need", "for them", "a sensation", "practice of wearing", "master", "the situation", "despite", "the ridicule", "of worldlings"], 
-				[]
-			));
-			poetryChapbook.addPoem(new Poem("The Methodist Library", 
-				["“Saint’s Rest”", "“Pilgrim’s Progress”", "“The Methodist Magazine”", "him", "he", "books", "his taste", "Sunday School", "the Bible", "ritualism", "eight years", "avidity"], 
-				["and volumes of", "were speaking", "figuratively", "swallowed", "with", "soon began", "a relish for", "attended", "recited", "reached", "assembled", "through", "was"]
-			));
-			poetryChapbook.addPoem(new Poem("Machinist", 
-				["problem", "rule", "sphere", "cone", "frustum", "solidity", "product", "diameter", "read", "metallurgy", "find", "difference", "sum", "square"], 
-				["÷", "¼", "30 pages", "+", "−", "×", "½", "10 pages", "of the", "of their", "will give the", "will be", "2 chapters", "being"]
-			));
-			poetryChapbook.addPoem(new Poem("Hammer in Hand", 
-				["geologist’s hammer", "hand", "silver spoon", "poverty", "genius", "love", "honor", "germ-principle", "world", "denizen"], 
-				["into", "with", "neither", "in", "indigenous to", "became", "of", "what of", "loosen", "to"]
-			));
-			poetryChapbook.addPoem(new Poem("Strata", 
-				["granite", "metamorphic", "Cambrian", "Silurian", "Devonian", "Carboniferous", "Permian", "Secondary", "Tertiary", "Quaternary"], 
-				["layered", "through", "on", "under", "over", "splitting", "excavating", "compressing", "ejecting", "leeching"]
-			));
-			poetryChapbook.addPoem(new Poem("Principles of Geology",
-				["geology", "history", "doctrine", "connexions", "light", "lakes", "valleys", "mountains", "volcanoes", "physical sciences", "moral"],
-				["compared to", "brought to", "as", "and", "is", "are", "can", "belonged to", "changed to", "related to", "acquainted with"]
-			));
-			poetryChapbook.addPoem(new Poem("Character is the Growth of Time", 
-				["solid", "rock", "love", "beauty", "world", "ours", "battlefields", "fights", "Alpine peaks", "lives", "words", "compute"], 
-				["as", "and", "devoid of", "utterly", "of", "forced into", "rise to", "is", "are", "can"]
-			));
-			poetryChapbook.addPoem(new Poem("Samson, Hercules and John Buddle", 
-				["cylinders", "cast iron", "box-like frames", "valve gear", "pumps", "throttle", "reversing lever", "vertically", "parallel motion", "wheels", "slides", "axles", "brackets", "chilled tread"], 
-				["fitted over", "resting on", "giving", "assembled", "guided by", "fixed upon", "bolted to", "renewed", "with a", "capacity of", "working", "rivetted to", "attached", "reduced to"]
-			));
-			poetryChapbook.addPoem(new Poem("A New Teacher, William Shotton", 
-				["rara avis", "phrenology", "electricity", "Baptist", "practical lessons", "religious subjects", "his lips", "galvanic battery", "revolution", "soul", "students"], 
-				["and", "conclusions on", "working within", "experiments with", "his own", "making", "anti-methodistic", "delighted to", "listening", "impressing", "marvelled at"]
-			));
-			poetryChapbook.addPoem(new Poem("Mr Hackworth’s Shildon", 
-				["Mr Hackworth", "file", "New Shildon", "superintendent", "locomotive", "Soho", "Stockton", "Darlington", "Conscience!", "employer", "railway", "machinery"], 
-				["&", "small regard for", "the old", "living in", "to be a", "as fine as a", "repair some", "go", "via", "told", "is not", "talked of", "returned"]
-			));
-			poetryChapbook.addPoem(new Poem("Currier", 
-				["paid", "half-crown", "week", "eleven years old", "earn", "distaste", "hired", "wages", "foreman", "boy", "independent", "work", "business", "spirit", "genius"], 
-				["flung", "considered", "little account", "privilege of", "accomplished", "at the", "a", "for", "and", "valiantly", "growing", "but not the", "with the", "used to"]
-			));
-			poetryChapbook.addPoem(new Poem("The Spirit of Reform", 
-				["old Methodist society", "a split", "debate", "his powers", "the devil", "the disguise", "commotion", "multitudes", "rule", "authority", "Popery", "nothing", "a voice", "the church", "the religious world"], 
-				["in", "wore", "stirred up", "grew tired of", "of", "and", "better than", "have", "hence", "desired", "excited", "to them", "had", "was", "sides with"]
-			));
-			poetryChapbook.addPoem(new Poem("Joseph Barker", 
-				["Gospel", "Christianity", "religion", "Christ", "questions", "observations", "triumphant", "Socialism", "Socialists", "society", "good", "evil", "New Testament", "who", "principled", "what"], 
-				["is", "professes", "advocates", "exposes", "charges", "of", "tendency of", "had", "increases", "itself", "opening the", "the true", "considers", "their", "our", "quote", "manifests"]
-			));
-			poetryChapbook.addPoem(new Poem("Methodist-minister-grocer", 
-				["Methodist world", "Lord’s vessel", "unsound", "dishonesty", "cheating", "false", "weight", "lead", "scale", "the public", "example", "morals", "piece"], 
-				["was", "chosen", "on", "denounced", "injurious", "adding", "as", "strictly", "is", "eschewed", "not", "with", "placing"]
-			));
-			poetryChapbook.addPoem(new Poem("Man Considered as a Physical Being", 
-				["human", "mind", "body", "bones", "muscles", "nerves", "bloodvessels", "nutrition", "respiration", "thought", "mechanical", "science", "principle", "physical", "creation", "Creator", "man"], 
-				["consists of", "organs of", "in harmony with", "law of", "perfect", "constructed on", "and", "infringement of", "with", "on", "pursuing", "bestowed by", "arrive at", "prosecuted in", "incomplete", "beside", "adaption of", "in relation to", "influence"]
-			));
-			poetryChapbook.addPoem(new Poem("Man Considered as an Organised Being", 
-				["organic", "laws", "food", "first", "obedience", "the earth", "harmony", "mode", "choice", "pleasure", "pain", "death", "sleep", "health"], 
-				["subsists on", "obeyed", "sowed", "producing", "supplying", "in", "frames",  "source of", "inflicted", "and", "if", "with", "has", "supplied with"]
-			));
-			poetryChapbook.addPoem(new Poem("True Religion", 
-				["men", "religion", "not", "I", "myself", "countries", "religious", "things", "Jesus", "teacher", "New Testament", "his disciples"], 
-				["true", "worship", "of", "is", "believe", "all", "naturally", "and", "preached", "practiced", "taught", "with", "heavenly"]
-			));
-			poetryChapbook.addPoem(new Poem("Improvement of the Mind", 
-				["subject", "well being", "happiness", "state", "existence", "felicity", "man", "animal", "helpless", "mind", "soul", "balloon", "diving bell", "depths", "clouds", "depths", "practice", "observation"], 
-				["interested", "connected", "of", "beneficial", "future", "in", "looking at", "acquainted", "perceives", "descends", "teaches", "and", "makes up for", "elevated", "weakness of", "or", "with", "learn by"]
-			));
-			poetryChapbook.addPoem(new Poem("Temperance", 
-				["meaning", "drinks", "subject", "together", "us", "disease", "injurious", "moral", "passions", "propensities", "branch", "I", "remains", "health", "a man’s body", "by God"], 
-				["intoxicating", "abstaining", "called", "of", "eating", "drinking", "to", "in", "in government of", "and our", "upon", "believe", "said", "taught", "much"]
-			));
-			poetryChapbook.addPoem(new Poem("Composed of Solids and Fluids", 
-				["waste", "solids", "fluids", "hunger", "thirst", "composition", "ale", "dirty water", "coarse food"], 
-				["of", "causes", "14 oz. of", "10 oz. of", "1 oz. of", "3 gallons of", "6 shilling for", "3 penny worth of"]
-			));
-			poetryChapbook.addPoem(new Poem("Railway Tunnel", 
-				["Geological studies", "fossils", "impetus", "Shildon", "specimens", "debris", "soul", "books", "nothing", "studies", "impulse"], 
-				["formation", "among", "found", "was", "were", "frequently", "his", "took to", "hunted", "own", "stimulated", "obtained from"]
-			));
+      <!-- Scripts -->
+      <script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyDQqDxv7wuWp8CeZNkIC-EtplXPLk7gp90"></script>
+      <script type="text/javascript" src="./d3/d3.min.js"></script>
+      <script type="text/javascript" src="./js/chapbook.js"></script>
 
-			/* Sort and select poems for publication */
-			poetryChapbook.prepareForPublication();
+      <!-- Styles -->
+      <link rel="stylesheet" type="text/css" href="./css/chapbook.css" />
+      <style type="text/css">
+         /* image preloader */
+         body:after {
+            display: none;
+            content:    url("./images/cover.png") 
+                     url("./images/up-arrow.svg") 
+                     url("./images/close.svg") 
+                     url("./images/samson.jpg") 
+                     url("./images/erectingshop.png");
+         }
+      </style>
+   </head>
+   <body>
+      <header><h1 id="title">The Durham Poems</h1></header>
+      <div id="poems">
+      </div>
+      <div id="controls-tab"><button type="button" id="controls-switch"><img alt="Hide controls" title="Hide controls" src="./images/down-arrow.svg" /></button></div>
+      <menu>
+         <li><button type="button" id="about"><abbr title="About">i</abbr></button></li>
+         <li><button type="button" id="play-pause"><img alt="Play" title="Play" src="./images/play.svg" /></button></li>
+         <li><button type="button" id="share"><img alt="Share" title="Share" src="./images/share.svg" /></button></li>
+         <li><button type="button" id="single-page"><img alt="Single page" title="Show single page view" src="./images/single-page.svg" /></button></li>
+         <li><button type="button" id="double-page"><img alt="Double page" title="Show double page view" src="./images/double-page.svg" /></button></li>
+         <li><button type="button" id="fullscreen"><img id="fullscreen-icon" alt="Fullscreen" title="Go fullscreen" src="./images/fullscreen.svg" /></button></li>
+         <li><button type="button" id="previous-control"><img alt="Previous page" title="Previous page" src="./images/previous-arrow.svg" /></button></li>
+         <li><button type="button" id="next-control"><img alt="Next page" title="Next page" src="./images/next-arrow.svg" /></button></li>
+      </menu>
+      <script type="text/javascript">
+         // @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&dn=gpl-3.0.txt GPL-v3-or-Later
+         "use strict";
 
-			/* Publish chapbook */
-			//Samson image sourced from http://collectionscanada.gc.ca/pam_archives/index.php?fuseaction=genitem.displayItem&rec_nbr=3391580 and no longer in copyright
-			//Hackworth's erecting shop image sourced from http://www.gracesguide.co.uk/File:Im1923TimHack-Erectingshop.jpg and modified and used under the terms of the GNU Free Documentation Licence, Version 1.2
-			var poetryChapbookPrinter = new ChapbookPrinter(poetryChapbook, {"name" : "The Code of Things", "url" : "https://thecodeofthings.com"}, "Melbourne", "Australia", [{"src" :"./images/erectingshop.png", "alt" : "Hackworth's erecting shop in Shildon as it appears to-day"},  {"src": "./images/samson.jpg", alt : "Samson"}], [{"quote" : "A poem is a small (or large) machine made of words.", "author" : "Williams"}, {"quote": "The town I once knew has departed and a new town with the old name is here.", "author" : "William Denton", "place" : "Darlington", "date" : "25 December 1876"}], {"text" : "I am grateful to the Wellesley Historical Society for access to the Denton family collection and especially to Kathleen Fahey for her time and invaluable assistance with the archive."});
-			
-			/* Read chapbook */
-			var poetryChapbookReader = new ChapbookReader(poetryChapbookPrinter, "<img class='cover' src='./images/cover.png' alt='' />These poems are part of a larger collection of biographical poems concerning the life of scientific lecturer, Spiritualist and radical, William Denton (1823–1883). More information about the series can be found at <a target='_top' href='https://thecodeofthings.com'><cite>The Code of Things</cite></a>.");
-		</script>
-	</body>
+         /* Add chapbook: chapbook title, alternative title, author [first name, last name], number of poems to be published */
+         var poetryChapbook = new Chapbook("The Durham Poems", "Poems on William Denton, years 1823–1842", ["Benjamin", "Laird"], 15);
+
+         /* Add poems to chapbook: poem title, node words list, link words list */
+         poetryChapbook.addPoem(new Poem("A Coat without Buttons", 
+            ["Young Denton", "ascetic fever", "Quaker-like", "what need", "for them", "a sensation", "practice of wearing", "master", "the situation", "despite", "the ridicule", "of worldlings"], 
+            []
+         ));
+         poetryChapbook.addPoem(new Poem("The Methodist Library", 
+            ["“Saint’s Rest”", "“Pilgrim’s Progress”", "“The Methodist Magazine”", "him", "he", "books", "his taste", "Sunday School", "the Bible", "ritualism", "eight years", "avidity"], 
+            ["and volumes of", "were speaking", "figuratively", "swallowed", "with", "soon began", "a relish for", "attended", "recited", "reached", "assembled", "through", "was"]
+         ));
+         poetryChapbook.addPoem(new Poem("Machinist", 
+            ["problem", "rule", "sphere", "cone", "frustum", "solidity", "product", "diameter", "read", "metallurgy", "find", "difference", "sum", "square"], 
+            ["÷", "¼", "30 pages", "+", "−", "×", "½", "10 pages", "of the", "of their", "will give the", "will be", "2 chapters", "being"]
+         ));
+         poetryChapbook.addPoem(new Poem("Hammer in Hand", 
+            ["geologist’s hammer", "hand", "silver spoon", "poverty", "genius", "love", "honor", "germ-principle", "world", "denizen"], 
+            ["into", "with", "neither", "in", "indigenous to", "became", "of", "what of", "loosen", "to"]
+         ));
+         poetryChapbook.addPoem(new Poem("Strata", 
+            ["granite", "metamorphic", "Cambrian", "Silurian", "Devonian", "Carboniferous", "Permian", "Secondary", "Tertiary", "Quaternary"], 
+            ["layered", "through", "on", "under", "over", "splitting", "excavating", "compressing", "ejecting", "leeching"]
+         ));
+         poetryChapbook.addPoem(new Poem("Principles of Geology",
+            ["geology", "history", "doctrine", "connexions", "light", "lakes", "valleys", "mountains", "volcanoes", "physical sciences", "moral"],
+            ["compared to", "brought to", "as", "and", "is", "are", "can", "belonged to", "changed to", "related to", "acquainted with"]
+         ));
+         poetryChapbook.addPoem(new Poem("Character is the Growth of Time", 
+            ["solid", "rock", "love", "beauty", "world", "ours", "battlefields", "fights", "Alpine peaks", "lives", "words", "compute"], 
+            ["as", "and", "devoid of", "utterly", "of", "forced into", "rise to", "is", "are", "can"]
+         ));
+         poetryChapbook.addPoem(new Poem("Samson, Hercules and John Buddle", 
+            ["cylinders", "cast iron", "box-like frames", "valve gear", "pumps", "throttle", "reversing lever", "vertically", "parallel motion", "wheels", "slides", "axles", "brackets", "chilled tread"], 
+            ["fitted over", "resting on", "giving", "assembled", "guided by", "fixed upon", "bolted to", "renewed", "with a", "capacity of", "working", "rivetted to", "attached", "reduced to"]
+         ));
+         poetryChapbook.addPoem(new Poem("A New Teacher, William Shotton", 
+            ["rara avis", "phrenology", "electricity", "Baptist", "practical lessons", "religious subjects", "his lips", "galvanic battery", "revolution", "soul", "students"], 
+            ["and", "conclusions on", "working within", "experiments with", "his own", "making", "anti-methodistic", "delighted to", "listening", "impressing", "marvelled at"]
+         ));
+         poetryChapbook.addPoem(new Poem("Mr Hackworth’s Shildon", 
+            ["Mr Hackworth", "file", "New Shildon", "superintendent", "locomotive", "Soho", "Stockton", "Darlington", "Conscience!", "employer", "railway", "machinery"], 
+            ["&", "small regard for", "the old", "living in", "to be a", "as fine as a", "repair some", "go", "via", "told", "is not", "talked of", "returned"]
+         ));
+         poetryChapbook.addPoem(new Poem("Currier", 
+            ["paid", "half-crown", "week", "eleven years old", "earn", "distaste", "hired", "wages", "foreman", "boy", "independent", "work", "business", "spirit", "genius"], 
+            ["flung", "considered", "little account", "privilege of", "accomplished", "at the", "a", "for", "and", "valiantly", "growing", "but not the", "with the", "used to"]
+         ));
+         poetryChapbook.addPoem(new Poem("The Spirit of Reform", 
+            ["old Methodist society", "a split", "debate", "his powers", "the devil", "the disguise", "commotion", "multitudes", "rule", "authority", "Popery", "nothing", "a voice", "the church", "the religious world"], 
+            ["in", "wore", "stirred up", "grew tired of", "of", "and", "better than", "have", "hence", "desired", "excited", "to them", "had", "was", "sides with"]
+         ));
+         poetryChapbook.addPoem(new Poem("Joseph Barker", 
+            ["Gospel", "Christianity", "religion", "Christ", "questions", "observations", "triumphant", "Socialism", "Socialists", "society", "good", "evil", "New Testament", "who", "principled", "what"], 
+            ["is", "professes", "advocates", "exposes", "charges", "of", "tendency of", "had", "increases", "itself", "opening the", "the true", "considers", "their", "our", "quote", "manifests"]
+         ));
+         poetryChapbook.addPoem(new Poem("Methodist-minister-grocer", 
+            ["Methodist world", "Lord’s vessel", "unsound", "dishonesty", "cheating", "false", "weight", "lead", "scale", "the public", "example", "morals", "piece"], 
+            ["was", "chosen", "on", "denounced", "injurious", "adding", "as", "strictly", "is", "eschewed", "not", "with", "placing"]
+         ));
+         poetryChapbook.addPoem(new Poem("Man Considered as a Physical Being", 
+            ["human", "mind", "body", "bones", "muscles", "nerves", "bloodvessels", "nutrition", "respiration", "thought", "mechanical", "science", "principle", "physical", "creation", "Creator", "man"], 
+            ["consists of", "organs of", "in harmony with", "law of", "perfect", "constructed on", "and", "infringement of", "with", "on", "pursuing", "bestowed by", "arrive at", "prosecuted in", "incomplete", "beside", "adaption of", "in relation to", "influence"]
+         ));
+         poetryChapbook.addPoem(new Poem("Man Considered as an Organised Being", 
+            ["organic", "laws", "food", "first", "obedience", "the earth", "harmony", "mode", "choice", "pleasure", "pain", "death", "sleep", "health"], 
+            ["subsists on", "obeyed", "sowed", "producing", "supplying", "in", "frames",  "source of", "inflicted", "and", "if", "with", "has", "supplied with"]
+         ));
+         poetryChapbook.addPoem(new Poem("True Religion", 
+            ["men", "religion", "not", "I", "myself", "countries", "religious", "things", "Jesus", "teacher", "New Testament", "his disciples"], 
+            ["true", "worship", "of", "is", "believe", "all", "naturally", "and", "preached", "practiced", "taught", "with", "heavenly"]
+         ));
+         poetryChapbook.addPoem(new Poem("Improvement of the Mind", 
+            ["subject", "well being", "happiness", "state", "existence", "felicity", "man", "animal", "helpless", "mind", "soul", "balloon", "diving bell", "depths", "clouds", "depths", "practice", "observation"], 
+            ["interested", "connected", "of", "beneficial", "future", "in", "looking at", "acquainted", "perceives", "descends", "teaches", "and", "makes up for", "elevated", "weakness of", "or", "with", "learn by"]
+         ));
+         poetryChapbook.addPoem(new Poem("Temperance", 
+            ["meaning", "drinks", "subject", "together", "us", "disease", "injurious", "moral", "passions", "propensities", "branch", "I", "remains", "health", "a man’s body", "by God"], 
+            ["intoxicating", "abstaining", "called", "of", "eating", "drinking", "to", "in", "in government of", "and our", "upon", "believe", "said", "taught", "much"]
+         ));
+         poetryChapbook.addPoem(new Poem("Composed of Solids and Fluids", 
+            ["waste", "solids", "fluids", "hunger", "thirst", "composition", "ale", "dirty water", "coarse food"], 
+            ["of", "causes", "14 oz. of", "10 oz. of", "1 oz. of", "3 gallons of", "6 shilling for", "3 penny worth of"]
+         ));
+         poetryChapbook.addPoem(new Poem("Railway Tunnel", 
+            ["Geological studies", "fossils", "impetus", "Shildon", "specimens", "debris", "soul", "books", "nothing", "studies", "impulse"], 
+            ["formation", "among", "found", "was", "were", "frequently", "his", "took to", "hunted", "own", "stimulated", "obtained from"]
+         ));
+
+         /* Sort and select poems for publication */
+         poetryChapbook.prepareForPublication();
+
+         /* Publish chapbook: publisher name, publisher url, publisher city, publisher country, images [facing title page image, closing image], quotes [title page quote, facing first poem quote], acknowledgements */
+
+         var poetryChapbookPrinter = new ChapbookPrinter(
+            poetryChapbook, 
+            {"name" : "The Code of Things", "url" : "https://thecodeofthings.com"}, 
+            "Melbourne", "Australia", 
+            [
+               {"src" :"./images/erectingshop.png", "alt" : "Hackworth's erecting shop in Shildon as it appears to-day"},
+               {"src": "./images/samson.jpg", alt : "Samson"}
+            ], 
+            [
+               {"quote" : "A poem is a small (or large) machine made of words.", "author" : "Williams"}, 
+               {"quote": "The town I once knew has departed and a new town with the old name is here.", "author" : "William Denton", "place" : "Darlington", "date" : "25 December 1876"}
+            ], 
+            {"text" : [
+               "I am grateful to the Wellesley Historical Society for access to the Denton family collection and especially to Kathleen Fahey for her time and invaluable assistance with the archive.", 
+               "Aside from the diaries and correspondence of William Denton, the sources for these poems included JH Powell’s *William Denton, the Geologist and Radical: A Biographical Sketch*, Joseph Barker’s *Christianity Triumphant*, George Coombe’s *The Constitution of Man Considered in Relation to External Objects*, Charles Lyell’s *Principles of Geology*, Grace’s Guide to British Industrial History, and the Pictou County Historical Society’s *The Saga of the Samson: Canada’s Oldest Locomotive*.",
+               "The image of the erecting shop at Shildon is from Robert Young’s *Timothy Hackworth and the Locomotive*. The photograph of the Samson on the facing page is from Library and Archives Canada (C-002614). The cover image was created from a map from JR Boyle’s *Comprehensive Guide to the County of Durham: With Maps and Plans*."
+            ]}
+         );
+         /* Read chapbook: about modal content */
+         var poetryChapbookReader = new ChapbookReader(poetryChapbookPrinter, "<img class='cover' src='./images/cover.png' alt='' />These poems are part of a larger collection of biographical poems concerning the life of scientific lecturer, Spiritualist and radical, William Denton (1823–1883). More information about the series can be found at <a target='_top' href='https://thecodeofthings.com'><cite>The Code of Things</cite></a>.");
+
+         // @license-end
+      </script>
+   </body>
 </html>
