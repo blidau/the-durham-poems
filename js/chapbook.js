@@ -34,7 +34,7 @@ function ChapbookPrinter(chapbook, publisher, city, country, images, quotes, ack
    this.publisher = publisher;
    this.images = images;
    this.quotes = quotes;
-   this.city = city; 
+   this.city = city;
    this.country = country; 
    this.year = new Date().getUTCFullYear(); 
 
@@ -471,7 +471,6 @@ ChapbookPrinter.prototype.addPage = function(pageID, turned, before) {
 
 }
 ChapbookPrinter.prototype.addSinglePage = function(pageID, isVerso, hasClass) {
-   //append to #poems
    var _this = this,
       deltaY,
       touchY = 0,
@@ -815,21 +814,21 @@ ChapbookPrinter.prototype.printImprintPage = function(pageID) {
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=yIncrement)
       .attr("text-anchor", "start")
-      .text("International License");
+      .text("International Licence");
 
    svg.append("text")
       .attr("class", "imprint")
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=yIncrement)
       .attr("text-anchor", "start")
-      .text("To view a copy of this license, visit");
+      .text("To view a copy of this licence, visit");
 
    svg.append("text")
       .attr("class", "imprint")
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=yIncrement)
       .attr("text-anchor", "start")
-      .text("https://creativecommons.org/licenses/by-sa/4.0/");
+      .text("https://creativecommons.org/licences/by-sa/4.0/");
 
 }
 ChapbookPrinter.prototype.printTitlePage = function(pageID) {
@@ -1456,7 +1455,7 @@ ChapbookReader.prototype.isFullscreenEnabled = function() {
    return _isFullscreenEnabled;
 }
 ChapbookReader.prototype.toggleFullScreen = function() {
-   if (!this.inFullscreen()) {  // current working methods
+   if (!this.inFullscreen()) {
       if (document.documentElement.requestFullscreen) {
          document.documentElement.requestFullscreen();
       } else if (document.documentElement.msRequestFullscreen) {
@@ -1595,7 +1594,6 @@ ChapbookReader.prototype.addModal = function(title) {
 
    return modalPanel;
 }
-
 ChapbookReader.prototype.removeModal = function() {
    d3.select("body").classed("show-modal", false);
    d3.select("#modal").remove(); 
