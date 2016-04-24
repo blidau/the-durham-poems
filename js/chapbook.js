@@ -828,7 +828,7 @@ ChapbookPrinter.prototype.printImprintPage = function(pageID) {
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=yIncrement)
       .attr("text-anchor", "start")
-      .text("https://creativecommons.org/licenses/by-sa/4.0/");
+      .text("https://creativecommons.org/licences/by-sa/4.0/");
 
 }
 ChapbookPrinter.prototype.printTitlePage = function(pageID) {
