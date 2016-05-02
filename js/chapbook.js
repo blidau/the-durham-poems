@@ -793,14 +793,21 @@ ChapbookPrinter.prototype.printImprintPage = function(pageID) {
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=(2*yIncrement))
       .attr("text-anchor", "start")
-      .text("This work is licensed");
+      .text("Except where otherwise noted,");
+
+   svg.append("text")
+      .attr("class", "imprint")
+      .attr("dx", xLayoutPosition)
+      .attr("dy", yLayoutPosition+=(yIncrement))
+      .attr("text-anchor", "start")
+      .text("this work is licensed under");
 
    svg.append("text")
       .attr("class", "imprint")
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=yIncrement)
       .attr("text-anchor", "start")
-      .text("under the Creative Commons");
+      .text("the Creative Commons");
 
    svg.append("text")
       .attr("class", "imprint")
