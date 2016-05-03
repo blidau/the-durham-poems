@@ -91,17 +91,17 @@ ChapbookPrinter.prototype.determinePublishingCity = function(geoposition) {
    geocoder.geocode({'latLng': latlng}, function(results, status) {
       var i,
          resultsAddressComponentsLength;
-      if (status == google.maps.GeocoderStatus.OK) {
+      if (status === google.maps.GeocoderStatus.OK) {
          if (results[0]) {
             for (i=0, resultsAddressComponentsLength=results[0].address_components.length;i<resultsAddressComponentsLength;i++) {
-               if ((results[0].address_components[i].types[0]=="locality") && !cityFound ) {
+               if ((results[0].address_components[i].types[0]==="locality") && !cityFound ) {
                   _city = results[0].address_components[i].long_name;
                   cityFound = true;
-               } else if ((results[0].address_components[i].types[0]=="administrative_area_level_2") && !cityFound ){
+               } else if ((results[0].address_components[i].types[0]==="administrative_area_level_2") && !cityFound ){
                   _city = results[0].address_components[i].long_name;
                   cityFound = true;
                }
-               if (results[0].address_components[i].types[0]=="country") {
+               if (results[0].address_components[i].types[0]==="country") {
                   _country = results[0].address_components[i].long_name;
                }
             }
@@ -163,31 +163,31 @@ ChapbookPrinter.prototype.nextPage = function() {
          d3.select("#page-" + turnPageNum).classed("turned", true).classed("turning", true);
 
          switch (true) {
-            case this.currentPageSpread == 0:
+            case this.currentPageSpread === 0:
                this.printPreTitlePage("#page-2");
                this.printImagePage("#page-2", 0);
                break;
-            case this.currentPageSpread == 1:
+            case this.currentPageSpread === 1:
                this.printTitlePage("#page-3");
                this.tabulaRasa("#page-3", 1);
                this.printImprintPage("#page-3");
                break;
-            case this.currentPageSpread == 2:
+            case this.currentPageSpread === 2:
                this.printContentsPage("#page-4");
                this.tabulaRasa("#page-4", 1);
                this.printQuotePage("#page-4");
                break;
-            case this.currentPageSpread == 3:
+            case this.currentPageSpread === 3:
                this.printPoemPage("#page-5", 0);
                break;
-            case this.currentPageSpread == afterPoems:
+            case this.currentPageSpread === afterPoems:
                this.tabulaRasa("#page-" + turnPageNum, 1);
                this.printImagePage("#page-" + turnPageNum, 1);
                if (this.acknowledgements) {
                   this.printAcknowledgementsPage("#page-" + addPageNum);
                }
                break;
-            case this.currentPageSpread == afterPoems + 1:
+            case this.currentPageSpread === afterPoems + 1:
                //add blank to last page and to page 1
                this.tabulaRasa("#page-" + turnPageNum, 1);
                this.tabulaRasa("#page-" + addPageNum, 0);
@@ -219,46 +219,46 @@ ChapbookPrinter.prototype.nextPage = function() {
          d3.select("#page-" + newPageID).classed("following", false);
 
          switch (true) {
-            case this.currentPageSpread == 0: 
+            case this.currentPageSpread === 0: 
                this.printPreTitlePage("#page-1");
                break;
-            case this.currentPageSpread == 1: 
+            case this.currentPageSpread === 1: 
                this.printImagePage("#page-2", 0);
                break;
-            case this.currentPageSpread == 2: 
+            case this.currentPageSpread === 2: 
                this.printTitlePage("#page-3");
                break;
-            case this.currentPageSpread == 3: 
+            case this.currentPageSpread === 3: 
                this.tabulaRasa("#page-4", 1);
                this.printImprintPage("#page-4");
                break;
-            case this.currentPageSpread == 4:
+            case this.currentPageSpread === 4:
                this.printContentsPage("#page-5"); 
                break;
-            case this.currentPageSpread == 5:
+            case this.currentPageSpread === 5:
                this.tabulaRasa("#page-6", 1);
                this.printQuotePage("#page-6");
                break;
             default:
                this.printPoemPage("#page-" + newPageID, this.currentPageSpread-6);
                break;
-            case this.currentPageSpread == afterPoems:
+            case this.currentPageSpread === afterPoems:
                this.tabulaRasa("#page-" + newPageID, 0); //move function into page draw
                this.printImagePage("#page-" + newPageID, 1);
                break;
-            case this.currentPageSpread == afterPoems + 1:
+            case this.currentPageSpread === afterPoems + 1:
                this.tabulaRasa("#page-" + newPageID, 1);
                if (this.acknowledgements) {
                   this.printAcknowledgementsPage("#page-" + newPageID);
                }
                break;
-            case this.currentPageSpread == afterPoems + 2:
+            case this.currentPageSpread === afterPoems + 2:
                this.tabulaRasa("#page-" + newPageID, 0);
                break;
-            case this.currentPageSpread == afterPoems + 3:
+            case this.currentPageSpread === afterPoems + 3:
                this.tabulaRasa("#page-" + newPageID, 1);
                break;
-            case this.currentPageSpread == afterPoems + 4:
+            case this.currentPageSpread === afterPoems + 4:
                this.tabulaRasa("#page-" + newPageID, 0);
                break;
          }
@@ -298,33 +298,33 @@ ChapbookPrinter.prototype.previousPage = function() {
          this.unturnPage("#page-" + unturnPageNum);
 
          switch (true) {
-            case this.currentPageSpread == 0:
+            case this.currentPageSpread === 0:
                this.tabulaRasa("#page-1", 0);
                this.tabulaRasa("#page-1", 1);
                break;
-            case this.currentPageSpread == 1:
+            case this.currentPageSpread === 1:
                this.printPreTitlePage("#page-2");
                this.printImagePage("#page-2", 0);
                break;
-            case this.currentPageSpread == 2:
+            case this.currentPageSpread === 2:
                this.printTitlePage("#page-3");
                this.tabulaRasa("#page-3", 1);
                this.printImprintPage("#page-3");
                break;
-            case this.currentPageSpread == 3:
+            case this.currentPageSpread === 3:
                this.printContentsPage("#page-4");
                this.tabulaRasa("#page-4", 1);
                this.printQuotePage("#page-4");
                this.printPoemPage("#page-5", 0);
                break;
-            case this.currentPageSpread == afterPoems:
+            case this.currentPageSpread === afterPoems:
                this.tabulaRasa("#page-" + addPageNum, 1);
                this.printImagePage("#page-" + addPageNum, 1);
                if (this.acknowledgements) {
                   this.printAcknowledgementsPage("#page-" + unturnPageNum);
                }
                break;
-            case this.currentPageSpread == afterPoems + 1:
+            case this.currentPageSpread === afterPoems + 1:
                this.tabulaRasa("#page-" + addPageNum, 1);
                this.tabulaRasa("#page-" + unturnPageNum, 0);
                break;
@@ -358,46 +358,46 @@ ChapbookPrinter.prototype.previousPage = function() {
          
 
          switch (true) {
-            case this.currentPageSpread == 0: // pre title page
+            case this.currentPageSpread === 0: // pre title page
                this.printPreTitlePage("#page-1");//right
                break;
-            case this.currentPageSpread == 1: // image
+            case this.currentPageSpread === 1: // image
                this.printImagePage("#page-2", 0);
                break;
-            case this.currentPageSpread == 2: // title page
+            case this.currentPageSpread === 2: // title page
                this.printTitlePage("#page-3");
                break;
-            case this.currentPageSpread == 3: // imprint
+            case this.currentPageSpread === 3: // imprint
                this.tabulaRasa("#page-4", 1);
                this.printImprintPage("#page-4");
                break;
-            case this.currentPageSpread == 4:
+            case this.currentPageSpread === 4:
                this.printContentsPage("#page-5");
                break;
-            case this.currentPageSpread == 5:
+            case this.currentPageSpread === 5:
                this.tabulaRasa("#page-6", 1);
                this.printQuotePage("#page-6");
                break;
             default:
                this.printPoemPage("#page-" + newPageID, this.currentPageSpread-6);
                break;
-            case this.currentPageSpread == afterPoems:
+            case this.currentPageSpread === afterPoems:
                this.tabulaRasa("#page-" + newPageID, 0);
                this.printImagePage("#page-" + newPageID, 1);
                break;
-            case this.currentPageSpread == afterPoems + 1:
+            case this.currentPageSpread === afterPoems + 1:
                this.tabulaRasa("#page-" + newPageID, 1);
                if (this.acknowledgements) {
                   this.printAcknowledgementsPage("#page-" + newPageID);
                }
                break;
-            case this.currentPageSpread == afterPoems + 2:
+            case this.currentPageSpread === afterPoems + 2:
                this.tabulaRasa("#page-" + newPageID, 0);
                break;
-            case this.currentPageSpread == afterPoems + 3:
+            case this.currentPageSpread === afterPoems + 3:
                this.tabulaRasa("#page-" + newPageID, 1);
                break;
-            case this.currentPageSpread == afterPoems + 4:
+            case this.currentPageSpread === afterPoems + 4:
                this.tabulaRasa("#page-" + newPageID, 0);
                break;
          }
@@ -423,7 +423,7 @@ ChapbookPrinter.prototype.addPage = function(pageID, turned, before) {
    rectoPage.on("touchmove", 
          function() { 
             d3.event.preventDefault();
-            if (touchX == 0) {
+            if (touchX === 0) {
                touchX = d3.event.changedTouches[0].pageX;
             }
          }
@@ -432,7 +432,7 @@ ChapbookPrinter.prototype.addPage = function(pageID, turned, before) {
          function() { 
             if (d3.event.defaultPrevented) return;
             deltaX = touchX - d3.event.changedTouches[0].pageX;
-            if ((deltaX > 0) || (touchX==0)) {
+            if ((deltaX > 0) || (touchX===0)) {
                _this.nextPage();
             }
             else if (deltaX < 0) {
@@ -450,7 +450,7 @@ ChapbookPrinter.prototype.addPage = function(pageID, turned, before) {
    versoPage.on("touchmove", 
          function() { 
             d3.event.preventDefault();
-            if (touchX == 0) {
+            if (touchX === 0) {
                touchX = d3.event.changedTouches[0].pageX;
             }
          }
@@ -462,7 +462,7 @@ ChapbookPrinter.prototype.addPage = function(pageID, turned, before) {
             if (deltaX > 0) {
                _this.nextPage();
             }
-            else if ((deltaX < 0) || (touchX==0)) {
+            else if ((deltaX < 0) || (touchX === 0)) {
                _this.previousPage();
             }
             touchX = 0;
@@ -486,7 +486,7 @@ ChapbookPrinter.prototype.addSinglePage = function(pageID, isVerso, hasClass) {
    newPage.on("touchmove", 
          function() { 
             d3.event.preventDefault();
-            if (touchY == 0) {
+            if (touchY === 0) {
                touchY = d3.event.changedTouches[0].pageY;
             }
          }
@@ -495,7 +495,7 @@ ChapbookPrinter.prototype.addSinglePage = function(pageID, isVerso, hasClass) {
          function() { 
             if (d3.event.defaultPrevented) return;
             deltaY = touchY - d3.event.changedTouches[0].pageY;
-            if ((deltaY > 0) || (touchY==0)) {
+            if ((deltaY > 0) || (touchY === 0)) {
                _this.nextPage();
             }
             else if (deltaY < 0) {
@@ -539,7 +539,7 @@ ChapbookPrinter.prototype.singlePageMode = function() {
 
       this.addSinglePage("page-" + currentPageID, this.currentPageSpread % 2, true); //add current page
 
-      precedingPageID = (this.currentPageSpread == 0) ? afterPoems + 5: this.currentPageSpread;
+      precedingPageID = (this.currentPageSpread === 0) ? afterPoems + 5: this.currentPageSpread;
       followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
 
       this.addSinglePage("page-" + precedingPageID, true, true); 
@@ -549,46 +549,46 @@ ChapbookPrinter.prototype.singlePageMode = function() {
       d3.select("#page-" + followingPageID).classed("following", true);
 
       switch (true) {
-         case this.currentPageSpread == 0:
+         case this.currentPageSpread === 0:
             this.printPreTitlePage("#page-1");
             break;
-         case this.currentPageSpread == 1: 
+         case this.currentPageSpread === 1: 
             this.printImagePage("#page-2", 0);
             break;
-         case this.currentPageSpread == 2: 
+         case this.currentPageSpread === 2: 
             this.printTitlePage("#page-3");
             break;
-         case this.currentPageSpread == 3: 
+         case this.currentPageSpread === 3: 
             this.tabulaRasa("#page-4", 1);
             this.printImprintPage("#page-4");
             break;
-         case this.currentPageSpread == 4:
+         case this.currentPageSpread === 4:
             this.printContentsPage("#page-5"); 
             break;
-         case this.currentPageSpread == 5:
+         case this.currentPageSpread === 5:
             this.tabulaRasa("#page-6", 1);
             this.printQuotePage("#page-6");
             break;
          default:
             this.printPoemPage("#page-" + currentPageID, this.currentPageSpread-6);
             break;
-         case this.currentPageSpread == afterPoems:
+         case this.currentPageSpread === afterPoems:
             this.tabulaRasa("#page-" + currentPageID, 0); 
             this.printImagePage("#page-" + currentPageID, 1);
             break;
-         case this.currentPageSpread == afterPoems + 1:
+         case this.currentPageSpread === afterPoems + 1:
             this.tabulaRasa("#page-" + currentPageID, 1);
             if (this.acknowledgements) {
                this.printAcknowledgementsPage("#page-" + currentPageID);
             }
             break;
-         case this.currentPageSpread == afterPoems + 2:
+         case this.currentPageSpread === afterPoems + 2:
             this.tabulaRasa("#page-" + currentPageID, 0);
             break;
-         case this.currentPageSpread == afterPoems + 3:
+         case this.currentPageSpread === afterPoems + 3:
             this.tabulaRasa("#page-" + currentPageID, 1);
             break;
-         case this.currentPageSpread == afterPoems + 4:
+         case this.currentPageSpread === afterPoems + 4:
             this.tabulaRasa("#page-" + currentPageID, 0);
             break;
       }
@@ -621,7 +621,7 @@ ChapbookPrinter.prototype.doublePageMode = function() {
 
       d3.select("#page-" + currentPageID).remove();
       
-      precedingPageID = (this.currentPageSpread == 0) ? afterPoems + 5: this.currentPageSpread;
+      precedingPageID = (this.currentPageSpread === 0) ? afterPoems + 5: this.currentPageSpread;
       followingPageID = (this.currentPageSpread + 1) > afterPoems + 4 ? 1 : currentPageID + 1;
 
       d3.select("#page-" + precedingPageID).remove();
@@ -643,20 +643,20 @@ ChapbookPrinter.prototype.doublePageMode = function() {
       this.addPage("page-" + secondPageNum);
 
       switch (true) {
-         case this.currentPageSpread == 0:
+         case this.currentPageSpread === 0:
             this.tabulaRasa("#page-1", 1);
             this.tabulaRasa("#page-1", 0);
             this.printPreTitlePage("#page-2");
             this.printImagePage("#page-2", 0);
             break;
-         case this.currentPageSpread == 1:
+         case this.currentPageSpread === 1:
             this.printPreTitlePage("#page-2");
             this.printImagePage("#page-2", 0);
             this.printTitlePage("#page-3");
             this.tabulaRasa("#page-3", 1);
             this.printImprintPage("#page-3");
             break;
-         case this.currentPageSpread == 2:
+         case this.currentPageSpread === 2:
             this.printTitlePage("#page-3");
             this.tabulaRasa("#page-3", 1);
             this.printImprintPage("#page-3");
@@ -664,13 +664,13 @@ ChapbookPrinter.prototype.doublePageMode = function() {
             this.tabulaRasa("#page-4", 1);
             this.printQuotePage("#page-4");
             break;
-         case this.currentPageSpread == 3:
+         case this.currentPageSpread === 3:
             this.printContentsPage("#page-4");
             this.tabulaRasa("#page-4", 1);
             this.printQuotePage("#page-4");
             this.printPoemPage("#page-5", 0);
             break;
-         case this.currentPageSpread == afterPoems:
+         case this.currentPageSpread === afterPoems:
             this.tabulaRasa("#page-" + firstPageNum, 1);
             this.printImagePage("#page-" + firstPageNum, 1);
             if (this.acknowledgements) {
@@ -678,7 +678,7 @@ ChapbookPrinter.prototype.doublePageMode = function() {
                this.printAcknowledgementsPage("#page-" + secondPageNum);
             }
             break;
-         case this.currentPageSpread == afterPoems + 1:
+         case this.currentPageSpread === afterPoems + 1:
             this.tabulaRasa("#page-" + firstPageNum, 1);
             this.tabulaRasa("#page-" + secondPageNum, 0);
             this.tabulaRasa("#page-" + secondPageNum, 1);
@@ -1076,7 +1076,7 @@ ChapbookPrinter.prototype.printAcknowledgementsPage = function(pageID) {
       j;
 
    this.tabulaRasa(pageID, 0);
-   if (this.acknowledgementsRendered == null) {
+   if (this.acknowledgementsRendered === null) {
       svg = d3.select(pageID+">." + page.side + "-page")
          .append("svg")
          .attr("class", page.side + "-page-svg")
@@ -1289,7 +1289,7 @@ Chapbook.prototype.prepareForPublication = function() {
       value, 
       randomIndex;
 
-   while(0 != index) {
+   while(0 !== index) {
       randomIndex = Math.floor(Math.random() * index);
       index -= 1;
       value = manuscript[index];
@@ -1326,7 +1326,7 @@ Poem.prototype.lineJoin = function() {
       source = 0,
       target = 0;
 
-   while ((source == target) || (this.joins.indexOf(source + "," + target) != -1)) {
+   while ((source === target) || (this.joins.indexOf(source + "," + target) !== -1)) {
       source = Math.floor(Math.random()*length);
       target = Math.floor(Math.random()*length);
    }
