@@ -840,6 +840,7 @@ ChapbookPrinter.prototype.printImprintPage = function(pageID) {
 }
 ChapbookPrinter.prototype.printTitlePage = function(pageID) {
    var page = this.pageSettings[0],
+      publisherTitle = this.publisher.title ? this.publisher.title : this.publisher.name.toUpperCase(),
       svg,
       xLayoutPosition = 200,
       yLayoutPosition = 40;
@@ -926,7 +927,7 @@ ChapbookPrinter.prototype.printTitlePage = function(pageID) {
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=20)
       .attr("text-anchor", "middle")
-      .text(this.publisher.name.toUpperCase() + ".");
+      .text(publisherTitle + ".");
 
    svg.append("text")
       .attr("id", "year")
