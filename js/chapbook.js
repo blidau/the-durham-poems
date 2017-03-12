@@ -843,7 +843,10 @@ ChapbookPrinter.prototype.printTitlePage = function(pageID) {
       publisherTitle = this.publisher.title ? this.publisher.title : this.publisher.name.toUpperCase(),
       svg,
       xLayoutPosition = 200,
-      yLayoutPosition = 40;
+      yLayoutPosition = 40,
+      isEdge = (window.navigator.userAgent.indexOf("Edge") > -1),
+      quoteMarks = isEdge ? ["", ""] : ["“","”"],
+      alternateTitle = isEdge ? this.chapbook.alternateTitle.replace("–","-") : this.chapbook.alternateTitle;
    
    this.tabulaRasa(pageID, 0);
 
@@ -878,14 +881,14 @@ ChapbookPrinter.prototype.printTitlePage = function(pageID) {
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=40)
       .attr("text-anchor", "middle")
-      .text(this.chapbook.alternateTitle.split(" ")[0].toUpperCase());
+      .text(alternateTitle.split(" ")[0].toUpperCase());
 
    svg.append("text")
       .attr("id", "sub-alternate-title")
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=40)
       .attr("text-anchor", "middle")
-      .text(this.chapbook.alternateTitle.split(" ").slice(1).join(" ").toUpperCase() + '.');
+      .text(alternateTitle.split(" ").slice(1).join(" ").toUpperCase() + '.');
 
    svg.append("text")
       .attr("class", "inter-title")
@@ -906,7 +909,7 @@ ChapbookPrinter.prototype.printTitlePage = function(pageID) {
       .attr("dx", xLayoutPosition)
       .attr("dy", yLayoutPosition+=60)
       .attr("text-anchor", "middle")
-      .text("“" + this.quotes[0].quote + "”");
+      .text(quoteMarks[0] + this.quotes[0].quote + quoteMarks[1]);
 
    svg.append("text")
       .attr("class", "quote-author")
