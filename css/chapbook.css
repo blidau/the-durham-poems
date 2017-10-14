@@ -198,8 +198,8 @@ img,
    width: 600px; 
    position: absolute;
    -webkit-transform-style: preserve-3d;
-      -moz-transform-style: preserve-3d;
            transform-style: preserve-3d;
+      -moz-transform-style: flat;
    -webkit-backface-visibility: hidden;
       -moz-backface-visibility: hidden;
            backface-visibility: hidden;
